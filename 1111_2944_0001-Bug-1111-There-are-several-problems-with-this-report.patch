@@ -1,0 +1,61 @@
+From 874273e340969602968c7c1b342f6ab11e1603d8 Mon Sep 17 00:00:00 2001
+From: Cristina Alvarino <cristina.alvarino@comtecsf.es>
+Date: Fri, 22 Jul 2011 13:18:29 +0200
+Subject: [PATCH] [Bug # 1111] There are several problems with this report: Task Scheduling Status In Project
+
+---
+ .../dtos/WorkingArrangementPerOrderDTO.java        |    6 +++++-
+ .../jasper/workingArrangementsPerOrderReport.jrxml |    7 +++++--
+ 2 files changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/navalplanner-business/src/main/java/org/navalplanner/business/reports/dtos/WorkingArrangementPerOrderDTO.java b/navalplanner-business/src/main/java/org/navalplanner/business/reports/dtos/WorkingArrangementPerOrderDTO.java
+index 815b05f..b70ea76 100644
+--- a/navalplanner-business/src/main/java/org/navalplanner/business/reports/dtos/WorkingArrangementPerOrderDTO.java
++++ b/navalplanner-business/src/main/java/org/navalplanner/business/reports/dtos/WorkingArrangementPerOrderDTO.java
+@@ -151,7 +151,11 @@ public class WorkingArrangementPerOrderDTO {
+     }
+ 
+     public BigDecimal getMeasuredProgress() {
+-        return measuredProgress;
++        if (measuredProgress.doubleValue() == 0.00) {
++            return measuredProgress;
++        } else {
++            return measuredProgress.multiply(new BigDecimal(100));
++        }
+     }
+ 
+     public String getStatus() {
+diff --git a/navalplanner-webapp/src/main/jasper/workingArrangementsPerOrderReport.jrxml b/navalplanner-webapp/src/main/jasper/workingArrangementsPerOrderReport.jrxml
+index 44c07b5..548552e 100644
+--- a/navalplanner-webapp/src/main/jasper/workingArrangementsPerOrderReport.jrxml
++++ b/navalplanner-webapp/src/main/jasper/workingArrangementsPerOrderReport.jrxml
+@@ -1,5 +1,8 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="workingArrangementsPerOrder" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" resourceBundle="workingArrangementsPerOrder">
++	<property name="ireport.zoom" value="1.0"/>
++	<property name="ireport.x" value="0"/>
++	<property name="ireport.y" value="0"/>
+ 	<reportFont name="FreeSans" isDefault="true" fontName="FreeSans" size="9"/>
+ 	<parameter name="orderName" class="java.lang.String"/>
+ 	<parameter name="taskStatus" class="java.lang.String"/>
+@@ -135,7 +138,7 @@
+ 					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+ 						<font size="10" isBold="true"/>
+ 					</textElement>
+-					<textFieldExpression class="java.lang.String"><![CDATA[$R{headers1.column2}]]></textFieldExpression>
++					<textFieldExpression class="java.lang.String"><![CDATA[$R{headers1.column3}]]></textFieldExpression>
+ 				</textField>
+ 				<textField>
+ 					<reportElement mode="Opaque" x="435" y="21" width="60" height="35" backcolor="#E0E4FB"/>
+@@ -419,7 +422,7 @@
+ 				<textFieldExpression class="java.lang.String"><![CDATA[$R{title}]]></textFieldExpression>
+ 			</textField>
+ 			<textField>
+-				<reportElement x="69" y="46" width="207" height="22"/>
++				<reportElement x="53" y="46" width="248" height="22"/>
+ 				<textElement markup="none">
+ 					<font size="15" isItalic="true"/>
+ 				</textElement>
+-- 
+1.7.0.4
+

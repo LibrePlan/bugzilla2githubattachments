@@ -1,0 +1,187 @@
+From a4915e16cd0c3b22f4f21bbef02be464627a7863 Mon Sep 17 00:00:00 2001
+From: Manuel Rego Casasnovas <mrego@igalia.com>
+Date: Wed, 9 Dec 2009 14:06:05 +0100
+Subject: [PATCH] Adding link "Go to order details".
+
+---
+ .../tabs/MultipleTabsPlannerController.java        |    6 +-
+ .../web/planner/tabs/PlanningTabCreator.java       |  109 ++++++++++++++------
+ 2 files changed, 80 insertions(+), 35 deletions(-)
+
+diff --git a/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/tabs/MultipleTabsPlannerController.java b/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/tabs/MultipleTabsPlannerController.java
+index 1088be8..fc0c956 100644
+--- a/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/tabs/MultipleTabsPlannerController.java
++++ b/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/tabs/MultipleTabsPlannerController.java
+@@ -112,9 +112,6 @@ public class MultipleTabsPlannerController implements Composer,
+     private URLHandlerRegistry registry;
+ 
+     private TabsConfiguration buildTabsConfiguration() {
+-        planningTab = doFeedbackOn(PlanningTabCreator.create(mode,
+-                companyPlanningController, orderPlanningController, orderDAO,
+-                breadcrumbs));
+         resourceLoadTab = ResourcesLoadTabCreator.create(mode,
+                 resourceLoadController, upCommand(),
+                 resourceLoadControllerGlobal,
+@@ -135,6 +132,9 @@ public class MultipleTabsPlannerController implements Composer,
+                     }
+ 
+                 });
++        planningTab = PlanningTabCreator.create(mode, tabsSwitcher
++                .getTabsRegistry(), ordersTab, companyPlanningController,
++                orderPlanningController, orderDAO, breadcrumbs);
+         final State<Void> typeChanged = typeChangedState();
+         ITab advancedAllocation = doFeedbackOn(AdvancedAllocationTabCreator.create(mode,
+                 transactionService, orderDAO, taskElementDAO, resourceDAO,
+diff --git a/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/tabs/PlanningTabCreator.java b/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/tabs/PlanningTabCreator.java
+index 6ee6fc2..0c4fe93 100644
+--- a/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/tabs/PlanningTabCreator.java
++++ b/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/tabs/PlanningTabCreator.java
+@@ -37,6 +37,7 @@ import org.navalplanner.web.common.Util;
+ import org.navalplanner.web.planner.company.CompanyPlanningController;
+ import org.navalplanner.web.planner.order.OrderPlanningController;
+ import org.navalplanner.web.planner.tabs.CreatedOnDemandTab.IComponentCreator;
++import org.zkoss.ganttz.TabsRegistry;
+ import org.zkoss.ganttz.extensions.ICommandOnTask;
+ import org.zkoss.ganttz.extensions.IContextWithPlannerTask;
+ import org.zkoss.ganttz.extensions.ITab;
+@@ -63,20 +64,27 @@ public class PlanningTabCreator {
+ 
+     private final IOrderDAO orderDAO;
+ 
+-    public static ITab create(Mode mode,
++    private final TabsRegistry registry;
++
++    private final ITab orderTab;
++
++    public static ITab create(Mode mode, TabsRegistry registry, ITab orderTab,
+             CompanyPlanningController companyPlanningController,
+             OrderPlanningController orderPlanningController,
+             IOrderDAO orderDAO,
+             Component breadcrumbs) {
+-        return new PlanningTabCreator(mode, companyPlanningController,
+-                orderPlanningController, breadcrumbs, orderDAO).create();
++        return new PlanningTabCreator(mode, registry, orderTab,
++                companyPlanningController, orderPlanningController,
++                breadcrumbs, orderDAO).create();
+     }
+ 
+-    private PlanningTabCreator(Mode mode,
++    private PlanningTabCreator(Mode mode, TabsRegistry registry, ITab orderTab,
+             CompanyPlanningController companyPlanningController,
+             OrderPlanningController orderPlanningController,
+             Component breadcrumbs, IOrderDAO orderDAO) {
+         this.mode = mode;
++        this.registry = registry;
++        this.orderTab = orderTab;
+         this.companyPlanningController = companyPlanningController;
+         this.orderPlanningController = orderPlanningController;
+         this.breadcrumbs = breadcrumbs;
+@@ -97,35 +105,10 @@ public class PlanningTabCreator {
+             public org.zkoss.zk.ui.Component create(
+                     org.zkoss.zk.ui.Component parent) {
+                 List<ICommandOnTask<TaskElement>> commands = new ArrayList<ICommandOnTask<TaskElement>>();
+-                ICommandOnTask<TaskElement> scheduleCommand = new ICommandOnTask<TaskElement>() {
+-
+-                    @Override
+-                    public void doAction(
+-                            IContextWithPlannerTask<TaskElement> context,
+-                            TaskElement task) {
+-                        OrderElement orderElement = task.getOrderElement();
+-                        if (orderElement instanceof Order) {
+-                            Order order = (Order) orderElement;
+-                            mode.goToOrderMode(order);
+-                        }
+-                    }
+-
+-                    @Override
+-                    public String getName() {
+-                        return _("Schedule");
+-                    }
+-
+-                    @Override
+-                    public String getIcon() {
+-                        return "/common/img/ico_planificador.png";
+-                    }
+-
+-                    @Override
+-                    public boolean isApplicableTo(TaskElement task) {
+-                        return true;
+-                    }
+-                };
++                ICommandOnTask<TaskElement> scheduleCommand = buildScheduleCommand();
+                 commands.add(scheduleCommand);
++                ICommandOnTask<TaskElement> goToOrderDetailCommand = buildGoToOrderDetailCommand();
++                commands.add(goToOrderDetailCommand);
+                 companyPlanningController.setAdditional(commands);
+                 companyPlanningController
+                         .setDoubleClickCommand(scheduleCommand);
+@@ -205,4 +188,66 @@ public class PlanningTabCreator {
+         }
+     }
+ 
++    private ICommandOnTask<TaskElement> buildScheduleCommand() {
++        return new ICommandOnTask<TaskElement>() {
++
++            @Override
++            public void doAction(
++                    IContextWithPlannerTask<TaskElement> context,
++                    TaskElement task) {
++                OrderElement orderElement = task.getOrderElement();
++                if (orderElement instanceof Order) {
++                    Order order = (Order) orderElement;
++                    mode.goToOrderMode(order);
++                }
++            }
++
++            @Override
++            public String getName() {
++                return _("Schedule");
++            }
++
++            @Override
++            public String getIcon() {
++                return "/common/img/ico_planificador.png";
++            }
++
++            @Override
++            public boolean isApplicableTo(TaskElement task) {
++                return true;
++            }
++        };
++    }
++
++    private ICommandOnTask<TaskElement> buildGoToOrderDetailCommand() {
++        return new ICommandOnTask<TaskElement>() {
++
++            @Override
++            public void doAction(IContextWithPlannerTask<TaskElement> context,
++                    TaskElement task) {
++                OrderElement orderElement = task.getOrderElement();
++                if (orderElement instanceof Order) {
++                    Order order = (Order) orderElement;
++                    mode.goToOrderMode(order);
++                    registry.show(orderTab);
++                }
++            }
++
++            @Override
++            public String getName() {
++                return _("Go to order detail");
++            }
++
++            @Override
++            public String getIcon() {
++                return null;
++            }
++
++            @Override
++            public boolean isApplicableTo(TaskElement task) {
++                return true;
++            }
++        };
++    }
++
+ }
+-- 
+1.6.0.4
+

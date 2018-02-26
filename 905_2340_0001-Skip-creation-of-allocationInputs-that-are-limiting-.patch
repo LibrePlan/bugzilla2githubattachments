@@ -1,0 +1,114 @@
+From 4e54c69bb6e7eb92e3ef2454dffdc58edd6d9398 Mon Sep 17 00:00:00 2001
+Message-Id: <4e54c69bb6e7eb92e3ef2454dffdc58edd6d9398.1300144404.git.dpino@igalia.com>
+In-Reply-To: <2c62785675ceba80eec385afbc728740ec585b6b.1300144404.git.dpino@igalia.com>
+References: <2c62785675ceba80eec385afbc728740ec585b6b.1300144404.git.dpino@igalia.com>
+From: Diego Pino Garcia <dpino@igalia.com>
+Date: Thu, 10 Mar 2011 13:46:15 +0100
+Subject: [PATCH 2/2] Skip creation of allocationInputs that are limiting and not satisfied
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="------------1.7.0.4"
+
+This is a multi-part message in MIME format.
+--------------1.7.0.4
+Content-Type: text/plain; charset=UTF-8; format=fixed
+Content-Transfer-Encoding: 8bit
+
+---
+ .../business/planner/entities/Task.java            |    4 +++
+ .../business/planner/entities/TaskElement.java     |    4 +++
+ .../planner/tabs/AdvancedAllocationTabCreator.java |   26 ++++++++++---------
+ 3 files changed, 22 insertions(+), 12 deletions(-)
+
+
+--------------1.7.0.4
+Content-Type: text/x-patch; name="0002-Skip-creation-of-allocationInputs-that-are-limiting-.patch"
+Content-Transfer-Encoding: 8bit
+Content-Disposition: attachment; filename="0002-Skip-creation-of-allocationInputs-that-are-limiting-.patch"
+
+diff --git a/navalplanner-business/src/main/java/org/navalplanner/business/planner/entities/Task.java b/navalplanner-business/src/main/java/org/navalplanner/business/planner/entities/Task.java
+index a359454..a357217 100644
+--- a/navalplanner-business/src/main/java/org/navalplanner/business/planner/entities/Task.java
++++ b/navalplanner-business/src/main/java/org/navalplanner/business/planner/entities/Task.java
+@@ -245,6 +245,10 @@ public class Task extends TaskElement implements ITaskPositionConstrained {
+                 && resourceAllocation.isLimitingAndHasDayAssignments();
+     }
+ 
++    public boolean isUnsatisfied() {
++        return getDayAssignments().isEmpty();
++    }
++
+     public void addResourceAllocation(ResourceAllocation<?> resourceAllocation) {
+         addResourceAllocation(resourceAllocation, true);
+     }
+diff --git a/navalplanner-business/src/main/java/org/navalplanner/business/planner/entities/TaskElement.java b/navalplanner-business/src/main/java/org/navalplanner/business/planner/entities/TaskElement.java
+index 4a988a7..6b67e18 100644
+--- a/navalplanner-business/src/main/java/org/navalplanner/business/planner/entities/TaskElement.java
++++ b/navalplanner-business/src/main/java/org/navalplanner/business/planner/entities/TaskElement.java
+@@ -533,6 +533,10 @@ public abstract class TaskElement extends BaseEntity {
+         return false;
+     }
+ 
++    public boolean isUnsatisfied() {
++        return false;
++    }
++
+     public boolean hasConsolidations() {
+         // Just Task could be consolidated
+         return false;
+diff --git a/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/tabs/AdvancedAllocationTabCreator.java b/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/tabs/AdvancedAllocationTabCreator.java
+index ce67afa..38581ac 100644
+--- a/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/tabs/AdvancedAllocationTabCreator.java
++++ b/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/tabs/AdvancedAllocationTabCreator.java
+@@ -310,9 +310,7 @@ public class AdvancedAllocationTabCreator {
+         Map<String, Object> result = new HashMap<String, Object>();
+         advancedAllocationController = new AdvancedAllocationController(onBack,
+                 createAllocationInputsFor(order));
+-        result
+-                .put("advancedAllocationController",
+-                        advancedAllocationController);
++        result.put("advancedAllocationController", advancedAllocationController);
+         return result;
+     }
+ 
+@@ -334,24 +332,28 @@ public class AdvancedAllocationTabCreator {
+             Order orderReloaded) {
+         List<AllocationInput> result = new ArrayList<AllocationInput>();
+         for (TaskElement taskElement : orderReloaded.getTaskElements()) {
+-            addAllocations(orderReloaded, result, taskElement);
++            addAllocations(orderReloaded, taskElement, result);
+             if (taskElement instanceof Task) {
+-                Task t = (Task) taskElement;
+-                result.add(createAllocationInputFor(orderReloaded, t));
++                Task task = (Task) taskElement;
++                result.add(createAllocationInputFor(orderReloaded, task));
+             }
+         }
+         return result;
+     }
+ 
+-    private void addAllocations(Order order,
+-            List<AllocationInput> result, TaskElement taskElement) {
+-        if (taskElement instanceof Task
+-                && ((Task) taskElement).hasSomeSatisfiedAllocation()) {
+-            result.add(createAllocationInputFor(order, (Task) taskElement));
++    private void addAllocations(Order order, TaskElement taskElement,
++            List<AllocationInput> result) {
++        if (taskElement instanceof Task) {
++            Task task = (Task) taskElement;
++            if (!(task.isLimiting() && task.isUnsatisfied())) {
++                if (task.hasSomeSatisfiedAllocation()) {
++                    result.add(createAllocationInputFor(order, task));
++                }
++            }
+         }
+         if (!taskElement.isLeaf()) {
+             for (TaskElement each : taskElement.getChildren()) {
+-                addAllocations(order, result, each);
++                addAllocations(order, each, result);
+             }
+         }
+     }
+
+--------------1.7.0.4--
+
+

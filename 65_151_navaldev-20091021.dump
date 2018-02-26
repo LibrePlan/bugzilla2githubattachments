@@ -1,0 +1,2687 @@
+--
+-- PostgreSQL database dump
+--
+
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = off;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET escape_string_warning = off;
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: advanceassignment; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE advanceassignment (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    reportglobaladvance boolean,
+    advance_type_id bigint
+);
+
+
+ALTER TABLE public.advanceassignment OWNER TO naval;
+
+--
+-- Name: advancemeasurement; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE advancemeasurement (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    date date,
+    value numeric(19,2),
+    advance_assignment_id bigint
+);
+
+
+ALTER TABLE public.advancemeasurement OWNER TO naval;
+
+--
+-- Name: advancetype; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE advancetype (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    unitname character varying(255),
+    defaultmaxvalue numeric(19,4),
+    updatable boolean,
+    unitprecision numeric(19,4),
+    active boolean,
+    percentage boolean
+);
+
+
+ALTER TABLE public.advancetype OWNER TO naval;
+
+--
+-- Name: all_criterions; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE all_criterions (
+    generic_resource_allocation_id bigint NOT NULL,
+    criterion_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.all_criterions OWNER TO naval;
+
+--
+-- Name: assignment_function; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE assignment_function (
+    id bigint NOT NULL,
+    version bigint NOT NULL
+);
+
+
+ALTER TABLE public.assignment_function OWNER TO naval;
+
+--
+-- Name: basecalendar; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE basecalendar (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    name character varying(255)
+);
+
+
+ALTER TABLE public.basecalendar OWNER TO naval;
+
+--
+-- Name: calendardata; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE calendardata (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    parent bigint,
+    expiringdate date,
+    base_calendar_id bigint,
+    position_in_calendar integer
+);
+
+
+ALTER TABLE public.calendardata OWNER TO naval;
+
+--
+-- Name: criterion; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE criterion (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    name character varying(255),
+    active boolean,
+    id_criterion_type bigint NOT NULL,
+    parent bigint
+);
+
+
+ALTER TABLE public.criterion OWNER TO naval;
+
+--
+-- Name: criterion_type_work_report_type; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE criterion_type_work_report_type (
+    work_report_type_id bigint NOT NULL,
+    criterion_type_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.criterion_type_work_report_type OWNER TO naval;
+
+--
+-- Name: criterion_work_report_line; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE criterion_work_report_line (
+    work_report_line_id bigint NOT NULL,
+    criterion_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.criterion_work_report_line OWNER TO naval;
+
+--
+-- Name: criterionhoursgroup; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE criterionhoursgroup (
+    hoursgroupid bigint NOT NULL,
+    criterionid bigint NOT NULL
+);
+
+
+ALTER TABLE public.criterionhoursgroup OWNER TO naval;
+
+--
+-- Name: criterionsatisfaction; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE criterionsatisfaction (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    startdate timestamp without time zone NOT NULL,
+    finishdate timestamp without time zone,
+    isdeleted boolean,
+    criterion bigint NOT NULL,
+    resource bigint NOT NULL
+);
+
+
+ALTER TABLE public.criterionsatisfaction OWNER TO naval;
+
+--
+-- Name: criteriontype; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE criteriontype (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    name character varying(255),
+    description character varying(255),
+    allowsimultaneouscriterionsperresource boolean,
+    allowhierarchy boolean,
+    enabled boolean,
+    resource integer
+);
+
+
+ALTER TABLE public.criteriontype OWNER TO naval;
+
+--
+-- Name: day_assignment; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE day_assignment (
+    id bigint NOT NULL,
+    day_assignment_type character varying(255) NOT NULL,
+    version bigint NOT NULL,
+    hours integer NOT NULL,
+    day date NOT NULL,
+    resource_id bigint NOT NULL,
+    specific_resource_allocation_id bigint,
+    generic_resource_allocation_id bigint
+);
+
+
+ALTER TABLE public.day_assignment OWNER TO naval;
+
+--
+-- Name: dependency; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE dependency (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    origin bigint,
+    destination bigint,
+    type integer
+);
+
+
+ALTER TABLE public.dependency OWNER TO naval;
+
+--
+-- Name: directadvanceassignment; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE directadvanceassignment (
+    advance_assignment_id bigint NOT NULL,
+    direct_order_element_id bigint,
+    maxvalue numeric(19,2)
+);
+
+
+ALTER TABLE public.directadvanceassignment OWNER TO naval;
+
+--
+-- Name: exceptionday; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE exceptionday (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    date date,
+    hours integer,
+    base_calendar_id bigint
+);
+
+
+ALTER TABLE public.exceptionday OWNER TO naval;
+
+--
+-- Name: generic_resource_allocation; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE generic_resource_allocation (
+    resource_allocation_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.generic_resource_allocation OWNER TO naval;
+
+--
+-- Name: hibernate_unique_key; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE hibernate_unique_key (
+    next_hi integer
+);
+
+
+ALTER TABLE public.hibernate_unique_key OWNER TO naval;
+
+--
+-- Name: hoursgroup; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE hoursgroup (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    workinghours integer,
+    percentage numeric(19,2),
+    fixedpercentage boolean,
+    parent_order_line bigint NOT NULL
+);
+
+
+ALTER TABLE public.hoursgroup OWNER TO naval;
+
+--
+-- Name: hoursperday; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE hoursperday (
+    base_calendar_id bigint NOT NULL,
+    hours integer,
+    day_id integer NOT NULL
+);
+
+
+ALTER TABLE public.hoursperday OWNER TO naval;
+
+--
+-- Name: indirectadvanceassignment; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE indirectadvanceassignment (
+    advance_assignment_id bigint NOT NULL,
+    indirect_order_element_id bigint
+);
+
+
+ALTER TABLE public.indirectadvanceassignment OWNER TO naval;
+
+--
+-- Name: label; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE label (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    name character varying(255),
+    label_type_id bigint
+);
+
+
+ALTER TABLE public.label OWNER TO naval;
+
+--
+-- Name: label_type; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE label_type (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    name character varying(255)
+);
+
+
+ALTER TABLE public.label_type OWNER TO naval;
+
+--
+-- Name: machine; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE machine (
+    machine_id bigint NOT NULL,
+    code character varying(255),
+    name character varying(255),
+    description character varying(255)
+);
+
+
+ALTER TABLE public.machine OWNER TO naval;
+
+--
+-- Name: order_element_label; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE order_element_label (
+    order_element_id bigint NOT NULL,
+    label_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.order_element_label OWNER TO naval;
+
+--
+-- Name: order_table; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE order_table (
+    orderelementid bigint NOT NULL,
+    responsible character varying(255),
+    customer character varying(255)
+);
+
+
+ALTER TABLE public.order_table OWNER TO naval;
+
+--
+-- Name: orderelement; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE orderelement (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    name character varying(255),
+    initdate timestamp without time zone,
+    enddate timestamp without time zone,
+    mandatoryinit boolean,
+    mandatoryend boolean,
+    description character varying(255),
+    code character varying(255),
+    parent bigint,
+    positionincontainer integer
+);
+
+
+ALTER TABLE public.orderelement OWNER TO naval;
+
+--
+-- Name: orderline; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE orderline (
+    orderelementid bigint NOT NULL
+);
+
+
+ALTER TABLE public.orderline OWNER TO naval;
+
+--
+-- Name: orderlinegroup; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE orderlinegroup (
+    orderelementid bigint NOT NULL
+);
+
+
+ALTER TABLE public.orderlinegroup OWNER TO naval;
+
+--
+-- Name: resource; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE resource (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    calendar bigint
+);
+
+
+ALTER TABLE public.resource OWNER TO naval;
+
+--
+-- Name: resourceallocation; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE resourceallocation (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    resourcesperday numeric(19,2),
+    task bigint,
+    assignment_function bigint
+);
+
+
+ALTER TABLE public.resourceallocation OWNER TO naval;
+
+--
+-- Name: resourcecalendar; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE resourcecalendar (
+    base_calendar_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.resourcecalendar OWNER TO naval;
+
+--
+-- Name: specific_resource_allocation; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE specific_resource_allocation (
+    resource_allocation_id bigint NOT NULL,
+    resource bigint
+);
+
+
+ALTER TABLE public.specific_resource_allocation OWNER TO naval;
+
+--
+-- Name: task; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE task (
+    task_element_id bigint NOT NULL,
+    hoursgroup bigint,
+    calculatedvalue integer
+);
+
+
+ALTER TABLE public.task OWNER TO naval;
+
+--
+-- Name: taskelement; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE taskelement (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    shareofhours integer,
+    name character varying(255),
+    notes character varying(255),
+    startdate timestamp without time zone,
+    enddate timestamp without time zone,
+    order_element_id bigint,
+    parent bigint,
+    base_calendar_id bigint,
+    positioninparent integer
+);
+
+
+ALTER TABLE public.taskelement OWNER TO naval;
+
+--
+-- Name: taskgroup; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE taskgroup (
+    task_element_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.taskgroup OWNER TO naval;
+
+--
+-- Name: taskmilestone; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE taskmilestone (
+    task_element_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.taskmilestone OWNER TO naval;
+
+--
+-- Name: work_report; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE work_report (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    date timestamp without time zone,
+    place character varying(255),
+    responsible character varying(255),
+    work_report_type_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.work_report OWNER TO naval;
+
+--
+-- Name: work_report_line; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE work_report_line (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    numhours integer,
+    work_report_id bigint,
+    resource_id bigint NOT NULL,
+    order_element_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.work_report_line OWNER TO naval;
+
+--
+-- Name: work_report_type; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE work_report_type (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    name character varying(255)
+);
+
+
+ALTER TABLE public.work_report_type OWNER TO naval;
+
+--
+-- Name: worker; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE worker (
+    worker_id bigint NOT NULL,
+    firstname character varying(255),
+    surname character varying(255),
+    nif character varying(255)
+);
+
+
+ALTER TABLE public.worker OWNER TO naval;
+
+--
+-- Data for Name: advanceassignment; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY advanceassignment (id, version, reportglobaladvance, advance_type_id) FROM stdin;
+909	1	t	1
+993	1	f	3333
+951	2	t	2
+994	1	f	3333
+952	2	f	2
+910	4	t	1
+\.
+
+
+--
+-- Data for Name: advancemeasurement; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY advancemeasurement (id, version, date, value, advance_assignment_id) FROM stdin;
+3527	1	2009-10-21	700.00	993
+3528	1	2009-10-14	500.00	993
+3496	2	2009-10-21	50.00	951
+3497	2	2009-10-20	40.00	951
+3498	2	2009-10-14	30.00	951
+\.
+
+
+--
+-- Data for Name: advancetype; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY advancetype (id, version, unitname, defaultmaxvalue, updatable, unitprecision, active, percentage) FROM stdin;
+1	3	children	100.0000	f	0.0100	t	t
+2	2	percentage	100.0000	f	0.0100	t	t
+3	1	units	2147483647.0000	f	1.0000	t	f
+3333	1	metros de tubería	1000.0000	t	1.0000	t	f
+\.
+
+
+--
+-- Data for Name: all_criterions; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY all_criterions (generic_resource_allocation_id, criterion_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: assignment_function; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY assignment_function (id, version) FROM stdin;
+\.
+
+
+--
+-- Data for Name: basecalendar; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY basecalendar (id, version, name) FROM stdin;
+505	1	ss
+2829	2	Calendario de España
+2828	2	calendario
+\.
+
+
+--
+-- Data for Name: calendardata; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY calendardata (id, version, parent, expiringdate, base_calendar_id, position_in_calendar) FROM stdin;
+606	1	\N	\N	505	0
+2930	2	\N	\N	2829	0
+2929	2	\N	2009-10-23	2828	0
+2931	1	\N	\N	2828	1
+\.
+
+
+--
+-- Data for Name: criterion; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY criterion (id, version, name, active, id_criterion_type, parent) FROM stdin;
+202	14	medicalLeave	t	32768	\N
+203	13	paternityLeave	t	32768	\N
+204	4	hiredResourceWorkingRelationship	t	32772	\N
+205	3	firedResourceWorkingRelationship	t	32772	\N
+404	1	Carpintero	t	32771	\N
+405	1	Pintor	t	32771	\N
+406	1	Calderero	t	32771	\N
+407	1	Soldador	t	32771	\N
+\.
+
+
+--
+-- Data for Name: criterion_type_work_report_type; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY criterion_type_work_report_type (work_report_type_id, criterion_type_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: criterion_work_report_line; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY criterion_work_report_line (work_report_line_id, criterion_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: criterionhoursgroup; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY criterionhoursgroup (hoursgroupid, criterionid) FROM stdin;
+\.
+
+
+--
+-- Data for Name: criterionsatisfaction; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY criterionsatisfaction (id, version, startdate, finishdate, isdeleted, criterion, resource) FROM stdin;
+\.
+
+
+--
+-- Data for Name: criteriontype; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY criteriontype (id, version, name, description, allowsimultaneouscriterionsperresource, allowhierarchy, enabled, resource) FROM stdin;
+32768	15	LEAVE	Leave	f	f	t	1
+32769	11	CATEGORY	Professional category	t	t	t	1
+32770	9	TRAINING	Training courses and labor training	t	t	t	1
+32772	5	WORK_RELATIONSHIP	Relationship of the resource with the enterprise 	f	f	t	1
+32773	1	LOCATION_GROUP	Location where the resource work	t	f	t	0
+32771	8	JOB	Job	t	t	t	1
+\.
+
+
+--
+-- Data for Name: day_assignment; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY day_assignment (id, day_assignment_type, version, hours, day, resource_id, specific_resource_allocation_id, generic_resource_allocation_id) FROM stdin;
+2534	GENERIC_DAY	2	3	2010-01-13	305	\N	1114
+2509	GENERIC_DAY	2	2	2009-11-08	303	\N	1114
+2438	GENERIC_DAY	2	2	2010-02-03	303	\N	1114
+2599	GENERIC_DAY	2	3	2010-02-11	304	\N	1114
+2568	GENERIC_DAY	2	2	2009-12-19	303	\N	1114
+2485	GENERIC_DAY	2	2	2010-01-15	303	\N	1114
+2475	GENERIC_DAY	2	2	2009-11-13	303	\N	1114
+2457	GENERIC_DAY	2	2	2010-01-10	303	\N	1114
+2581	GENERIC_DAY	2	3	2009-11-14	305	\N	1114
+2449	GENERIC_DAY	2	3	2009-11-04	304	\N	1114
+2401	GENERIC_DAY	2	3	2010-01-16	305	\N	1114
+2451	GENERIC_DAY	2	3	2009-12-21	304	\N	1114
+2430	GENERIC_DAY	2	3	2009-11-21	304	\N	1114
+2473	GENERIC_DAY	2	2	2009-11-25	303	\N	1114
+2596	GENERIC_DAY	2	2	2009-10-22	303	\N	1114
+2416	GENERIC_DAY	2	3	2009-11-17	304	\N	1114
+2407	GENERIC_DAY	2	2	2010-02-01	303	\N	1114
+2499	GENERIC_DAY	2	3	2009-11-18	304	\N	1114
+2538	GENERIC_DAY	2	3	2010-02-14	304	\N	1114
+2469	GENERIC_DAY	2	3	2010-01-11	305	\N	1114
+2618	GENERIC_DAY	2	3	2009-11-02	305	\N	1114
+2613	GENERIC_DAY	2	3	2010-01-02	305	\N	1114
+2442	GENERIC_DAY	2	3	2009-11-06	304	\N	1114
+2450	GENERIC_DAY	2	2	2009-12-03	303	\N	1114
+2565	GENERIC_DAY	2	3	2010-01-03	304	\N	1114
+2515	GENERIC_DAY	2	3	2009-11-01	305	\N	1114
+2353	GENERIC_DAY	2	3	2010-02-09	305	\N	1114
+2592	GENERIC_DAY	2	3	2009-12-08	305	\N	1114
+2409	GENERIC_DAY	2	3	2009-11-27	304	\N	1114
+2364	GENERIC_DAY	2	3	2010-01-31	304	\N	1114
+2672	GENERIC_DAY	2	3	2010-01-04	305	\N	1114
+2543	GENERIC_DAY	2	3	2009-11-03	304	\N	1114
+2574	GENERIC_DAY	2	2	2009-12-16	303	\N	1114
+2464	GENERIC_DAY	2	3	2009-12-14	304	\N	1114
+2340	GENERIC_DAY	2	3	2009-11-18	305	\N	1114
+2621	GENERIC_DAY	2	3	2009-11-14	304	\N	1114
+2529	GENERIC_DAY	2	2	2009-11-17	303	\N	1114
+2354	GENERIC_DAY	2	3	2009-11-29	305	\N	1114
+2395	GENERIC_DAY	2	3	2010-01-14	304	\N	1114
+2358	GENERIC_DAY	2	2	2010-01-28	303	\N	1114
+2369	GENERIC_DAY	2	3	2010-01-31	305	\N	1114
+2560	GENERIC_DAY	2	3	2009-12-15	305	\N	1114
+2547	GENERIC_DAY	2	3	2009-12-16	305	\N	1114
+2602	GENERIC_DAY	2	3	2009-12-20	305	\N	1114
+2650	GENERIC_DAY	2	3	2009-11-04	305	\N	1114
+2705	GENERIC_DAY	2	3	2009-11-15	304	\N	1114
+2357	GENERIC_DAY	2	3	2010-02-13	304	\N	1114
+2664	GENERIC_DAY	2	3	2010-01-15	305	\N	1114
+2386	GENERIC_DAY	2	3	2010-02-17	304	\N	1114
+2566	GENERIC_DAY	2	2	2009-11-27	303	\N	1114
+2374	GENERIC_DAY	2	3	2010-02-01	304	\N	1114
+2629	GENERIC_DAY	2	2	2009-11-21	303	\N	1114
+2472	GENERIC_DAY	2	3	2010-01-12	304	\N	1114
+1587	GENERIC_DAY	0	3	2009-12-01	303	\N	1112
+1588	GENERIC_DAY	0	3	2009-11-12	304	\N	1112
+1589	GENERIC_DAY	0	3	2009-12-08	304	\N	1112
+1590	GENERIC_DAY	0	3	2009-11-04	303	\N	1112
+1591	GENERIC_DAY	0	3	2009-11-13	304	\N	1112
+1592	GENERIC_DAY	0	3	2010-01-05	304	\N	1112
+1593	GENERIC_DAY	0	3	2010-01-02	303	\N	1112
+1594	GENERIC_DAY	0	2	2009-12-01	305	\N	1112
+1595	GENERIC_DAY	0	2	2010-01-25	305	\N	1112
+1596	GENERIC_DAY	0	3	2010-01-22	303	\N	1112
+1597	GENERIC_DAY	0	3	2010-01-09	303	\N	1112
+1598	GENERIC_DAY	0	3	2009-12-11	304	\N	1112
+1599	GENERIC_DAY	0	3	2009-12-04	303	\N	1112
+1600	GENERIC_DAY	0	2	2009-12-09	305	\N	1112
+1601	GENERIC_DAY	0	2	2009-10-20	305	\N	1112
+1602	GENERIC_DAY	0	2	2009-12-11	305	\N	1112
+1603	GENERIC_DAY	0	2	2010-01-27	305	\N	1112
+1604	GENERIC_DAY	0	3	2009-12-12	304	\N	1112
+1605	GENERIC_DAY	0	2	2009-12-23	305	\N	1112
+1606	GENERIC_DAY	0	3	2009-11-10	303	\N	1112
+1607	GENERIC_DAY	0	2	2009-11-22	305	\N	1112
+1608	GENERIC_DAY	0	3	2010-01-12	303	\N	1112
+1609	GENERIC_DAY	0	3	2009-11-14	304	\N	1112
+1610	GENERIC_DAY	0	3	2009-12-13	304	\N	1112
+1611	GENERIC_DAY	0	2	2010-01-30	305	\N	1112
+1612	GENERIC_DAY	0	2	2009-12-03	305	\N	1112
+1613	GENERIC_DAY	0	2	2010-01-22	305	\N	1112
+1614	GENERIC_DAY	0	2	2010-02-18	305	\N	1112
+1615	GENERIC_DAY	0	3	2010-01-19	303	\N	1112
+1616	GENERIC_DAY	0	2	2009-12-28	305	\N	1112
+1617	GENERIC_DAY	0	2	2010-01-15	305	\N	1112
+1618	GENERIC_DAY	0	3	2009-12-27	303	\N	1112
+1619	GENERIC_DAY	0	3	2009-10-28	303	\N	1112
+1620	GENERIC_DAY	0	3	2010-01-23	303	\N	1112
+1621	GENERIC_DAY	0	3	2009-11-20	304	\N	1112
+1622	GENERIC_DAY	0	2	2010-01-08	305	\N	1112
+1623	GENERIC_DAY	0	2	2009-11-19	305	\N	1112
+1624	GENERIC_DAY	0	2	2009-11-07	305	\N	1112
+1625	GENERIC_DAY	0	2	2009-11-21	305	\N	1112
+1626	GENERIC_DAY	0	2	2009-12-31	305	\N	1112
+1627	GENERIC_DAY	0	3	2010-02-17	303	\N	1112
+1628	GENERIC_DAY	0	2	2009-12-25	305	\N	1112
+1629	GENERIC_DAY	0	3	2009-12-29	303	\N	1112
+1630	GENERIC_DAY	0	3	2010-01-11	304	\N	1112
+1631	GENERIC_DAY	0	2	2009-11-20	305	\N	1112
+1632	GENERIC_DAY	0	3	2010-01-03	303	\N	1112
+1633	GENERIC_DAY	0	2	2010-02-03	305	\N	1112
+1634	GENERIC_DAY	0	3	2009-11-25	304	\N	1112
+1635	GENERIC_DAY	0	3	2009-12-07	304	\N	1112
+1636	GENERIC_DAY	0	2	2010-02-11	305	\N	1112
+1637	GENERIC_DAY	0	2	2010-01-10	305	\N	1112
+1638	GENERIC_DAY	0	2	2009-10-30	305	\N	1112
+1639	GENERIC_DAY	0	3	2009-11-24	304	\N	1112
+1640	GENERIC_DAY	0	2	2009-11-14	305	\N	1112
+1641	GENERIC_DAY	0	2	2010-01-28	305	\N	1112
+1642	GENERIC_DAY	0	3	2009-11-21	304	\N	1112
+1643	GENERIC_DAY	0	3	2010-02-21	303	\N	1112
+1644	GENERIC_DAY	0	3	2009-12-28	304	\N	1112
+1645	GENERIC_DAY	0	3	2009-11-20	303	\N	1112
+1646	GENERIC_DAY	0	3	2009-11-30	303	\N	1112
+1647	GENERIC_DAY	0	3	2009-12-19	304	\N	1112
+1648	GENERIC_DAY	0	3	2009-12-18	303	\N	1112
+1649	GENERIC_DAY	0	3	2010-01-18	304	\N	1112
+1650	GENERIC_DAY	0	3	2010-02-16	304	\N	1112
+1651	GENERIC_DAY	0	3	2010-02-06	304	\N	1112
+1652	GENERIC_DAY	0	3	2009-11-01	304	\N	1112
+1653	GENERIC_DAY	0	2	2010-01-13	305	\N	1112
+1654	GENERIC_DAY	0	2	2009-11-13	305	\N	1112
+1655	GENERIC_DAY	0	3	2009-12-21	304	\N	1112
+1656	GENERIC_DAY	0	2	2009-11-06	305	\N	1112
+1657	GENERIC_DAY	0	3	2009-12-04	304	\N	1112
+1658	GENERIC_DAY	0	3	2010-01-17	303	\N	1112
+1659	GENERIC_DAY	0	3	2009-12-25	304	\N	1112
+1660	GENERIC_DAY	0	2	2009-11-15	305	\N	1112
+1661	GENERIC_DAY	0	3	2010-02-07	304	\N	1112
+1662	GENERIC_DAY	0	3	2009-12-12	303	\N	1112
+1663	GENERIC_DAY	0	3	2010-01-10	303	\N	1112
+1664	GENERIC_DAY	0	3	2009-10-24	304	\N	1112
+1665	GENERIC_DAY	0	2	2009-11-29	305	\N	1112
+1666	GENERIC_DAY	0	3	2009-12-13	303	\N	1112
+1667	GENERIC_DAY	0	3	2009-11-25	303	\N	1112
+1668	GENERIC_DAY	0	2	2009-10-26	305	\N	1112
+1669	GENERIC_DAY	0	2	2009-11-25	305	\N	1112
+1670	GENERIC_DAY	0	2	2010-02-13	305	\N	1112
+1671	GENERIC_DAY	0	3	2010-01-23	304	\N	1112
+1672	GENERIC_DAY	0	3	2009-10-26	304	\N	1112
+1673	GENERIC_DAY	0	3	2010-01-10	304	\N	1112
+1674	GENERIC_DAY	0	3	2009-12-19	303	\N	1112
+1675	GENERIC_DAY	0	2	2009-11-27	305	\N	1112
+1676	GENERIC_DAY	0	3	2010-02-09	304	\N	1112
+1677	GENERIC_DAY	0	3	2010-01-01	303	\N	1112
+1678	GENERIC_DAY	0	3	2010-02-19	304	\N	1112
+1679	GENERIC_DAY	0	3	2010-02-18	303	\N	1112
+1680	GENERIC_DAY	0	3	2009-12-17	303	\N	1112
+1681	GENERIC_DAY	0	2	2009-12-22	305	\N	1112
+1682	GENERIC_DAY	0	3	2009-12-01	304	\N	1112
+1683	GENERIC_DAY	0	2	2009-12-04	305	\N	1112
+1684	GENERIC_DAY	0	3	2010-02-10	304	\N	1112
+1685	GENERIC_DAY	0	3	2009-11-17	304	\N	1112
+1686	GENERIC_DAY	0	3	2010-01-30	304	\N	1112
+1687	GENERIC_DAY	0	2	2009-10-31	305	\N	1112
+1688	GENERIC_DAY	0	3	2009-10-28	304	\N	1112
+1689	GENERIC_DAY	0	3	2009-12-16	304	\N	1112
+1690	GENERIC_DAY	0	2	2010-01-19	305	\N	1112
+1691	GENERIC_DAY	0	2	2010-01-04	305	\N	1112
+1692	GENERIC_DAY	0	2	2009-11-30	305	\N	1112
+1693	GENERIC_DAY	0	2	2009-10-29	305	\N	1112
+1694	GENERIC_DAY	0	3	2010-01-14	304	\N	1112
+1695	GENERIC_DAY	0	3	2010-01-04	304	\N	1112
+1696	GENERIC_DAY	0	3	2009-12-05	303	\N	1112
+1697	GENERIC_DAY	0	3	2009-12-20	303	\N	1112
+1698	GENERIC_DAY	0	3	2009-12-23	304	\N	1112
+1699	GENERIC_DAY	0	3	2009-10-22	304	\N	1112
+1700	GENERIC_DAY	0	3	2009-11-22	303	\N	1112
+1701	GENERIC_DAY	0	2	2009-11-01	305	\N	1112
+1702	GENERIC_DAY	0	3	2010-01-31	303	\N	1112
+1703	GENERIC_DAY	0	3	2009-11-15	304	\N	1112
+1704	GENERIC_DAY	0	2	2009-11-09	305	\N	1112
+1705	GENERIC_DAY	0	3	2009-10-21	304	\N	1112
+1706	GENERIC_DAY	0	2	2010-01-26	305	\N	1112
+1707	GENERIC_DAY	0	3	2009-12-06	304	\N	1112
+1708	GENERIC_DAY	0	3	2009-10-20	303	\N	1112
+1709	GENERIC_DAY	0	2	2009-11-23	305	\N	1112
+1710	GENERIC_DAY	0	3	2010-01-25	304	\N	1112
+1711	GENERIC_DAY	0	2	2009-10-28	305	\N	1112
+1712	GENERIC_DAY	0	3	2009-12-11	303	\N	1112
+1713	GENERIC_DAY	0	3	2009-12-21	303	\N	1112
+1714	GENERIC_DAY	0	2	2010-01-06	305	\N	1112
+1715	GENERIC_DAY	0	2	2010-01-03	305	\N	1112
+1716	GENERIC_DAY	0	3	2010-01-26	303	\N	1112
+1717	GENERIC_DAY	0	3	2010-01-05	303	\N	1112
+1718	GENERIC_DAY	0	3	2009-10-22	303	\N	1112
+1719	GENERIC_DAY	0	2	2009-12-15	305	\N	1112
+1720	GENERIC_DAY	0	3	2010-02-02	303	\N	1112
+1721	GENERIC_DAY	0	2	2010-02-01	305	\N	1112
+1722	GENERIC_DAY	0	3	2010-01-03	304	\N	1112
+1723	GENERIC_DAY	0	3	2009-11-08	303	\N	1112
+1724	GENERIC_DAY	0	2	2009-12-24	305	\N	1112
+1725	GENERIC_DAY	0	3	2009-11-28	304	\N	1112
+1726	GENERIC_DAY	0	2	2010-01-29	305	\N	1112
+1727	GENERIC_DAY	0	3	2009-11-09	303	\N	1112
+1728	GENERIC_DAY	0	2	2010-02-10	305	\N	1112
+1729	GENERIC_DAY	0	3	2010-02-03	304	\N	1112
+1730	GENERIC_DAY	0	3	2010-01-09	304	\N	1112
+1731	GENERIC_DAY	0	2	2010-01-20	305	\N	1112
+1732	GENERIC_DAY	0	3	2010-01-21	304	\N	1112
+1733	GENERIC_DAY	0	3	2009-11-21	303	\N	1112
+1734	GENERIC_DAY	0	3	2010-01-08	304	\N	1112
+1735	GENERIC_DAY	0	3	2009-11-27	303	\N	1112
+1736	GENERIC_DAY	0	3	2009-11-16	304	\N	1112
+1737	GENERIC_DAY	0	3	2010-02-21	304	\N	1112
+1738	GENERIC_DAY	0	3	2010-02-20	304	\N	1112
+1739	GENERIC_DAY	0	2	2010-01-01	305	\N	1112
+1740	GENERIC_DAY	0	2	2009-12-16	305	\N	1112
+1741	GENERIC_DAY	0	3	2009-12-02	304	\N	1112
+1742	GENERIC_DAY	0	3	2010-02-19	303	\N	1112
+1743	GENERIC_DAY	0	3	2009-10-25	304	\N	1112
+1744	GENERIC_DAY	0	3	2009-10-24	303	\N	1112
+1745	GENERIC_DAY	0	3	2009-12-31	303	\N	1112
+1746	GENERIC_DAY	0	3	2009-10-23	303	\N	1112
+1747	GENERIC_DAY	0	2	2010-01-24	305	\N	1112
+1748	GENERIC_DAY	0	3	2009-11-05	304	\N	1112
+1749	GENERIC_DAY	0	3	2009-10-21	303	\N	1112
+1750	GENERIC_DAY	0	3	2009-12-18	304	\N	1112
+1751	GENERIC_DAY	0	3	2010-01-17	304	\N	1112
+1752	GENERIC_DAY	0	3	2010-01-22	304	\N	1112
+1753	GENERIC_DAY	0	3	2010-01-11	303	\N	1112
+1754	GENERIC_DAY	0	2	2010-02-05	305	\N	1112
+1755	GENERIC_DAY	0	3	2010-01-07	303	\N	1112
+1756	GENERIC_DAY	0	3	2009-11-19	304	\N	1112
+1757	GENERIC_DAY	0	3	2009-11-13	303	\N	1112
+1758	GENERIC_DAY	0	3	2009-11-09	304	\N	1112
+1759	GENERIC_DAY	0	2	2009-11-11	305	\N	1112
+1760	GENERIC_DAY	0	3	2009-11-14	303	\N	1112
+1761	GENERIC_DAY	0	3	2009-12-08	303	\N	1112
+1762	GENERIC_DAY	0	2	2010-02-08	305	\N	1112
+1763	GENERIC_DAY	0	2	2010-02-04	305	\N	1112
+1764	GENERIC_DAY	0	3	2010-01-16	303	\N	1112
+1765	GENERIC_DAY	0	3	2009-11-10	304	\N	1112
+1766	GENERIC_DAY	0	3	2009-12-23	303	\N	1112
+1767	GENERIC_DAY	0	3	2009-11-02	303	\N	1112
+1768	GENERIC_DAY	0	3	2009-10-27	304	\N	1112
+1769	GENERIC_DAY	0	3	2009-12-03	303	\N	1112
+1770	GENERIC_DAY	0	3	2010-02-12	304	\N	1112
+1771	GENERIC_DAY	0	3	2010-02-05	303	\N	1112
+1772	GENERIC_DAY	0	3	2009-11-28	303	\N	1112
+1773	GENERIC_DAY	0	3	2010-02-17	304	\N	1112
+1774	GENERIC_DAY	0	3	2009-12-22	304	\N	1112
+1775	GENERIC_DAY	0	3	2009-12-03	304	\N	1112
+1776	GENERIC_DAY	0	3	2009-10-25	303	\N	1112
+1777	GENERIC_DAY	0	3	2010-02-04	303	\N	1112
+1778	GENERIC_DAY	0	3	2010-01-25	303	\N	1112
+1779	GENERIC_DAY	0	3	2009-11-15	303	\N	1112
+1780	GENERIC_DAY	0	2	2010-01-11	305	\N	1112
+1781	GENERIC_DAY	0	3	2009-11-23	303	\N	1112
+1782	GENERIC_DAY	0	3	2009-12-28	303	\N	1112
+1783	GENERIC_DAY	0	3	2010-02-10	303	\N	1112
+1784	GENERIC_DAY	0	3	2009-12-17	304	\N	1112
+1785	GENERIC_DAY	0	2	2010-02-12	305	\N	1112
+1786	GENERIC_DAY	0	2	2009-12-06	305	\N	1112
+1787	GENERIC_DAY	0	2	2010-02-17	305	\N	1112
+1788	GENERIC_DAY	0	3	2009-12-05	304	\N	1112
+1789	GENERIC_DAY	0	3	2009-11-07	303	\N	1112
+1790	GENERIC_DAY	0	2	2010-02-09	305	\N	1112
+1791	GENERIC_DAY	0	3	2010-02-01	304	\N	1112
+1792	GENERIC_DAY	0	3	2009-12-07	303	\N	1112
+1793	GENERIC_DAY	0	2	2009-12-20	305	\N	1112
+1794	GENERIC_DAY	0	2	2010-01-16	305	\N	1112
+1795	GENERIC_DAY	0	2	2009-11-18	305	\N	1112
+1796	GENERIC_DAY	0	3	2009-10-31	304	\N	1112
+1797	GENERIC_DAY	0	2	2010-02-19	305	\N	1112
+1798	GENERIC_DAY	0	3	2010-01-24	303	\N	1112
+1799	GENERIC_DAY	0	3	2009-11-06	304	\N	1112
+1800	GENERIC_DAY	0	3	2010-02-11	304	\N	1112
+1801	GENERIC_DAY	0	2	2010-02-02	305	\N	1112
+1802	GENERIC_DAY	0	2	2010-02-14	305	\N	1112
+1803	GENERIC_DAY	0	3	2010-02-18	304	\N	1112
+1804	GENERIC_DAY	0	2	2010-01-02	305	\N	1112
+1805	GENERIC_DAY	0	2	2009-11-04	305	\N	1112
+1806	GENERIC_DAY	0	3	2010-02-04	304	\N	1112
+1807	GENERIC_DAY	0	3	2009-12-15	303	\N	1112
+1808	GENERIC_DAY	0	3	2009-10-30	303	\N	1112
+1809	GENERIC_DAY	0	3	2010-02-02	304	\N	1112
+1810	GENERIC_DAY	0	3	2010-02-11	303	\N	1112
+1811	GENERIC_DAY	0	3	2009-12-31	304	\N	1112
+1812	GENERIC_DAY	0	3	2009-12-29	304	\N	1112
+1813	GENERIC_DAY	0	2	2009-11-28	305	\N	1112
+1814	GENERIC_DAY	0	3	2010-01-28	304	\N	1112
+1815	GENERIC_DAY	0	2	2009-12-12	305	\N	1112
+1816	GENERIC_DAY	0	2	2009-11-10	305	\N	1112
+1817	GENERIC_DAY	0	3	2010-02-08	304	\N	1112
+1818	GENERIC_DAY	0	3	2009-11-30	304	\N	1112
+1819	GENERIC_DAY	0	2	2009-12-30	305	\N	1112
+1820	GENERIC_DAY	0	3	2009-12-24	304	\N	1112
+1821	GENERIC_DAY	0	3	2009-12-26	303	\N	1112
+1822	GENERIC_DAY	0	3	2009-12-22	303	\N	1112
+1823	GENERIC_DAY	0	3	2009-12-02	303	\N	1112
+1824	GENERIC_DAY	0	3	2010-02-06	303	\N	1112
+1825	GENERIC_DAY	0	2	2009-12-27	305	\N	1112
+1826	GENERIC_DAY	0	3	2009-11-26	304	\N	1112
+1827	GENERIC_DAY	0	3	2010-01-15	304	\N	1112
+1828	GENERIC_DAY	0	2	2010-02-21	305	\N	1112
+1829	GENERIC_DAY	0	3	2010-02-15	304	\N	1112
+1830	GENERIC_DAY	0	3	2010-02-03	303	\N	1112
+1831	GENERIC_DAY	0	2	2010-01-07	305	\N	1112
+1832	GENERIC_DAY	0	2	2009-12-19	305	\N	1112
+1833	GENERIC_DAY	0	3	2009-12-25	303	\N	1112
+1834	GENERIC_DAY	0	3	2010-01-15	303	\N	1112
+1835	GENERIC_DAY	0	3	2009-12-15	304	\N	1112
+1836	GENERIC_DAY	0	3	2009-11-07	304	\N	1112
+1837	GENERIC_DAY	0	3	2010-02-14	303	\N	1112
+1838	GENERIC_DAY	0	2	2009-11-24	305	\N	1112
+1839	GENERIC_DAY	0	3	2009-11-23	304	\N	1112
+1840	GENERIC_DAY	0	3	2010-01-16	304	\N	1112
+1841	GENERIC_DAY	0	2	2009-11-08	305	\N	1112
+1842	GENERIC_DAY	0	2	2010-02-15	305	\N	1112
+1843	GENERIC_DAY	0	2	2009-10-22	305	\N	1112
+1844	GENERIC_DAY	0	3	2010-02-14	304	\N	1112
+1845	GENERIC_DAY	0	2	2009-10-27	305	\N	1112
+1846	GENERIC_DAY	0	2	2009-11-16	305	\N	1112
+1847	GENERIC_DAY	0	3	2010-01-01	304	\N	1112
+1848	GENERIC_DAY	0	3	2009-11-01	303	\N	1112
+1849	GENERIC_DAY	0	3	2010-01-14	303	\N	1112
+1850	GENERIC_DAY	0	3	2009-10-26	303	\N	1112
+1851	GENERIC_DAY	0	2	2010-01-31	305	\N	1112
+1852	GENERIC_DAY	0	3	2010-02-09	303	\N	1112
+1853	GENERIC_DAY	0	2	2009-11-05	305	\N	1112
+1854	GENERIC_DAY	0	3	2010-01-18	303	\N	1112
+1855	GENERIC_DAY	0	3	2010-01-30	303	\N	1112
+1856	GENERIC_DAY	0	3	2010-02-12	303	\N	1112
+1857	GENERIC_DAY	0	2	2010-02-07	305	\N	1112
+1858	GENERIC_DAY	0	2	2010-01-05	305	\N	1112
+1859	GENERIC_DAY	0	3	2009-10-23	304	\N	1112
+1860	GENERIC_DAY	0	3	2010-02-01	303	\N	1112
+1861	GENERIC_DAY	0	3	2010-02-15	303	\N	1112
+1862	GENERIC_DAY	0	2	2009-10-24	305	\N	1112
+1863	GENERIC_DAY	0	3	2010-01-21	303	\N	1112
+1864	GENERIC_DAY	0	3	2010-01-12	304	\N	1112
+1865	GENERIC_DAY	0	3	2010-02-07	303	\N	1112
+1866	GENERIC_DAY	0	3	2009-11-29	304	\N	1112
+1867	GENERIC_DAY	0	3	2009-12-06	303	\N	1112
+1868	GENERIC_DAY	0	2	2009-12-08	305	\N	1112
+1869	GENERIC_DAY	0	2	2010-01-17	305	\N	1112
+1870	GENERIC_DAY	0	2	2009-12-29	305	\N	1112
+1871	GENERIC_DAY	0	3	2009-12-27	304	\N	1112
+1872	GENERIC_DAY	0	2	2009-10-25	305	\N	1112
+1873	GENERIC_DAY	0	2	2010-02-20	305	\N	1112
+1874	GENERIC_DAY	0	3	2009-11-17	303	\N	1112
+1875	GENERIC_DAY	0	3	2009-10-30	304	\N	1112
+1876	GENERIC_DAY	0	2	2010-01-09	305	\N	1112
+1877	GENERIC_DAY	0	3	2009-12-20	304	\N	1112
+1878	GENERIC_DAY	0	3	2010-02-05	304	\N	1112
+1879	GENERIC_DAY	0	2	2009-12-21	305	\N	1112
+1880	GENERIC_DAY	0	3	2010-01-29	304	\N	1112
+1881	GENERIC_DAY	0	3	2009-12-24	303	\N	1112
+1882	GENERIC_DAY	0	2	2010-01-12	305	\N	1112
+1883	GENERIC_DAY	0	3	2009-12-30	304	\N	1112
+1884	GENERIC_DAY	0	2	2009-10-21	305	\N	1112
+1885	GENERIC_DAY	0	3	2010-02-16	303	\N	1112
+1886	GENERIC_DAY	0	3	2010-01-13	304	\N	1112
+1887	GENERIC_DAY	0	2	2009-11-26	305	\N	1112
+1888	GENERIC_DAY	0	3	2009-11-06	303	\N	1112
+1889	GENERIC_DAY	0	3	2010-01-06	303	\N	1112
+1890	GENERIC_DAY	0	3	2009-11-18	304	\N	1112
+1891	GENERIC_DAY	0	2	2009-11-03	305	\N	1112
+1892	GENERIC_DAY	0	3	2009-11-11	303	\N	1112
+1893	GENERIC_DAY	0	2	2010-01-23	305	\N	1112
+1894	GENERIC_DAY	0	2	2009-11-17	305	\N	1112
+1895	GENERIC_DAY	0	3	2009-10-20	304	\N	1112
+1896	GENERIC_DAY	0	2	2010-02-16	305	\N	1112
+1897	GENERIC_DAY	0	2	2009-12-18	305	\N	1112
+1898	GENERIC_DAY	0	3	2010-01-02	304	\N	1112
+1899	GENERIC_DAY	0	3	2009-11-03	303	\N	1112
+1900	GENERIC_DAY	0	3	2009-11-08	304	\N	1112
+1901	GENERIC_DAY	0	3	2009-11-11	304	\N	1112
+1902	GENERIC_DAY	0	3	2010-01-08	303	\N	1112
+1903	GENERIC_DAY	0	3	2009-12-10	304	\N	1112
+1904	GENERIC_DAY	0	3	2010-01-27	303	\N	1112
+1905	GENERIC_DAY	0	3	2009-12-26	304	\N	1112
+1906	GENERIC_DAY	0	3	2010-02-20	303	\N	1112
+1907	GENERIC_DAY	0	3	2009-12-14	304	\N	1112
+1908	GENERIC_DAY	0	3	2009-11-29	303	\N	1112
+1909	GENERIC_DAY	0	2	2010-01-14	305	\N	1112
+1910	GENERIC_DAY	0	3	2010-01-19	304	\N	1112
+1911	GENERIC_DAY	0	3	2010-01-06	304	\N	1112
+1912	GENERIC_DAY	0	2	2009-12-26	305	\N	1112
+1913	GENERIC_DAY	0	3	2010-01-28	303	\N	1112
+1914	GENERIC_DAY	0	3	2010-01-20	303	\N	1112
+1915	GENERIC_DAY	0	3	2010-01-04	303	\N	1112
+1916	GENERIC_DAY	0	3	2009-11-02	304	\N	1112
+1917	GENERIC_DAY	0	3	2010-01-20	304	\N	1112
+1918	GENERIC_DAY	0	2	2009-12-02	305	\N	1112
+1919	GENERIC_DAY	0	2	2009-12-10	305	\N	1112
+1920	GENERIC_DAY	0	3	2009-12-30	303	\N	1112
+1921	GENERIC_DAY	0	3	2009-12-09	304	\N	1112
+1922	GENERIC_DAY	0	3	2009-12-16	303	\N	1112
+1923	GENERIC_DAY	0	3	2009-11-26	303	\N	1112
+1924	GENERIC_DAY	0	3	2010-02-13	304	\N	1112
+1925	GENERIC_DAY	0	2	2009-12-05	305	\N	1112
+1926	GENERIC_DAY	0	2	2010-02-06	305	\N	1112
+1927	GENERIC_DAY	0	3	2009-10-29	303	\N	1112
+1928	GENERIC_DAY	0	3	2010-01-13	303	\N	1112
+1929	GENERIC_DAY	0	3	2010-01-31	304	\N	1112
+1930	GENERIC_DAY	0	3	2009-11-03	304	\N	1112
+1931	GENERIC_DAY	0	3	2009-11-22	304	\N	1112
+1932	GENERIC_DAY	0	3	2010-02-08	303	\N	1112
+1933	GENERIC_DAY	0	3	2010-01-24	304	\N	1112
+1934	GENERIC_DAY	0	3	2009-11-24	303	\N	1112
+1935	GENERIC_DAY	0	3	2009-11-04	304	\N	1112
+1936	GENERIC_DAY	0	3	2009-11-16	303	\N	1112
+1937	GENERIC_DAY	0	2	2009-11-12	305	\N	1112
+1938	GENERIC_DAY	0	3	2009-11-27	304	\N	1112
+1939	GENERIC_DAY	0	2	2009-12-07	305	\N	1112
+1940	GENERIC_DAY	0	3	2009-11-19	303	\N	1112
+1941	GENERIC_DAY	0	3	2009-11-05	303	\N	1112
+1942	GENERIC_DAY	0	3	2010-01-26	304	\N	1112
+1943	GENERIC_DAY	0	2	2009-12-14	305	\N	1112
+1944	GENERIC_DAY	0	3	2009-12-09	303	\N	1112
+1945	GENERIC_DAY	0	2	2010-01-18	305	\N	1112
+1946	GENERIC_DAY	0	2	2009-12-17	305	\N	1112
+1947	GENERIC_DAY	0	3	2009-10-29	304	\N	1112
+1948	GENERIC_DAY	0	3	2009-10-31	303	\N	1112
+1949	GENERIC_DAY	0	3	2009-12-14	303	\N	1112
+1950	GENERIC_DAY	0	3	2009-11-18	303	\N	1112
+1951	GENERIC_DAY	0	2	2009-10-23	305	\N	1112
+1952	GENERIC_DAY	0	3	2009-10-27	303	\N	1112
+1953	GENERIC_DAY	0	3	2009-12-10	303	\N	1112
+1954	GENERIC_DAY	0	3	2010-02-13	303	\N	1112
+1955	GENERIC_DAY	0	3	2010-01-07	304	\N	1112
+1956	GENERIC_DAY	0	2	2010-01-21	305	\N	1112
+1957	GENERIC_DAY	0	3	2010-01-29	303	\N	1112
+1958	GENERIC_DAY	0	3	2010-01-27	304	\N	1112
+1959	GENERIC_DAY	0	2	2009-12-13	305	\N	1112
+1960	GENERIC_DAY	0	3	2009-11-12	303	\N	1112
+1961	GENERIC_DAY	0	2	2009-11-02	305	\N	1112
+2468	GENERIC_DAY	2	2	2009-12-30	303	\N	1114
+2459	GENERIC_DAY	2	3	2009-12-30	305	\N	1114
+2461	GENERIC_DAY	2	3	2010-02-21	305	\N	1114
+2643	GENERIC_DAY	2	3	2010-02-03	305	\N	1114
+2391	GENERIC_DAY	2	3	2010-02-17	305	\N	1114
+2467	GENERIC_DAY	2	3	2010-01-04	304	\N	1114
+2607	GENERIC_DAY	2	3	2009-10-25	305	\N	1114
+2375	GENERIC_DAY	2	2	2009-12-05	303	\N	1114
+2567	GENERIC_DAY	2	3	2010-01-01	304	\N	1114
+2435	GENERIC_DAY	2	2	2010-01-14	303	\N	1114
+2425	GENERIC_DAY	2	3	2009-12-29	304	\N	1114
+2595	GENERIC_DAY	2	3	2009-12-04	304	\N	1114
+2584	GENERIC_DAY	2	3	2009-12-03	305	\N	1114
+2525	GENERIC_DAY	2	3	2010-01-28	304	\N	1114
+2454	GENERIC_DAY	2	2	2009-12-29	303	\N	1114
+2510	GENERIC_DAY	2	3	2010-01-14	305	\N	1114
+2681	GENERIC_DAY	2	2	2010-01-23	303	\N	1114
+2522	GENERIC_DAY	2	3	2009-12-09	305	\N	1114
+2437	GENERIC_DAY	2	3	2009-10-25	304	\N	1114
+2523	GENERIC_DAY	2	3	2009-12-07	305	\N	1114
+2654	GENERIC_DAY	2	3	2009-12-27	305	\N	1114
+2344	GENERIC_DAY	2	2	2009-12-14	303	\N	1114
+2434	GENERIC_DAY	2	2	2010-02-07	303	\N	1114
+2666	GENERIC_DAY	2	3	2009-12-27	304	\N	1114
+2620	GENERIC_DAY	2	3	2010-01-28	305	\N	1114
+2359	GENERIC_DAY	2	3	2009-12-30	304	\N	1114
+2706	GENERIC_DAY	2	3	2010-02-03	304	\N	1114
+2633	GENERIC_DAY	2	2	2010-01-17	303	\N	1114
+2411	GENERIC_DAY	2	3	2009-12-05	304	\N	1114
+2546	GENERIC_DAY	2	2	2009-11-29	303	\N	1114
+2483	GENERIC_DAY	2	2	2010-01-22	303	\N	1114
+2591	GENERIC_DAY	2	3	2010-02-08	304	\N	1114
+2673	GENERIC_DAY	2	3	2009-12-09	304	\N	1114
+2608	GENERIC_DAY	2	3	2009-11-12	304	\N	1114
+2582	GENERIC_DAY	2	3	2009-11-09	304	\N	1114
+2530	GENERIC_DAY	2	3	2009-10-28	304	\N	1114
+2569	GENERIC_DAY	2	3	2010-01-20	305	\N	1114
+2611	GENERIC_DAY	2	2	2010-01-31	303	\N	1114
+2400	GENERIC_DAY	2	2	2010-02-09	303	\N	1114
+2436	GENERIC_DAY	2	3	2009-12-28	304	\N	1114
+2556	GENERIC_DAY	2	2	2010-01-18	303	\N	1114
+2636	GENERIC_DAY	2	2	2009-12-12	303	\N	1114
+2644	GENERIC_DAY	2	3	2010-02-18	305	\N	1114
+2370	GENERIC_DAY	2	3	2010-02-19	304	\N	1114
+2616	GENERIC_DAY	2	2	2010-02-21	303	\N	1114
+2545	GENERIC_DAY	2	3	2010-01-23	305	\N	1114
+2628	GENERIC_DAY	2	2	2009-10-23	303	\N	1114
+2687	GENERIC_DAY	2	3	2010-01-10	304	\N	1114
+2493	GENERIC_DAY	2	3	2009-12-25	305	\N	1114
+2505	GENERIC_DAY	2	2	2009-10-26	303	\N	1114
+2641	GENERIC_DAY	2	3	2009-12-16	304	\N	1114
+2446	GENERIC_DAY	2	3	2009-10-31	304	\N	1114
+2362	GENERIC_DAY	2	2	2009-12-17	303	\N	1114
+2619	GENERIC_DAY	2	2	2009-12-28	303	\N	1114
+2350	GENERIC_DAY	2	2	2010-02-02	303	\N	1114
+2640	GENERIC_DAY	2	2	2009-12-21	303	\N	1114
+2690	GENERIC_DAY	2	3	2010-02-10	305	\N	1114
+2601	GENERIC_DAY	2	3	2009-11-25	304	\N	1114
+2502	GENERIC_DAY	2	3	2010-02-15	304	\N	1114
+2645	GENERIC_DAY	2	3	2009-12-19	305	\N	1114
+2463	GENERIC_DAY	2	2	2009-11-15	303	\N	1114
+2685	GENERIC_DAY	2	3	2010-02-15	305	\N	1114
+2489	GENERIC_DAY	2	3	2009-11-26	305	\N	1114
+2431	GENERIC_DAY	2	3	2010-02-20	304	\N	1114
+2497	GENERIC_DAY	2	3	2010-01-25	304	\N	1114
+2683	GENERIC_DAY	2	3	2010-01-13	304	\N	1114
+2342	GENERIC_DAY	2	3	2010-02-11	305	\N	1114
+2590	GENERIC_DAY	2	3	2010-02-16	304	\N	1114
+2659	GENERIC_DAY	2	3	2009-11-11	305	\N	1114
+2637	GENERIC_DAY	2	2	2009-10-25	303	\N	1114
+2427	GENERIC_DAY	2	3	2010-01-22	304	\N	1114
+2651	GENERIC_DAY	2	3	2009-12-19	304	\N	1114
+2630	GENERIC_DAY	2	3	2009-12-11	305	\N	1114
+2351	GENERIC_DAY	2	3	2009-10-22	305	\N	1114
+2387	GENERIC_DAY	2	2	2009-12-18	303	\N	1114
+2632	GENERIC_DAY	2	2	2009-12-15	303	\N	1114
+2487	GENERIC_DAY	2	3	2010-02-13	305	\N	1114
+2698	GENERIC_DAY	2	3	2009-11-22	304	\N	1114
+2544	GENERIC_DAY	2	3	2010-02-20	305	\N	1114
+2349	GENERIC_DAY	2	3	2009-11-16	305	\N	1114
+2604	GENERIC_DAY	2	3	2009-11-24	304	\N	1114
+2478	GENERIC_DAY	2	3	2010-01-17	304	\N	1114
+2552	GENERIC_DAY	2	2	2010-01-24	303	\N	1114
+2677	GENERIC_DAY	2	2	2009-12-08	303	\N	1114
+2549	GENERIC_DAY	2	3	2010-01-29	305	\N	1114
+2348	GENERIC_DAY	2	3	2009-11-27	305	\N	1114
+2448	GENERIC_DAY	2	3	2010-01-12	305	\N	1114
+2377	GENERIC_DAY	2	2	2009-12-10	303	\N	1114
+2419	GENERIC_DAY	2	3	2010-02-02	305	\N	1114
+2402	GENERIC_DAY	2	2	2010-02-18	303	\N	1114
+2531	GENERIC_DAY	2	3	2010-01-08	305	\N	1114
+2508	GENERIC_DAY	2	3	2009-11-08	304	\N	1114
+2635	GENERIC_DAY	2	3	2009-12-12	304	\N	1114
+2550	GENERIC_DAY	2	3	2009-10-21	305	\N	1114
+2572	GENERIC_DAY	2	3	2010-01-18	304	\N	1114
+2593	GENERIC_DAY	2	2	2010-01-21	303	\N	1114
+2639	GENERIC_DAY	2	3	2009-12-03	304	\N	1114
+2424	GENERIC_DAY	2	2	2010-01-19	303	\N	1114
+2394	GENERIC_DAY	2	3	2009-12-06	304	\N	1114
+2366	GENERIC_DAY	2	3	2009-11-28	304	\N	1114
+2662	GENERIC_DAY	2	3	2010-01-22	305	\N	1114
+2548	GENERIC_DAY	2	3	2009-12-05	305	\N	1114
+2564	GENERIC_DAY	2	3	2009-11-10	305	\N	1114
+2700	GENERIC_DAY	2	3	2009-11-28	305	\N	1114
+2516	GENERIC_DAY	2	3	2009-12-25	304	\N	1114
+2412	GENERIC_DAY	2	3	2009-11-26	304	\N	1114
+2563	GENERIC_DAY	2	3	2009-12-02	305	\N	1114
+2576	GENERIC_DAY	2	3	2010-01-01	305	\N	1114
+2372	GENERIC_DAY	2	2	2009-12-31	303	\N	1114
+2371	GENERIC_DAY	2	3	2010-01-06	304	\N	1114
+2674	GENERIC_DAY	2	3	2009-11-12	305	\N	1114
+2383	GENERIC_DAY	2	3	2009-11-19	304	\N	1114
+2697	GENERIC_DAY	2	3	2009-12-28	305	\N	1114
+2385	GENERIC_DAY	2	2	2010-01-29	303	\N	1114
+2656	GENERIC_DAY	2	2	2010-01-11	303	\N	1114
+2589	GENERIC_DAY	2	2	2010-02-05	303	\N	1114
+2579	GENERIC_DAY	2	3	2009-12-11	304	\N	1114
+2445	GENERIC_DAY	2	3	2009-11-15	305	\N	1114
+2676	GENERIC_DAY	2	3	2010-01-16	304	\N	1114
+2361	GENERIC_DAY	2	3	2010-02-07	305	\N	1114
+2682	GENERIC_DAY	2	3	2010-02-19	305	\N	1114
+2420	GENERIC_DAY	2	3	2010-01-03	305	\N	1114
+2506	GENERIC_DAY	2	3	2010-01-09	304	\N	1114
+2403	GENERIC_DAY	2	2	2009-12-24	303	\N	1114
+2465	GENERIC_DAY	2	3	2010-02-07	304	\N	1114
+2658	GENERIC_DAY	2	3	2009-11-07	304	\N	1114
+2389	GENERIC_DAY	2	2	2009-11-26	303	\N	1114
+2406	GENERIC_DAY	2	3	2010-02-02	304	\N	1114
+2660	GENERIC_DAY	2	2	2009-10-27	303	\N	1114
+2684	GENERIC_DAY	2	3	2009-12-21	305	\N	1114
+2532	GENERIC_DAY	2	2	2010-01-08	303	\N	1114
+2456	GENERIC_DAY	2	2	2010-02-16	303	\N	1114
+2426	GENERIC_DAY	2	2	2010-02-19	303	\N	1114
+2408	GENERIC_DAY	2	2	2010-01-27	303	\N	1114
+2627	GENERIC_DAY	2	2	2009-11-06	303	\N	1114
+2671	GENERIC_DAY	2	3	2009-10-27	305	\N	1114
+2614	GENERIC_DAY	2	3	2010-01-20	304	\N	1114
+2669	GENERIC_DAY	2	2	2010-01-12	303	\N	1114
+2554	GENERIC_DAY	2	3	2009-10-27	304	\N	1114
+2496	GENERIC_DAY	2	2	2009-12-07	303	\N	1114
+2352	GENERIC_DAY	2	2	2010-01-06	303	\N	1114
+2441	GENERIC_DAY	2	2	2009-12-27	303	\N	1114
+2701	GENERIC_DAY	2	2	2009-11-04	303	\N	1114
+2675	GENERIC_DAY	2	3	2009-12-20	304	\N	1114
+2421	GENERIC_DAY	2	3	2010-01-07	304	\N	1114
+2495	GENERIC_DAY	2	3	2009-11-03	305	\N	1114
+2503	GENERIC_DAY	2	3	2009-11-25	305	\N	1114
+2399	GENERIC_DAY	2	3	2009-11-09	305	\N	1114
+2355	GENERIC_DAY	2	3	2010-02-06	305	\N	1114
+2539	GENERIC_DAY	2	3	2009-10-28	305	\N	1114
+2433	GENERIC_DAY	2	3	2009-12-10	305	\N	1114
+2689	GENERIC_DAY	2	2	2010-01-16	303	\N	1114
+2667	GENERIC_DAY	2	3	2009-11-13	304	\N	1114
+2663	GENERIC_DAY	2	3	2010-01-07	305	\N	1114
+2605	GENERIC_DAY	2	3	2009-10-29	305	\N	1114
+2460	GENERIC_DAY	2	2	2009-11-22	303	\N	1114
+2655	GENERIC_DAY	2	3	2010-01-23	304	\N	1114
+2517	GENERIC_DAY	2	2	2009-11-20	303	\N	1114
+2657	GENERIC_DAY	2	3	2010-01-08	304	\N	1114
+2562	GENERIC_DAY	2	3	2009-11-30	305	\N	1114
+2486	GENERIC_DAY	2	3	2009-11-07	305	\N	1114
+2390	GENERIC_DAY	2	3	2009-10-26	304	\N	1114
+2587	GENERIC_DAY	2	2	2010-02-15	303	\N	1114
+2338	GENERIC_DAY	2	2	2009-11-16	303	\N	1114
+2360	GENERIC_DAY	2	2	2009-11-11	303	\N	1114
+2528	GENERIC_DAY	2	2	2010-01-02	303	\N	1114
+2561	GENERIC_DAY	2	3	2009-11-13	305	\N	1114
+2537	GENERIC_DAY	2	3	2010-01-25	305	\N	1114
+2393	GENERIC_DAY	2	2	2009-11-24	303	\N	1114
+2577	GENERIC_DAY	2	3	2009-10-29	304	\N	1114
+2388	GENERIC_DAY	2	3	2009-11-24	305	\N	1114
+2444	GENERIC_DAY	2	2	2009-12-04	303	\N	1114
+2652	GENERIC_DAY	2	2	2009-11-10	303	\N	1114
+2570	GENERIC_DAY	2	2	2009-11-02	303	\N	1114
+2553	GENERIC_DAY	2	3	2009-12-22	305	\N	1114
+2356	GENERIC_DAY	2	2	2009-11-03	303	\N	1114
+2670	GENERIC_DAY	2	2	2010-01-03	303	\N	1114
+2615	GENERIC_DAY	2	2	2010-01-13	303	\N	1114
+2462	GENERIC_DAY	2	3	2009-10-31	305	\N	1114
+2476	GENERIC_DAY	2	3	2009-10-30	305	\N	1114
+2520	GENERIC_DAY	2	2	2009-12-09	303	\N	1114
+2404	GENERIC_DAY	2	3	2010-01-29	304	\N	1114
+2594	GENERIC_DAY	2	3	2010-01-21	304	\N	1114
+2527	GENERIC_DAY	2	2	2009-11-12	303	\N	1114
+2536	GENERIC_DAY	2	3	2009-12-26	304	\N	1114
+2470	GENERIC_DAY	2	3	2010-02-05	305	\N	1114
+2540	GENERIC_DAY	2	2	2009-10-29	303	\N	1114
+2680	GENERIC_DAY	2	3	2009-10-23	305	\N	1114
+2453	GENERIC_DAY	2	2	2009-11-09	303	\N	1114
+2482	GENERIC_DAY	2	3	2010-01-26	304	\N	1114
+2638	GENERIC_DAY	2	3	2010-02-05	304	\N	1114
+2693	GENERIC_DAY	2	3	2010-02-12	305	\N	1114
+2704	GENERIC_DAY	2	2	2009-11-23	303	\N	1114
+2542	GENERIC_DAY	2	2	2009-12-02	303	\N	1114
+2498	GENERIC_DAY	2	3	2009-12-08	304	\N	1114
+2504	GENERIC_DAY	2	3	2010-01-02	304	\N	1114
+2555	GENERIC_DAY	2	3	2009-11-29	304	\N	1114
+2443	GENERIC_DAY	2	3	2010-01-09	305	\N	1114
+2365	GENERIC_DAY	2	3	2009-12-14	305	\N	1114
+2382	GENERIC_DAY	2	2	2010-01-01	303	\N	1114
+2648	GENERIC_DAY	2	3	2009-10-21	304	\N	1114
+2524	GENERIC_DAY	2	2	2009-11-01	303	\N	1114
+2367	GENERIC_DAY	2	3	2009-11-02	304	\N	1114
+2631	GENERIC_DAY	2	2	2010-01-30	303	\N	1114
+2347	GENERIC_DAY	2	3	2010-02-21	304	\N	1114
+2432	GENERIC_DAY	2	2	2009-12-26	303	\N	1114
+2612	GENERIC_DAY	2	2	2009-12-11	303	\N	1114
+2585	GENERIC_DAY	2	3	2009-12-06	305	\N	1114
+2603	GENERIC_DAY	2	3	2009-11-06	305	\N	1114
+2466	GENERIC_DAY	2	2	2010-02-14	303	\N	1114
+2598	GENERIC_DAY	2	3	2009-11-22	305	\N	1114
+2492	GENERIC_DAY	2	3	2010-01-19	304	\N	1114
+2337	GENERIC_DAY	2	3	2010-02-08	305	\N	1114
+2625	GENERIC_DAY	2	3	2009-12-12	305	\N	1114
+2597	GENERIC_DAY	2	3	2009-10-22	304	\N	1114
+2413	GENERIC_DAY	2	3	2009-11-30	304	\N	1114
+2692	GENERIC_DAY	2	3	2009-11-20	305	\N	1114
+2479	GENERIC_DAY	2	3	2009-12-18	304	\N	1114
+2477	GENERIC_DAY	2	2	2009-11-07	303	\N	1114
+2345	GENERIC_DAY	2	3	2010-02-22	304	\N	1114
+2668	GENERIC_DAY	2	3	2009-11-11	304	\N	1114
+2694	GENERIC_DAY	2	3	2010-02-04	305	\N	1114
+2711	GENERIC_DAY	2	2	2010-02-20	303	\N	1114
+2501	GENERIC_DAY	2	2	2010-02-11	303	\N	1114
+2588	GENERIC_DAY	2	3	2009-11-23	304	\N	1114
+2368	GENERIC_DAY	2	3	2009-11-05	305	\N	1114
+2346	GENERIC_DAY	2	3	2010-01-17	305	\N	1114
+2392	GENERIC_DAY	2	3	2010-01-27	305	\N	1114
+2428	GENERIC_DAY	2	3	2010-01-05	305	\N	1114
+2647	GENERIC_DAY	2	3	2009-10-30	304	\N	1114
+2557	GENERIC_DAY	2	2	2010-02-06	303	\N	1114
+2609	GENERIC_DAY	2	3	2009-10-23	304	\N	1114
+2452	GENERIC_DAY	2	3	2009-12-24	305	\N	1114
+2507	GENERIC_DAY	2	3	2009-12-31	305	\N	1114
+2617	GENERIC_DAY	2	3	2009-12-26	305	\N	1114
+2708	GENERIC_DAY	2	3	2009-12-04	305	\N	1114
+2480	GENERIC_DAY	2	3	2010-02-04	304	\N	1114
+2380	GENERIC_DAY	2	2	2009-12-06	303	\N	1114
+2606	GENERIC_DAY	2	2	2009-11-18	303	\N	1114
+2398	GENERIC_DAY	2	3	2009-12-22	304	\N	1114
+2634	GENERIC_DAY	2	2	2010-02-04	303	\N	1114
+2415	GENERIC_DAY	2	3	2009-12-02	304	\N	1114
+2422	GENERIC_DAY	2	2	2009-12-20	303	\N	1114
+2429	GENERIC_DAY	2	3	2009-12-10	304	\N	1114
+2417	GENERIC_DAY	2	2	2009-12-22	303	\N	1114
+2494	GENERIC_DAY	2	3	2009-12-13	304	\N	1114
+2541	GENERIC_DAY	2	3	2010-01-27	304	\N	1114
+2533	GENERIC_DAY	2	3	2010-01-24	304	\N	1114
+2376	GENERIC_DAY	2	2	2010-01-25	303	\N	1114
+2373	GENERIC_DAY	2	3	2009-11-08	305	\N	1114
+2379	GENERIC_DAY	2	2	2010-02-13	303	\N	1114
+2440	GENERIC_DAY	2	2	2009-12-01	303	\N	1114
+2709	GENERIC_DAY	2	3	2009-12-01	305	\N	1114
+2519	GENERIC_DAY	2	3	2009-12-17	305	\N	1114
+2423	GENERIC_DAY	2	2	2010-02-12	303	\N	1114
+2688	GENERIC_DAY	2	3	2009-12-07	304	\N	1114
+2678	GENERIC_DAY	2	2	2010-02-10	303	\N	1114
+2695	GENERIC_DAY	2	3	2010-01-21	305	\N	1114
+2410	GENERIC_DAY	2	2	2009-10-30	303	\N	1114
+2474	GENERIC_DAY	2	3	2010-02-14	305	\N	1114
+2624	GENERIC_DAY	2	2	2009-12-13	303	\N	1114
+2405	GENERIC_DAY	2	3	2010-01-26	305	\N	1114
+2626	GENERIC_DAY	2	3	2010-02-09	304	\N	1114
+2623	GENERIC_DAY	2	3	2010-01-19	305	\N	1114
+2500	GENERIC_DAY	2	3	2010-02-22	305	\N	1114
+2418	GENERIC_DAY	2	2	2010-02-08	303	\N	1114
+2661	GENERIC_DAY	2	3	2009-12-15	304	\N	1114
+2447	GENERIC_DAY	2	2	2009-10-28	303	\N	1114
+2699	GENERIC_DAY	2	3	2009-10-24	304	\N	1114
+2580	GENERIC_DAY	2	2	2009-11-28	303	\N	1114
+2526	GENERIC_DAY	2	3	2009-12-29	305	\N	1114
+2578	GENERIC_DAY	2	3	2009-12-23	304	\N	1114
+2488	GENERIC_DAY	2	3	2010-01-11	304	\N	1114
+2455	GENERIC_DAY	2	3	2009-12-24	304	\N	1114
+2707	GENERIC_DAY	2	3	2010-01-30	305	\N	1114
+2559	GENERIC_DAY	2	3	2009-11-21	305	\N	1114
+2665	GENERIC_DAY	2	2	2010-02-17	303	\N	1114
+3215	SPECIFIC_DAY	0	40	2010-03-06	305	1116	\N
+3216	SPECIFIC_DAY	0	40	2010-03-13	305	1116	\N
+3217	SPECIFIC_DAY	0	40	2010-03-12	305	1116	\N
+3218	SPECIFIC_DAY	0	40	2010-03-18	305	1116	\N
+3219	SPECIFIC_DAY	0	40	2010-04-17	305	1116	\N
+3220	SPECIFIC_DAY	0	40	2010-04-08	305	1116	\N
+3221	SPECIFIC_DAY	0	40	2010-03-25	305	1116	\N
+3222	SPECIFIC_DAY	0	40	2010-03-11	305	1116	\N
+3223	SPECIFIC_DAY	0	40	2010-04-10	305	1116	\N
+3224	SPECIFIC_DAY	0	40	2010-03-15	305	1116	\N
+3225	SPECIFIC_DAY	0	40	2010-04-05	305	1116	\N
+3226	SPECIFIC_DAY	0	40	2010-04-03	305	1116	\N
+3227	SPECIFIC_DAY	0	40	2010-04-01	305	1116	\N
+3228	SPECIFIC_DAY	0	40	2010-04-18	305	1116	\N
+3229	SPECIFIC_DAY	0	40	2010-03-03	305	1116	\N
+3230	SPECIFIC_DAY	0	40	2010-04-19	305	1116	\N
+3231	SPECIFIC_DAY	0	40	2010-04-11	305	1116	\N
+3232	SPECIFIC_DAY	0	40	2010-03-23	305	1116	\N
+3233	SPECIFIC_DAY	0	40	2010-04-09	305	1116	\N
+3234	SPECIFIC_DAY	0	40	2010-03-09	305	1116	\N
+3235	SPECIFIC_DAY	0	40	2010-03-20	305	1116	\N
+3236	SPECIFIC_DAY	0	40	2010-03-08	305	1116	\N
+3237	SPECIFIC_DAY	0	40	2010-03-21	305	1116	\N
+3238	SPECIFIC_DAY	0	40	2010-03-31	305	1116	\N
+3239	SPECIFIC_DAY	0	40	2010-04-15	305	1116	\N
+3240	SPECIFIC_DAY	0	40	2010-03-14	305	1116	\N
+3241	SPECIFIC_DAY	0	40	2010-03-02	305	1116	\N
+3242	SPECIFIC_DAY	0	40	2010-03-10	305	1116	\N
+3243	SPECIFIC_DAY	0	40	2010-03-04	305	1116	\N
+3244	SPECIFIC_DAY	0	40	2010-03-22	305	1116	\N
+3245	SPECIFIC_DAY	0	40	2010-03-29	305	1116	\N
+3246	SPECIFIC_DAY	0	40	2010-03-28	305	1116	\N
+3247	SPECIFIC_DAY	0	40	2010-03-30	305	1116	\N
+3248	SPECIFIC_DAY	0	40	2010-04-04	305	1116	\N
+3249	SPECIFIC_DAY	0	40	2010-04-16	305	1116	\N
+3250	SPECIFIC_DAY	0	40	2010-04-07	305	1116	\N
+3251	SPECIFIC_DAY	0	40	2010-03-17	305	1116	\N
+3252	SPECIFIC_DAY	0	40	2010-04-02	305	1116	\N
+3253	SPECIFIC_DAY	0	40	2010-04-06	305	1116	\N
+3254	SPECIFIC_DAY	0	40	2010-03-26	305	1116	\N
+3255	SPECIFIC_DAY	0	40	2010-03-07	305	1116	\N
+3256	SPECIFIC_DAY	0	40	2010-03-19	305	1116	\N
+3257	SPECIFIC_DAY	0	40	2010-03-24	305	1116	\N
+3258	SPECIFIC_DAY	0	40	2010-03-01	305	1116	\N
+3259	SPECIFIC_DAY	0	40	2010-04-12	305	1116	\N
+2381	GENERIC_DAY	2	3	2009-11-20	304	\N	1114
+2481	GENERIC_DAY	2	3	2010-01-15	304	\N	1114
+2471	GENERIC_DAY	2	2	2010-01-04	303	\N	1114
+2558	GENERIC_DAY	2	3	2010-02-10	304	\N	1114
+2514	GENERIC_DAY	2	2	2009-11-05	303	\N	1114
+2341	GENERIC_DAY	2	2	2009-10-31	303	\N	1114
+2691	GENERIC_DAY	2	3	2009-11-19	305	\N	1114
+2679	GENERIC_DAY	2	3	2009-10-24	305	\N	1114
+2414	GENERIC_DAY	2	3	2009-11-05	304	\N	1114
+2458	GENERIC_DAY	2	2	2009-11-19	303	\N	1114
+2518	GENERIC_DAY	2	3	2010-01-10	305	\N	1114
+2363	GENERIC_DAY	2	3	2010-02-06	304	\N	1114
+2343	GENERIC_DAY	2	3	2009-11-16	304	\N	1114
+2586	GENERIC_DAY	2	2	2009-10-21	303	\N	1114
+2573	GENERIC_DAY	2	3	2009-10-26	305	\N	1114
+2484	GENERIC_DAY	2	2	2010-01-20	303	\N	1114
+2339	GENERIC_DAY	2	3	2009-11-10	304	\N	1114
+2575	GENERIC_DAY	2	3	2009-11-01	304	\N	1114
+2653	GENERIC_DAY	2	2	2009-11-14	303	\N	1114
+2696	GENERIC_DAY	2	3	2010-02-12	304	\N	1114
+2491	GENERIC_DAY	2	2	2010-01-05	303	\N	1114
+2535	GENERIC_DAY	2	2	2009-12-25	303	\N	1114
+2646	GENERIC_DAY	2	2	2009-10-24	303	\N	1114
+2439	GENERIC_DAY	2	3	2010-01-05	304	\N	1114
+2513	GENERIC_DAY	2	3	2010-01-18	305	\N	1114
+2571	GENERIC_DAY	2	3	2009-12-18	305	\N	1114
+2397	GENERIC_DAY	2	3	2009-12-23	305	\N	1114
+2686	GENERIC_DAY	2	3	2009-12-13	305	\N	1114
+2512	GENERIC_DAY	2	3	2010-01-24	305	\N	1114
+2511	GENERIC_DAY	2	3	2009-12-17	304	\N	1114
+2521	GENERIC_DAY	2	3	2009-12-01	304	\N	1114
+2384	GENERIC_DAY	2	3	2010-02-16	305	\N	1114
+2642	GENERIC_DAY	2	2	2010-01-26	303	\N	1114
+2649	GENERIC_DAY	2	3	2009-11-17	305	\N	1114
+2703	GENERIC_DAY	2	3	2010-01-06	305	\N	1114
+2710	GENERIC_DAY	2	2	2010-01-09	303	\N	1114
+2622	GENERIC_DAY	2	3	2009-12-31	304	\N	1114
+2396	GENERIC_DAY	2	2	2010-02-22	303	\N	1114
+2600	GENERIC_DAY	2	3	2010-02-01	305	\N	1114
+2551	GENERIC_DAY	2	3	2010-01-30	304	\N	1114
+2583	GENERIC_DAY	2	3	2009-11-23	305	\N	1114
+2610	GENERIC_DAY	2	3	2010-02-18	304	\N	1114
+2490	GENERIC_DAY	2	2	2009-12-23	303	\N	1114
+2378	GENERIC_DAY	2	2	2009-11-30	303	\N	1114
+2702	GENERIC_DAY	2	2	2010-01-07	303	\N	1114
+3260	SPECIFIC_DAY	0	40	2010-03-27	305	1116	\N
+3261	SPECIFIC_DAY	0	40	2010-04-13	305	1116	\N
+3262	SPECIFIC_DAY	0	40	2010-03-05	305	1116	\N
+3263	SPECIFIC_DAY	0	40	2010-03-16	305	1116	\N
+3264	SPECIFIC_DAY	0	40	2010-04-14	305	1116	\N
+\.
+
+
+--
+-- Data for Name: dependency; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY dependency (id, version, origin, destination, type) FROM stdin;
+\.
+
+
+--
+-- Data for Name: directadvanceassignment; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY directadvanceassignment (advance_assignment_id, direct_order_element_id, maxvalue) FROM stdin;
+993	710	1000.00
+951	710	100.00
+\.
+
+
+--
+-- Data for Name: exceptionday; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY exceptionday (id, version, date, hours, base_calendar_id) FROM stdin;
+3030	1	2009-10-28	0	2829
+3031	1	2009-10-28	0	2828
+\.
+
+
+--
+-- Data for Name: generic_resource_allocation; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY generic_resource_allocation (resource_allocation_id) FROM stdin;
+1112
+1114
+\.
+
+
+--
+-- Data for Name: hibernate_unique_key; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY hibernate_unique_key (next_hi) FROM stdin;
+39
+\.
+
+
+--
+-- Data for Name: hoursgroup; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY hoursgroup (id, version, workinghours, percentage, fixedpercentage, parent_order_line) FROM stdin;
+808	1	1000	1.00	f	708
+809	3	1000	1.00	f	710
+810	3	2000	1.00	f	711
+\.
+
+
+--
+-- Data for Name: hoursperday; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY hoursperday (base_calendar_id, hours, day_id) FROM stdin;
+2929	8	0
+2929	8	1
+2929	8	2
+2929	8	3
+2929	8	4
+2930	8	0
+2930	8	1
+2930	8	2
+2930	8	3
+2930	8	4
+\.
+
+
+--
+-- Data for Name: indirectadvanceassignment; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY indirectadvanceassignment (advance_assignment_id, indirect_order_element_id) FROM stdin;
+909	707
+994	709
+952	709
+910	709
+\.
+
+
+--
+-- Data for Name: label; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY label (id, version, name, label_type_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: label_type; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY label_type (id, version, name) FROM stdin;
+\.
+
+
+--
+-- Data for Name: machine; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY machine (machine_id, code, name, description) FROM stdin;
+\.
+
+
+--
+-- Data for Name: order_element_label; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY order_element_label (order_element_id, label_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: order_table; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY order_table (orderelementid, responsible, customer) FROM stdin;
+707	Javier	\N
+709	pepe	acme
+\.
+
+
+--
+-- Data for Name: orderelement; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY orderelement (id, version, name, initdate, enddate, mandatoryinit, mandatoryend, description, code, parent, positionincontainer) FROM stdin;
+707	1	Pedido 1	2009-10-20 23:16:37.742	\N	f	f	\N	code 1	\N	\N
+708	1	new1	\N	\N	f	f	\N	ec1	707	0
+709	4	pedido2	2009-10-21 12:51:15.219	2009-10-30 00:00:00	f	f	pedido de prueba\n	p2	\N	\N
+710	3	order element 1	\N	\N	f	f		oe1	709	0
+711	3	order element 2	\N	\N	f	f	\N	oe2	709	1
+\.
+
+
+--
+-- Data for Name: orderline; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY orderline (orderelementid) FROM stdin;
+708
+710
+711
+\.
+
+
+--
+-- Data for Name: orderlinegroup; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY orderlinegroup (orderelementid) FROM stdin;
+707
+709
+\.
+
+
+--
+-- Data for Name: resource; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY resource (id, version, calendar) FROM stdin;
+303	1	\N
+304	1	\N
+305	1	\N
+\.
+
+
+--
+-- Data for Name: resourceallocation; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY resourceallocation (id, version, resourcesperday, task, assignment_function) FROM stdin;
+1112	0	1.00	1011	\N
+1116	1	5.00	1014	\N
+1114	2	1.00	1013	\N
+\.
+
+
+--
+-- Data for Name: resourcecalendar; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY resourcecalendar (base_calendar_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: specific_resource_allocation; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY specific_resource_allocation (resource_allocation_id, resource) FROM stdin;
+1116	305
+\.
+
+
+--
+-- Data for Name: task; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY task (task_element_id, hoursgroup, calculatedvalue) FROM stdin;
+1011	808	1
+1014	810	1
+1013	809	1
+\.
+
+
+--
+-- Data for Name: taskelement; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY taskelement (id, version, shareofhours, name, notes, startdate, enddate, order_element_id, parent, base_calendar_id, positioninparent) FROM stdin;
+1011	2	\N	new1	\N	2009-10-20 00:00:00	2010-02-22 00:00:00	708	1010	\N	0
+1010	2	\N	\N	\N	2009-10-20 00:00:00	2010-02-22 00:00:00	707	\N	\N	\N
+1014	4	\N	order element 2	\N	2010-03-01 19:34:15.194	2010-04-20 00:00:00	711	1012	\N	1
+1013	4	\N	order element 1	\N	2009-10-21 00:00:00	2010-02-23 00:00:00	710	1012	\N	0
+1012	4	\N	\N	\N	2009-10-21 00:00:00	2010-04-20 00:00:00	709	\N	\N	\N
+\.
+
+
+--
+-- Data for Name: taskgroup; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY taskgroup (task_element_id) FROM stdin;
+1010
+1012
+\.
+
+
+--
+-- Data for Name: taskmilestone; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY taskmilestone (task_element_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: work_report; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY work_report (id, version, date, place, responsible, work_report_type_id) FROM stdin;
+3636	1	2009-10-21 00:00:00	Coruña	Pepe	3535
+\.
+
+
+--
+-- Data for Name: work_report_line; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY work_report_line (id, version, numhours, work_report_id, resource_id, order_element_id) FROM stdin;
+3737	1	500	3636	305	710
+\.
+
+
+--
+-- Data for Name: work_report_type; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY work_report_type (id, version, name) FROM stdin;
+3535	1	Work report 1
+\.
+
+
+--
+-- Data for Name: worker; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY worker (worker_id, firstname, surname, nif) FROM stdin;
+303	Pedro	Garcia	11111111A
+304	Juan	Vazquez	22222222B
+305	Alberto	Garcia	33333333C
+\.
+
+
+--
+-- Name: advanceassignment_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY advanceassignment
+    ADD CONSTRAINT advanceassignment_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: advancemeasurement_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY advancemeasurement
+    ADD CONSTRAINT advancemeasurement_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: advancetype_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY advancetype
+    ADD CONSTRAINT advancetype_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: advancetype_unitname_key; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY advancetype
+    ADD CONSTRAINT advancetype_unitname_key UNIQUE (unitname);
+
+
+--
+-- Name: all_criterions_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY all_criterions
+    ADD CONSTRAINT all_criterions_pkey PRIMARY KEY (generic_resource_allocation_id, criterion_id);
+
+
+--
+-- Name: assignment_function_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY assignment_function
+    ADD CONSTRAINT assignment_function_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: basecalendar_name_key; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY basecalendar
+    ADD CONSTRAINT basecalendar_name_key UNIQUE (name);
+
+
+--
+-- Name: basecalendar_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY basecalendar
+    ADD CONSTRAINT basecalendar_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: calendardata_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY calendardata
+    ADD CONSTRAINT calendardata_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: criterion_name_key; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY criterion
+    ADD CONSTRAINT criterion_name_key UNIQUE (name, id_criterion_type);
+
+
+--
+-- Name: criterion_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY criterion
+    ADD CONSTRAINT criterion_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: criterion_type_work_report_type_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY criterion_type_work_report_type
+    ADD CONSTRAINT criterion_type_work_report_type_pkey PRIMARY KEY (work_report_type_id, criterion_type_id);
+
+
+--
+-- Name: criterion_work_report_line_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY criterion_work_report_line
+    ADD CONSTRAINT criterion_work_report_line_pkey PRIMARY KEY (work_report_line_id, criterion_id);
+
+
+--
+-- Name: criterionhoursgroup_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY criterionhoursgroup
+    ADD CONSTRAINT criterionhoursgroup_pkey PRIMARY KEY (hoursgroupid, criterionid);
+
+
+--
+-- Name: criterionsatisfaction_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY criterionsatisfaction
+    ADD CONSTRAINT criterionsatisfaction_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: criteriontype_name_key; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY criteriontype
+    ADD CONSTRAINT criteriontype_name_key UNIQUE (name);
+
+
+--
+-- Name: criteriontype_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY criteriontype
+    ADD CONSTRAINT criteriontype_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: day_assignment_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY day_assignment
+    ADD CONSTRAINT day_assignment_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: dependency_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY dependency
+    ADD CONSTRAINT dependency_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directadvanceassignment_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY directadvanceassignment
+    ADD CONSTRAINT directadvanceassignment_pkey PRIMARY KEY (advance_assignment_id);
+
+
+--
+-- Name: exceptionday_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY exceptionday
+    ADD CONSTRAINT exceptionday_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: generic_resource_allocation_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY generic_resource_allocation
+    ADD CONSTRAINT generic_resource_allocation_pkey PRIMARY KEY (resource_allocation_id);
+
+
+--
+-- Name: hoursgroup_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY hoursgroup
+    ADD CONSTRAINT hoursgroup_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: hoursperday_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY hoursperday
+    ADD CONSTRAINT hoursperday_pkey PRIMARY KEY (base_calendar_id, day_id);
+
+
+--
+-- Name: indirectadvanceassignment_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY indirectadvanceassignment
+    ADD CONSTRAINT indirectadvanceassignment_pkey PRIMARY KEY (advance_assignment_id);
+
+
+--
+-- Name: label_name_key; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY label
+    ADD CONSTRAINT label_name_key UNIQUE (name, label_type_id);
+
+
+--
+-- Name: label_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY label
+    ADD CONSTRAINT label_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: label_type_name_key; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY label_type
+    ADD CONSTRAINT label_type_name_key UNIQUE (name);
+
+
+--
+-- Name: label_type_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY label_type
+    ADD CONSTRAINT label_type_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: machine_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY machine
+    ADD CONSTRAINT machine_pkey PRIMARY KEY (machine_id);
+
+
+--
+-- Name: order_element_label_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY order_element_label
+    ADD CONSTRAINT order_element_label_pkey PRIMARY KEY (order_element_id, label_id);
+
+
+--
+-- Name: order_table_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY order_table
+    ADD CONSTRAINT order_table_pkey PRIMARY KEY (orderelementid);
+
+
+--
+-- Name: orderelement_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY orderelement
+    ADD CONSTRAINT orderelement_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: orderline_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY orderline
+    ADD CONSTRAINT orderline_pkey PRIMARY KEY (orderelementid);
+
+
+--
+-- Name: orderlinegroup_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY orderlinegroup
+    ADD CONSTRAINT orderlinegroup_pkey PRIMARY KEY (orderelementid);
+
+
+--
+-- Name: resource_calendar_key; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY resource
+    ADD CONSTRAINT resource_calendar_key UNIQUE (calendar);
+
+
+--
+-- Name: resource_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY resource
+    ADD CONSTRAINT resource_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: resourceallocation_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY resourceallocation
+    ADD CONSTRAINT resourceallocation_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: resourcecalendar_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY resourcecalendar
+    ADD CONSTRAINT resourcecalendar_pkey PRIMARY KEY (base_calendar_id);
+
+
+--
+-- Name: specific_resource_allocation_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY specific_resource_allocation
+    ADD CONSTRAINT specific_resource_allocation_pkey PRIMARY KEY (resource_allocation_id);
+
+
+--
+-- Name: task_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY task
+    ADD CONSTRAINT task_pkey PRIMARY KEY (task_element_id);
+
+
+--
+-- Name: taskelement_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY taskelement
+    ADD CONSTRAINT taskelement_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: taskgroup_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY taskgroup
+    ADD CONSTRAINT taskgroup_pkey PRIMARY KEY (task_element_id);
+
+
+--
+-- Name: taskmilestone_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY taskmilestone
+    ADD CONSTRAINT taskmilestone_pkey PRIMARY KEY (task_element_id);
+
+
+--
+-- Name: work_report_line_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY work_report_line
+    ADD CONSTRAINT work_report_line_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: work_report_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY work_report
+    ADD CONSTRAINT work_report_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: work_report_type_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY work_report_type
+    ADD CONSTRAINT work_report_type_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: worker_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY worker
+    ADD CONSTRAINT worker_pkey PRIMARY KEY (worker_id);
+
+
+--
+-- Name: fk1a95a222131853a1; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY work_report
+    ADD CONSTRAINT fk1a95a222131853a1 FOREIGN KEY (work_report_type_id) REFERENCES work_report_type(id);
+
+
+--
+-- Name: fk27a9a54936bb8c; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY task
+    ADD CONSTRAINT fk27a9a54936bb8c FOREIGN KEY (task_element_id) REFERENCES taskelement(id);
+
+
+--
+-- Name: fk27a9a55ac3aeb2; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY task
+    ADD CONSTRAINT fk27a9a55ac3aeb2 FOREIGN KEY (hoursgroup) REFERENCES hoursgroup(id);
+
+
+--
+-- Name: fk3d1ffd21218d7620; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY indirectadvanceassignment
+    ADD CONSTRAINT fk3d1ffd21218d7620 FOREIGN KEY (indirect_order_element_id) REFERENCES orderelement(id);
+
+
+--
+-- Name: fk3d1ffd212f2d3aec; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY indirectadvanceassignment
+    ADD CONSTRAINT fk3d1ffd212f2d3aec FOREIGN KEY (advance_assignment_id) REFERENCES advanceassignment(id);
+
+
+--
+-- Name: fk3d1ffd218202350f; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY indirectadvanceassignment
+    ADD CONSTRAINT fk3d1ffd218202350f FOREIGN KEY (indirect_order_element_id) REFERENCES orderlinegroup(orderelementid);
+
+
+--
+-- Name: fk3f30d9ad8c4c676c; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY criterionsatisfaction
+    ADD CONSTRAINT fk3f30d9ad8c4c676c FOREIGN KEY (criterion) REFERENCES criterion(id);
+
+
+--
+-- Name: fk3f30d9adeae850b2; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY criterionsatisfaction
+    ADD CONSTRAINT fk3f30d9adeae850b2 FOREIGN KEY (resource) REFERENCES resource(id);
+
+
+--
+-- Name: fk41e073ae15671e92; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY resourceallocation
+    ADD CONSTRAINT fk41e073ae15671e92 FOREIGN KEY (assignment_function) REFERENCES assignment_function(id);
+
+
+--
+-- Name: fk41e073aeff61540d; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY resourceallocation
+    ADD CONSTRAINT fk41e073aeff61540d FOREIGN KEY (task) REFERENCES task(task_element_id);
+
+
+--
+-- Name: fk44d86d4707cd777; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY label
+    ADD CONSTRAINT fk44d86d4707cd777 FOREIGN KEY (label_type_id) REFERENCES label_type(id);
+
+
+--
+-- Name: fk4822b25e131853a1; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY criterion_type_work_report_type
+    ADD CONSTRAINT fk4822b25e131853a1 FOREIGN KEY (work_report_type_id) REFERENCES work_report_type(id);
+
+
+--
+-- Name: fk4822b25eff876347; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY criterion_type_work_report_type
+    ADD CONSTRAINT fk4822b25eff876347 FOREIGN KEY (criterion_type_id) REFERENCES criteriontype(id);
+
+
+--
+-- Name: fk5863798ca44abee3; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY resourcecalendar
+    ADD CONSTRAINT fk5863798ca44abee3 FOREIGN KEY (base_calendar_id) REFERENCES basecalendar(id);
+
+
+--
+-- Name: fk6017744297b1c209; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY orderline
+    ADD CONSTRAINT fk6017744297b1c209 FOREIGN KEY (orderelementid) REFERENCES orderelement(id);
+
+
+--
+-- Name: fk62b2994b4936bb8c; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY taskmilestone
+    ADD CONSTRAINT fk62b2994b4936bb8c FOREIGN KEY (task_element_id) REFERENCES taskelement(id);
+
+
+--
+-- Name: fk70d5d997a44abee3; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY taskelement
+    ADD CONSTRAINT fk70d5d997a44abee3 FOREIGN KEY (base_calendar_id) REFERENCES basecalendar(id);
+
+
+--
+-- Name: fk70d5d997a5f3c581; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY taskelement
+    ADD CONSTRAINT fk70d5d997a5f3c581 FOREIGN KEY (parent) REFERENCES taskgroup(task_element_id);
+
+
+--
+-- Name: fk70d5d997efda874f; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY taskelement
+    ADD CONSTRAINT fk70d5d997efda874f FOREIGN KEY (order_element_id) REFERENCES orderelement(id);
+
+
+--
+-- Name: fk7540af6b1545e7a; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY dependency
+    ADD CONSTRAINT fk7540af6b1545e7a FOREIGN KEY (origin) REFERENCES taskelement(id);
+
+
+--
+-- Name: fk7540af6be838f362; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY dependency
+    ADD CONSTRAINT fk7540af6be838f362 FOREIGN KEY (destination) REFERENCES taskelement(id);
+
+
+--
+-- Name: fk75a2f39df82680f8; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY order_table
+    ADD CONSTRAINT fk75a2f39df82680f8 FOREIGN KEY (orderelementid) REFERENCES orderlinegroup(orderelementid);
+
+
+--
+-- Name: fk7980035061f02c44; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY all_criterions
+    ADD CONSTRAINT fk7980035061f02c44 FOREIGN KEY (criterion_id) REFERENCES criterion(id);
+
+
+--
+-- Name: fk79800350b1524a73; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY all_criterions
+    ADD CONSTRAINT fk79800350b1524a73 FOREIGN KEY (generic_resource_allocation_id) REFERENCES generic_resource_allocation(resource_allocation_id);
+
+
+--
+-- Name: fk7d2eeb5d97b1c209; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY orderlinegroup
+    ADD CONSTRAINT fk7d2eeb5d97b1c209 FOREIGN KEY (orderelementid) REFERENCES orderelement(id);
+
+
+--
+-- Name: fk808010cfb216ed4c; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY advanceassignment
+    ADD CONSTRAINT fk808010cfb216ed4c FOREIGN KEY (advance_type_id) REFERENCES advancetype(id);
+
+
+--
+-- Name: fk80e79bda4936bb8c; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY taskgroup
+    ADD CONSTRAINT fk80e79bda4936bb8c FOREIGN KEY (task_element_id) REFERENCES taskelement(id);
+
+
+--
+-- Name: fk8e542e8114a5c61; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY criterion
+    ADD CONSTRAINT fk8e542e8114a5c61 FOREIGN KEY (id_criterion_type) REFERENCES criteriontype(id);
+
+
+--
+-- Name: fk8e542e813a156175; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY criterion
+    ADD CONSTRAINT fk8e542e813a156175 FOREIGN KEY (parent) REFERENCES criterion(id);
+
+
+--
+-- Name: fk9469dc27937680b7; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY machine
+    ADD CONSTRAINT fk9469dc27937680b7 FOREIGN KEY (machine_id) REFERENCES resource(id);
+
+
+--
+-- Name: fk9654b9ef5078e161; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY criterion_work_report_line
+    ADD CONSTRAINT fk9654b9ef5078e161 FOREIGN KEY (work_report_line_id) REFERENCES work_report_line(id);
+
+
+--
+-- Name: fk9654b9ef61f02c44; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY criterion_work_report_line
+    ADD CONSTRAINT fk9654b9ef61f02c44 FOREIGN KEY (criterion_id) REFERENCES criterion(id);
+
+
+--
+-- Name: fk9ac73f9e40901220; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY worker
+    ADD CONSTRAINT fk9ac73f9e40901220 FOREIGN KEY (worker_id) REFERENCES resource(id);
+
+
+--
+-- Name: fka3cfee1117b6c7cd; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY criterionhoursgroup
+    ADD CONSTRAINT fka3cfee1117b6c7cd FOREIGN KEY (hoursgroupid) REFERENCES hoursgroup(id);
+
+
+--
+-- Name: fka3cfee115c035047; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY criterionhoursgroup
+    ADD CONSTRAINT fka3cfee115c035047 FOREIGN KEY (criterionid) REFERENCES criterion(id);
+
+
+--
+-- Name: fkbb2f91fa2f2d3aec; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY advancemeasurement
+    ADD CONSTRAINT fkbb2f91fa2f2d3aec FOREIGN KEY (advance_assignment_id) REFERENCES advanceassignment(id);
+
+
+--
+-- Name: fkbb2f91faa9e53843; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY advancemeasurement
+    ADD CONSTRAINT fkbb2f91faa9e53843 FOREIGN KEY (advance_assignment_id) REFERENCES directadvanceassignment(advance_assignment_id);
+
+
+--
+-- Name: fkbb493f5048d21790; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY day_assignment
+    ADD CONSTRAINT fkbb493f5048d21790 FOREIGN KEY (resource_id) REFERENCES resource(id);
+
+
+--
+-- Name: fkbb493f506394139; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY day_assignment
+    ADD CONSTRAINT fkbb493f506394139 FOREIGN KEY (specific_resource_allocation_id) REFERENCES specific_resource_allocation(resource_allocation_id);
+
+
+--
+-- Name: fkbb493f50b1524a73; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY day_assignment
+    ADD CONSTRAINT fkbb493f50b1524a73 FOREIGN KEY (generic_resource_allocation_id) REFERENCES generic_resource_allocation(resource_allocation_id);
+
+
+--
+-- Name: fkc001d52efd5e49bc; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY hoursperday
+    ADD CONSTRAINT fkc001d52efd5e49bc FOREIGN KEY (base_calendar_id) REFERENCES calendardata(id);
+
+
+--
+-- Name: fkcf1f2cd01ed629ea; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY hoursgroup
+    ADD CONSTRAINT fkcf1f2cd01ed629ea FOREIGN KEY (parent_order_line) REFERENCES orderline(orderelementid);
+
+
+--
+-- Name: fkdbbb4fee1e635c19; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY orderelement
+    ADD CONSTRAINT fkdbbb4fee1e635c19 FOREIGN KEY (parent) REFERENCES orderlinegroup(orderelementid);
+
+
+--
+-- Name: fke203860c1c2746e; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY order_element_label
+    ADD CONSTRAINT fke203860c1c2746e FOREIGN KEY (label_id) REFERENCES label(id);
+
+
+--
+-- Name: fke203860efda874f; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY order_element_label
+    ADD CONSTRAINT fke203860efda874f FOREIGN KEY (order_element_id) REFERENCES orderelement(id);
+
+
+--
+-- Name: fkeb02c3f148d21790; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY work_report_line
+    ADD CONSTRAINT fkeb02c3f148d21790 FOREIGN KEY (resource_id) REFERENCES resource(id);
+
+
+--
+-- Name: fkeb02c3f1efda874f; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY work_report_line
+    ADD CONSTRAINT fkeb02c3f1efda874f FOREIGN KEY (order_element_id) REFERENCES orderelement(id);
+
+
+--
+-- Name: fkeb02c3f1f1a3177c; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY work_report_line
+    ADD CONSTRAINT fkeb02c3f1f1a3177c FOREIGN KEY (work_report_id) REFERENCES work_report(id);
+
+
+--
+-- Name: fkef86282ee893ce10; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY resource
+    ADD CONSTRAINT fkef86282ee893ce10 FOREIGN KEY (calendar) REFERENCES resourcecalendar(base_calendar_id);
+
+
+--
+-- Name: fkf0e8572475ed79ba; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY specific_resource_allocation
+    ADD CONSTRAINT fkf0e8572475ed79ba FOREIGN KEY (resource_allocation_id) REFERENCES resourceallocation(id);
+
+
+--
+-- Name: fkf0e85724eae850b2; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY specific_resource_allocation
+    ADD CONSTRAINT fkf0e85724eae850b2 FOREIGN KEY (resource) REFERENCES resource(id);
+
+
+--
+-- Name: fkf4bee4287fa34e3f; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY calendardata
+    ADD CONSTRAINT fkf4bee4287fa34e3f FOREIGN KEY (parent) REFERENCES basecalendar(id);
+
+
+--
+-- Name: fkf4bee428a44abee3; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY calendardata
+    ADD CONSTRAINT fkf4bee428a44abee3 FOREIGN KEY (base_calendar_id) REFERENCES basecalendar(id);
+
+
+--
+-- Name: fkf788b34975ed79ba; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY generic_resource_allocation
+    ADD CONSTRAINT fkf788b34975ed79ba FOREIGN KEY (resource_allocation_id) REFERENCES resourceallocation(id);
+
+
+--
+-- Name: fkf9ce78eda44abee3; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY exceptionday
+    ADD CONSTRAINT fkf9ce78eda44abee3 FOREIGN KEY (base_calendar_id) REFERENCES basecalendar(id);
+
+
+--
+-- Name: fkfc7b7be62f2d3aec; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY directadvanceassignment
+    ADD CONSTRAINT fkfc7b7be62f2d3aec FOREIGN KEY (advance_assignment_id) REFERENCES advanceassignment(id);
+
+
+--
+-- Name: fkfc7b7be6a1127ce5; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY directadvanceassignment
+    ADD CONSTRAINT fkfc7b7be6a1127ce5 FOREIGN KEY (direct_order_element_id) REFERENCES orderelement(id);
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- PostgreSQL database dump complete
+--
+

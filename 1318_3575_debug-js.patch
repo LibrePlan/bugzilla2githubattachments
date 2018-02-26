@@ -1,0 +1,26 @@
+diff --git a/libreplan-webapp/src/main/webapp/WEB-INF/zk.xml b/libreplan-webapp/src/main/webapp/WEB-INF/zk.xml
+index e04d8fb..fd0603e 100644
+--- a/libreplan-webapp/src/main/webapp/WEB-INF/zk.xml
++++ b/libreplan-webapp/src/main/webapp/WEB-INF/zk.xml
+@@ -49,4 +49,21 @@
+         <value>com.igalia.java.zk.components.JFreeChartEngine</value>
+     </library-property>
+ 
++       <!-- Turn on if you want to debug by copying JavaScript files directly
++                to classpath -->
++        <desktop-config>
++                <extendlet-check-period>5</extendlet-check-period>
++        </desktop-config>
++
++        <!-- Turn on if you want to debug JavaScript.
++                Once turned on, the uncompressed JavaScript files will be loaded. -->
++        <client-config>
++                <debug-js>true</debug-js>
++        </client-config>
++
++        <library-property>
++                <name>org.zkoss.web.classWebResource.cache</name>
++                <value>false</value>
++        </library-property>
++
+ </zk>

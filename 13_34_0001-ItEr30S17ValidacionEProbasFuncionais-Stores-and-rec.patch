@@ -1,0 +1,214 @@
+From 594e9872a158ff149dbc7e297ec24b44437b5912 Mon Sep 17 00:00:00 2001
+From: Manuel Rego Casasnovas <mrego@igalia.com>
+Date: Tue, 13 Oct 2009 18:26:50 +0200
+Subject: [PATCH] ItEr30S17ValidacionEProbasFuncionais: Stores and recovers milestone information properly. Fixes bug #13.
+
+---
+ .../business/orders/entities/Order.java            |    5 +-
+ .../business/planner/entities/TaskGroup.java       |    6 ++-
+ .../web/planner/AddMilestoneCommand.java           |   23 ++++++++++-
+ .../web/planner/OrderPlanningModel.java            |   43 +++++--------------
+ .../navalplanner/web/planner/PlanningState.java    |    4 ++
+ 5 files changed, 45 insertions(+), 36 deletions(-)
+
+diff --git a/navalplanner-business/src/main/java/org/navalplanner/business/orders/entities/Order.java b/navalplanner-business/src/main/java/org/navalplanner/business/orders/entities/Order.java
+index 3190ab4..68cf4ce 100644
+--- a/navalplanner-business/src/main/java/org/navalplanner/business/orders/entities/Order.java
++++ b/navalplanner-business/src/main/java/org/navalplanner/business/orders/entities/Order.java
+@@ -95,9 +95,8 @@ public class Order extends OrderLineGroup implements IValidable {
+ 
+     public List<TaskElement> getAssociatedTasks() {
+         ArrayList<TaskElement> result = new ArrayList<TaskElement>();
+-        for (OrderElement orderElement : getChildren()) {
+-            result.addAll(orderElement.getTaskElements());
+-        }
++        TaskGroup taskGroup = getAssociatedTaskElement();
++        result.addAll(taskGroup.getChildren());
+         return result;
+     }
+ 
+diff --git a/navalplanner-business/src/main/java/org/navalplanner/business/planner/entities/TaskGroup.java b/navalplanner-business/src/main/java/org/navalplanner/business/planner/entities/TaskGroup.java
+index ac3d19f..9cfadc8 100644
+--- a/navalplanner-business/src/main/java/org/navalplanner/business/planner/entities/TaskGroup.java
++++ b/navalplanner-business/src/main/java/org/navalplanner/business/planner/entities/TaskGroup.java
+@@ -51,9 +51,13 @@ public class TaskGroup extends TaskElement {
+     }
+ 
+     public void addTaskElement(TaskElement task) {
++        addTaskElement(taskElements.size(), task);
++    }
++
++    public void addTaskElement(Integer index, TaskElement task) {
+         Validate.notNull(task);
+         task.setParent(this);
+-        taskElements.add(task);
++        taskElements.add(index, task);
+     }
+ 
+     @Override
+diff --git a/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/AddMilestoneCommand.java b/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/AddMilestoneCommand.java
+index 345839a..0528990 100644
+--- a/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/AddMilestoneCommand.java
++++ b/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/AddMilestoneCommand.java
+@@ -22,11 +22,15 @@ package org.navalplanner.web.planner;
+ 
+ import static org.navalplanner.web.I18nHelper._;
+ 
++import org.navalplanner.business.planner.daos.ITaskElementDAO;
+ import org.navalplanner.business.planner.entities.TaskElement;
++import org.navalplanner.business.planner.entities.TaskGroup;
+ import org.navalplanner.business.planner.entities.TaskMilestone;
++import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.beans.factory.config.BeanDefinition;
+ import org.springframework.context.annotation.Scope;
+ import org.springframework.stereotype.Component;
++import org.springframework.transaction.annotation.Transactional;
+ import org.zkoss.ganttz.extensions.IContextWithPlannerTask;
+ 
+ /**
+@@ -39,18 +43,35 @@ public class AddMilestoneCommand implements IAddMilestoneCommand {
+ 
+     private PlanningState planningState;
+ 
++    @Autowired
++    private ITaskElementDAO taskElementDAO;
++
+     @Override
+     public void setState(PlanningState planningState) {
+         this.planningState = planningState;
+     }
+ 
+     @Override
++    @Transactional(readOnly = true)
+     public void doAction(IContextWithPlannerTask<TaskElement> context,
+             TaskElement task) {
+         TaskMilestone milestone = new TaskMilestone();
+         milestone.setName("new milestone");
++
++        taskElementDAO.save(task);
++        getRoot(task).addTaskElement(getRoot(task).getChildren().indexOf(task),
++                milestone);
++
+         context.add(context.getMapper().findPositionFor(task), milestone);
+-        planningState.added(milestone);
++        planningState.added(milestone.getParent());
++    }
++
++    private TaskGroup getRoot(TaskElement task) {
++        if (task.getParent() == null) {
++            return (TaskGroup) task;
++        }
++
++        return getRoot(task.getParent());
+     }
+ 
+     @Override
+diff --git a/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/OrderPlanningModel.java b/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/OrderPlanningModel.java
+index 0a26445..4da1f3e 100644
+--- a/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/OrderPlanningModel.java
++++ b/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/OrderPlanningModel.java
+@@ -27,7 +27,6 @@ import java.util.Collection;
+ import java.util.Collections;
+ import java.util.Comparator;
+ import java.util.Date;
+-import java.util.HashSet;
+ import java.util.List;
+ import java.util.Set;
+ import java.util.SortedMap;
+@@ -38,6 +37,7 @@ import org.navalplanner.business.calendars.entities.ResourceCalendar;
+ import org.navalplanner.business.common.exceptions.InstanceNotFoundException;
+ import org.navalplanner.business.orders.daos.IOrderDAO;
+ import org.navalplanner.business.orders.entities.Order;
++import org.navalplanner.business.orders.entities.OrderElement;
+ import org.navalplanner.business.planner.entities.DayAssignment;
+ import org.navalplanner.business.planner.entities.TaskElement;
+ import org.navalplanner.business.planner.entities.TaskMilestone;
+@@ -214,8 +214,9 @@ public abstract class OrderPlanningModel implements IOrderPlanningModel {
+             Order orderReloaded) {
+         ITaskElementAdapter taskElementAdapter = getTaskElementAdapter();
+         taskElementAdapter.setOrder(orderReloaded);
+-        planningState = new PlanningState(retainOnlyTopLevel(orderReloaded
+-                .getAssociatedTasks()), resourceDAO.list(Resource.class));
++        planningState = new PlanningState(orderReloaded.getAssociatedTasks(),
++                resourceDAO.list(Resource.class));
++
+         forceLoadOfDependenciesCollections(planningState.getInitial());
+         forceLoadOfWorkingHours(planningState.getInitial());
+         forceLoadOfLabels(planningState.getInitial());
+@@ -223,35 +224,12 @@ public abstract class OrderPlanningModel implements IOrderPlanningModel {
+                 new TaskElementNavigator(), planningState.getInitial());
+     }
+ 
+-    private Collection<? extends TaskElement> retainOnlyTopLevel(
+-            List<TaskElement> associatedTasks) {
+-        Set<TaskElement> descendantsFromOther = new HashSet<TaskElement>();
+-        for (TaskElement taskElement : associatedTasks) {
+-            descandants(descendantsFromOther, taskElement);
+-        }
+-        ArrayList<TaskElement> result = new ArrayList<TaskElement>();
+-        for (TaskElement taskElement : associatedTasks) {
+-            if (!descendantsFromOther.contains(taskElement)) {
+-                result.add(taskElement);
+-            }
+-        }
+-        return result;
+-    }
+-
+-    private void descandants(Set<TaskElement> accumulated,
+-            TaskElement taskElement) {
+-        if (taskElement.isLeaf()) {
+-            return;
+-        }
+-        for (TaskElement t : taskElement.getChildren()) {
+-            accumulated.add(t);
+-            descandants(accumulated, t);
+-        }
+-    }
+-
+     private void forceLoadOfWorkingHours(List<TaskElement> initial) {
+         for (TaskElement taskElement : initial) {
+-            taskElement.getOrderElement().getWorkHours();
++            OrderElement orderElement = taskElement.getOrderElement();
++            if (orderElement != null) {
++                orderElement.getWorkHours();
++            }
+             if (!taskElement.isLeaf()) {
+                 forceLoadOfWorkingHours(taskElement.getChildren());
+             }
+@@ -276,7 +254,10 @@ public abstract class OrderPlanningModel implements IOrderPlanningModel {
+     private void forceLoadOfLabels(List<TaskElement> initial) {
+         for (TaskElement taskElement : initial) {
+             if (taskElement.isLeaf()) {
+-                taskElement.getOrderElement().getLabels().size();
++                OrderElement orderElement = taskElement.getOrderElement();
++                if (orderElement != null) {
++                    orderElement.getLabels().size();
++                }
+             } else {
+                 forceLoadOfLabels(taskElement.getChildren());
+             }
+diff --git a/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/PlanningState.java b/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/PlanningState.java
+index 5986b7b..6ebdfeb 100644
+--- a/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/PlanningState.java
++++ b/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/PlanningState.java
+@@ -28,6 +28,7 @@ import java.util.List;
+ import java.util.Set;
+ 
+ import org.navalplanner.business.planner.entities.TaskElement;
++import org.navalplanner.business.planner.entities.TaskMilestone;
+ import org.navalplanner.business.resources.daos.IResourceDAO;
+ import org.navalplanner.business.resources.entities.Resource;
+ 
+@@ -92,6 +93,9 @@ public class PlanningState {
+     }
+ 
+     private boolean isTopLevel(TaskElement taskElement) {
++        if (taskElement instanceof TaskMilestone) {
++            return true;
++        }
+         return taskElement.getParent() == null;
+     }
+ 
+-- 
+1.6.0.4
+

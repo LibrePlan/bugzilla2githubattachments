@@ -1,0 +1,225 @@
+From 89d1ce1585c041c956e0d513ccbc84e1a698bb9a Mon Sep 17 00:00:00 2001
+From: Manuel Rego Casasnovas <rego@igalia.com>
+Date: Mon, 20 Feb 2012 15:43:10 +0100
+Subject: [PATCH] Bug #1374: Move capacity field to calendar tab in order to
+ be edited together
+
+FEA: ItEr76S04BugFixing
+---
+ .../calendars/BaseCalendarEditionController.java   |   12 ++++++++
+ .../libreplan/web/calendars/BaseCalendarModel.java |   30 ++++++++++++++++++++
+ .../web/calendars/IBaseCalendarModel.java          |    6 ++++
+ .../web/resources/worker/IWorkerModel.java         |    4 --
+ .../web/resources/worker/WorkerCRUDController.java |   18 ------------
+ .../web/resources/worker/WorkerModel.java          |   16 ----------
+ .../src/main/webapp/calendars/_edition.zul         |    4 ++
+ .../src/main/webapp/resources/worker/_edition.zul  |    4 --
+ 8 files changed, 52 insertions(+), 42 deletions(-)
+
+diff --git a/libreplan-webapp/src/main/java/org/libreplan/web/calendars/BaseCalendarEditionController.java b/libreplan-webapp/src/main/java/org/libreplan/web/calendars/BaseCalendarEditionController.java
+index d5ff6aa..6d4fca3 100644
+--- a/libreplan-webapp/src/main/java/org/libreplan/web/calendars/BaseCalendarEditionController.java
++++ b/libreplan-webapp/src/main/java/org/libreplan/web/calendars/BaseCalendarEditionController.java
+@@ -1550,4 +1550,16 @@ public abstract class BaseCalendarEditionController extends
+         }
+     }
+ 
++    public boolean isVirtualWorker() {
++        return baseCalendarModel.isVirtualWorker();
++    }
++
++    public Integer getCapacity() {
++        return baseCalendarModel.getCapacity();
++    }
++
++    public void setCapacity(Integer capacity) {
++        baseCalendarModel.setCapacity(capacity);
++    }
++
+ }
+diff --git a/libreplan-webapp/src/main/java/org/libreplan/web/calendars/BaseCalendarModel.java b/libreplan-webapp/src/main/java/org/libreplan/web/calendars/BaseCalendarModel.java
+index 935102e..038c6df 100644
+--- a/libreplan-webapp/src/main/java/org/libreplan/web/calendars/BaseCalendarModel.java
++++ b/libreplan-webapp/src/main/java/org/libreplan/web/calendars/BaseCalendarModel.java
+@@ -856,4 +856,34 @@ public class BaseCalendarModel extends IntegrationEntityModel implements
+         return false;
+     }
+ 
++    @Override
++    public boolean isVirtualWorker() {
++        if (baseCalendar == null) {
++            return false;
++        }
++        if (baseCalendar instanceof ResourceCalendar) {
++            ResourceCalendar resourceCalendar = (ResourceCalendar) baseCalendar;
++            return (resourceCalendar.getResource() != null)
++                    && resourceCalendar.getResource().isVirtual();
++        }
++        return false;
++    }
++
++    @Override
++    public Integer getCapacity() {
++        if (isVirtualWorker()) {
++            ResourceCalendar resourceCalendar = (ResourceCalendar) baseCalendar;
++            return resourceCalendar.getCapacity();
++        }
++        return 1;
++    }
++
++    @Override
++    public void setCapacity(Integer capacity) {
++        if (isVirtualWorker()) {
++            ResourceCalendar resourceCalendar = (ResourceCalendar) baseCalendar;
++            resourceCalendar.setCapacity(capacity);
++        }
++    }
++
+ }
+diff --git a/libreplan-webapp/src/main/java/org/libreplan/web/calendars/IBaseCalendarModel.java b/libreplan-webapp/src/main/java/org/libreplan/web/calendars/IBaseCalendarModel.java
+index 2ee470d..7596e24 100644
+--- a/libreplan-webapp/src/main/java/org/libreplan/web/calendars/IBaseCalendarModel.java
++++ b/libreplan-webapp/src/main/java/org/libreplan/web/calendars/IBaseCalendarModel.java
+@@ -220,4 +220,10 @@ public interface IBaseCalendarModel extends IIntegrationEntityModel {
+ 
+     boolean isOwnExceptionDay();
+ 
++    boolean isVirtualWorker();
++
++    Integer getCapacity();
++
++    void setCapacity(Integer capacity);
++
+ }
+diff --git a/libreplan-webapp/src/main/java/org/libreplan/web/resources/worker/IWorkerModel.java b/libreplan-webapp/src/main/java/org/libreplan/web/resources/worker/IWorkerModel.java
+index f2cd9d8..e3ee56c 100644
+--- a/libreplan-webapp/src/main/java/org/libreplan/web/resources/worker/IWorkerModel.java
++++ b/libreplan-webapp/src/main/java/org/libreplan/web/resources/worker/IWorkerModel.java
+@@ -132,10 +132,6 @@ public interface IWorkerModel extends IIntegrationEntityModel {
+ 
+     BaseCalendar getDefaultCalendar();
+ 
+-    Integer getCapacity();
+-
+-    void setCapacity(Integer capacity);
+-
+     public List<Worker> getFilteredWorker(ResourcePredicate predicate);
+ 
+     public List<Worker> getAllCurrentWorkers();
+diff --git a/libreplan-webapp/src/main/java/org/libreplan/web/resources/worker/WorkerCRUDController.java b/libreplan-webapp/src/main/java/org/libreplan/web/resources/worker/WorkerCRUDController.java
+index f2969a0..13eea9a 100644
+--- a/libreplan-webapp/src/main/java/org/libreplan/web/resources/worker/WorkerCRUDController.java
++++ b/libreplan-webapp/src/main/java/org/libreplan/web/resources/worker/WorkerCRUDController.java
+@@ -216,9 +216,6 @@ public class WorkerCRUDController extends GenericForwardComposer implements
+                     return false;
+                 }
+             }
+-            if (workerModel.getWorker().isVirtual()) {
+-                workerModel.setCapacity(getVirtualWorkerCapacity());
+-            }
+             if (workerModel.getCalendar() == null) {
+                 createCalendar();
+             }
+@@ -517,7 +514,6 @@ public class WorkerCRUDController extends GenericForwardComposer implements
+             @Override
+             public void save() {
+                 validateCalendarExceptionCodes();
+-                Integer capacity = workerModel.getCapacity();
+                 ResourceCalendar calendar = (ResourceCalendar) resourceCalendarModel
+                         .getBaseCalendar();
+                 if (calendar != null) {
+@@ -525,7 +521,6 @@ public class WorkerCRUDController extends GenericForwardComposer implements
+                     workerModel.setCalendar(calendar);
+                 }
+                 reloadCurrentWindow();
+-                workerModel.setCapacity(capacity);
+             }
+ 
+             @Override
+@@ -603,19 +598,6 @@ public class WorkerCRUDController extends GenericForwardComposer implements
+         }
+     }
+ 
+-    public Integer getVirtualWorkerCapacity() {
+-        if (isVirtualWorker()) {
+-            if (this.workerModel.getCalendar() != null) {
+-                return this.workerModel.getCapacity();
+-            }
+-        }
+-        return 1;
+-    }
+-
+-    public void setVirtualWorkerCapacity(Integer capacity) {
+-        this.workerModel.setCapacity(capacity);
+-    }
+-
+     /**
+      * Operations to filter the machines by multiple filters
+      */
+diff --git a/libreplan-webapp/src/main/java/org/libreplan/web/resources/worker/WorkerModel.java b/libreplan-webapp/src/main/java/org/libreplan/web/resources/worker/WorkerModel.java
+index 2f5cbab..46d8033 100644
+--- a/libreplan-webapp/src/main/java/org/libreplan/web/resources/worker/WorkerModel.java
++++ b/libreplan-webapp/src/main/java/org/libreplan/web/resources/worker/WorkerModel.java
+@@ -203,7 +203,6 @@ public class WorkerModel extends IntegrationEntityModel implements IWorkerModel
+ 
+         if (virtual) {
+             worker = VirtualWorker.create("");
+-            setCapacity(1);
+         } else {
+             worker = Worker.create("");
+         }
+@@ -547,21 +546,6 @@ public class WorkerModel extends IntegrationEntityModel implements IWorkerModel
+         return null;
+     }
+ 
+-    @Override
+-    public Integer getCapacity() {
+-        if (getCalendar() != null) {
+-            return getCalendar().getCapacity();
+-        }
+-        return null;
+-    }
+-
+-    @Override
+-    public void setCapacity(Integer capacity) {
+-        if (getCalendar() != null) {
+-            getCalendar().setCapacity(capacity);
+-        }
+-    }
+-
+     public IAssignedCriterionsModel getAssignedCriterionsModel() {
+         return assignedCriterionsModel;
+     }
+diff --git a/libreplan-webapp/src/main/webapp/calendars/_edition.zul b/libreplan-webapp/src/main/webapp/calendars/_edition.zul
+index b61d68c..f96d633 100644
+--- a/libreplan-webapp/src/main/webapp/calendars/_edition.zul
++++ b/libreplan-webapp/src/main/webapp/calendars/_edition.zul
+@@ -62,6 +62,10 @@
+                   checked="@{calendarController.baseCalendar.codeAutogenerated}" />
+               </hbox>
+             </row>
++            <row visible="@{calendarController.editionController.virtualWorker}">
++              <label value="${i18n:_('Capacity')}" />
++              <intbox value="@{calendarController.editionController.capacity}" width="100px" constraint="no negative,no zero,no empty" />
++            </row>
+           </rows>
+         </grid>
+ 
+diff --git a/libreplan-webapp/src/main/webapp/resources/worker/_edition.zul b/libreplan-webapp/src/main/webapp/resources/worker/_edition.zul
+index a4eaa19..cf6d17f 100644
+--- a/libreplan-webapp/src/main/webapp/resources/worker/_edition.zul
++++ b/libreplan-webapp/src/main/webapp/resources/worker/_edition.zul
+@@ -86,10 +86,6 @@
+                                 disabled="@{controller.isEditing}" />
+                         </row>
+                         <row visible="@{controller.isVirtualWorker}">
+-                            <label value="${i18n:_('Capacity')}" />
+-                            <intbox value="@{controller.virtualWorkerCapacity}" width="100px" constraint="no negative,no zero,no empty" />
+-                        </row>
+-                        <row visible="@{controller.isVirtualWorker}">
+                             <label value="${i18n:_('Observations')}" />
+                             <textbox value="@{controller.virtualWorkerObservations}" width="500px" multiline="true" />
+                         </row>
+-- 
+1.7.9
+

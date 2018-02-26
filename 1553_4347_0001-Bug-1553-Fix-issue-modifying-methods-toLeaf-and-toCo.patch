@@ -1,0 +1,43 @@
+From 4fe4aa032f8147339c463cf6f25a9c6dc944ab7c Mon Sep 17 00:00:00 2001
+From: Manuel Rego Casasnovas <rego@igalia.com>
+Date: Wed, 31 Oct 2012 14:57:55 +0100
+Subject: [PATCH] Bug #1553: Fix issue modifying methods toLeaf and
+ toContainer
+
+FEA: ItEr77S04BugFixing
+---
+ .../main/java/org/libreplan/business/orders/entities/OrderLine.java |    2 ++
+ .../java/org/libreplan/business/orders/entities/OrderLineGroup.java |    3 ++-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/libreplan-business/src/main/java/org/libreplan/business/orders/entities/OrderLine.java b/libreplan-business/src/main/java/org/libreplan/business/orders/entities/OrderLine.java
+index ded2427..fac42a8 100644
+--- a/libreplan-business/src/main/java/org/libreplan/business/orders/entities/OrderLine.java
++++ b/libreplan-business/src/main/java/org/libreplan/business/orders/entities/OrderLine.java
+@@ -152,7 +152,9 @@ public class OrderLine extends OrderElement {
+     @Override
+     public OrderLineGroup toContainer() {
+         OrderLineGroup result = OrderLineGroup.create();
++        result.setCode(getCode());
+         result.setName(getName());
++        setCode("");
+         setName("");
+         return result;
+     }
+diff --git a/libreplan-business/src/main/java/org/libreplan/business/orders/entities/OrderLineGroup.java b/libreplan-business/src/main/java/org/libreplan/business/orders/entities/OrderLineGroup.java
+index b201fe6..bbd90cf 100644
+--- a/libreplan-business/src/main/java/org/libreplan/business/orders/entities/OrderLineGroup.java
++++ b/libreplan-business/src/main/java/org/libreplan/business/orders/entities/OrderLineGroup.java
+@@ -336,7 +336,8 @@ public class OrderLineGroup extends OrderElement implements
+         OrderLine result = OrderLine.create();
+ 
+         result.infoComponent = getInfoComponent().copy();
+-        result.setCode(null);
++        result.setCode(getCode());
++        setCode("");
+         result.setInitDate(getInitDate());
+         result.setDeadline(getDeadline());
+ 
+-- 
+1.7.10.4
+

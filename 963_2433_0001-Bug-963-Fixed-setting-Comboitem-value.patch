@@ -1,0 +1,24 @@
+From 647c3629ed6abd7ad3e063333df4388099b0e853 Mon Sep 17 00:00:00 2001
+From: Manuel Rego Casasnovas <mrego@igalia.com>
+Date: Mon, 4 Apr 2011 12:43:59 +0200
+Subject: [PATCH] [Bug #963] Fixed setting Comboitem value.
+
+---
+ .../planner/company/CompanyPlanningController.java |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/company/CompanyPlanningController.java b/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/company/CompanyPlanningController.java
+index c07d660..06475f9 100644
+--- a/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/company/CompanyPlanningController.java
++++ b/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/company/CompanyPlanningController.java
+@@ -176,6 +176,7 @@ public class CompanyPlanningController implements Composer {
+         @Override
+         public void render(Comboitem item, Object data) throws Exception {
+             ProgressType progressType = (ProgressType) data;
++            item.setValue(progressType);
+             item.setLabel(_(progressType.getValue()));
+         }
+     }
+-- 
+1.7.1
+

@@ -1,0 +1,13 @@
+diff --git a/libreplan-webapp/src/main/java/org/libreplan/web/print/CutyPrint.java b/libreplan-webapp/src/main/java/org/libreplan/web/print/CutyPrint.java
+index a0c3161..59d88db 100644
+--- a/libreplan-webapp/src/main/java/org/libreplan/web/print/CutyPrint.java
++++ b/libreplan-webapp/src/main/java/org/libreplan/web/print/CutyPrint.java
+@@ -168,7 +168,7 @@ public class CutyPrint {
+ 
+         // Add capture destination callback URL
+         String hostName = resolveLocalHost(request);
+-        captureString += " --url=http://" + hostName + ":"
++        captureString += " --url="+ request.getScheme() + "://" + hostName + ":"
+                 + request.getLocalPort() + url;
+         if (parameters != null) {
+             captureString += "?";

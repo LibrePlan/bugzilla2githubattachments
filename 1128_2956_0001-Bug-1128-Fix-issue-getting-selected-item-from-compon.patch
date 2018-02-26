@@ -1,0 +1,48 @@
+From 2252fb66097807642c40bbea1521a84fa7315ee5 Mon Sep 17 00:00:00 2001
+From: Manuel Rego Casasnovas <rego@igalia.com>
+Date: Tue, 2 Aug 2011 18:16:21 +0200
+Subject: [PATCH] [Bug #1128] Fix issue getting selected item from component
+
+FEA: ItEr75S04BugFixing
+---
+ .../ManageOrderElementAdvancesController.java      |    3 ++-
+ .../webapp/orders/_listOrderElementAdvances.zul    |    2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/navalplanner-webapp/src/main/java/org/navalplanner/web/orders/ManageOrderElementAdvancesController.java b/navalplanner-webapp/src/main/java/org/navalplanner/web/orders/ManageOrderElementAdvancesController.java
+index d3f9df9..9a1f93c 100644
+--- a/navalplanner-webapp/src/main/java/org/navalplanner/web/orders/ManageOrderElementAdvancesController.java
++++ b/navalplanner-webapp/src/main/java/org/navalplanner/web/orders/ManageOrderElementAdvancesController.java
+@@ -221,7 +221,7 @@ public class ManageOrderElementAdvancesController extends
+ 
+     private Listbox editAdvances;
+ 
+-    public void selectAdvanceLine(Listitem selectedItem) {
++    public void selectAdvanceLine() {
+         /*
+          * validate the previous advance line before changing the selected
+          * advance.
+@@ -233,6 +233,7 @@ public class ManageOrderElementAdvancesController extends
+          * preparation to select the advance line. Set the current selected
+          * index that will show when the grid reloads.
+          */
++        Listitem selectedItem = editAdvances.getSelectedItem();
+         AdvanceAssignment advance = (AdvanceAssignment) selectedItem.getValue();
+         indexSelectedItem = editAdvances.getIndexOfItem(selectedItem);
+         prepareEditAdvanceMeasurements(advance);
+diff --git a/navalplanner-webapp/src/main/webapp/orders/_listOrderElementAdvances.zul b/navalplanner-webapp/src/main/webapp/orders/_listOrderElementAdvances.zul
+index 5bd4026..ddcb46d 100644
+--- a/navalplanner-webapp/src/main/webapp/orders/_listOrderElementAdvances.zul
++++ b/navalplanner-webapp/src/main/webapp/orders/_listOrderElementAdvances.zul
+@@ -36,7 +36,7 @@
+             <listbox id="editAdvances" height="170px"
+                      model="@{manageOrderElementAdvancesController.advanceAssignments}"
+                      itemRenderer="@{manageOrderElementAdvancesController.advancesRenderer}" mold="paging"
+-                     onSelect="manageOrderElementAdvancesController.selectAdvanceLine(self.selectedItem);"
++                     onSelect="manageOrderElementAdvancesController.selectAdvanceLine();"
+                      pageSize="4">
+                     <listhead sizable="true">
+                          <listheader label="${i18n:_('Type')}" width="150px" tooltiptext="Progress unit type" />
+-- 
+1.7.6
+

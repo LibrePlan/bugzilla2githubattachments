@@ -1,0 +1,63 @@
+From 9c55324978f7dd6dbc9ef8eae06b64b9a075732c Mon Sep 17 00:00:00 2001
+Message-Id: <9c55324978f7dd6dbc9ef8eae06b64b9a075732c.1300787033.git.dpino@igalia.com>
+In-Reply-To: <e73e807d9509bdabe1ceebcc861fb99645f1d4a8.1300787033.git.dpino@igalia.com>
+References: <e73e807d9509bdabe1ceebcc861fb99645f1d4a8.1300787033.git.dpino@igalia.com>
+From: Diego Pino Garcia <dpino@igalia.com>
+Date: Tue, 22 Mar 2011 10:43:15 +0100
+Subject: [PATCH 2/2] [Bug #943] Temporal fix, LOG error instead of launching exception
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="------------1.7.0.4"
+
+This is a multi-part message in MIME format.
+--------------1.7.0.4
+Content-Type: text/plain; charset=UTF-8; format=fixed
+Content-Transfer-Encoding: 8bit
+
+---
+ .../planner/entities/ResourceAllocation.java       |    9 +++++++--
+ 1 files changed, 7 insertions(+), 2 deletions(-)
+
+
+--------------1.7.0.4
+Content-Type: text/x-patch; name="0002-Bug-943-Temporal-fix-LOG-error-instead-of-launching-.patch"
+Content-Transfer-Encoding: 8bit
+Content-Disposition: attachment; filename="0002-Bug-943-Temporal-fix-LOG-error-instead-of-launching-.patch"
+
+diff --git a/navalplanner-business/src/main/java/org/navalplanner/business/planner/entities/ResourceAllocation.java b/navalplanner-business/src/main/java/org/navalplanner/business/planner/entities/ResourceAllocation.java
+index 3126101..98163cf 100644
+--- a/navalplanner-business/src/main/java/org/navalplanner/business/planner/entities/ResourceAllocation.java
++++ b/navalplanner-business/src/main/java/org/navalplanner/business/planner/entities/ResourceAllocation.java
+@@ -38,6 +38,8 @@ import java.util.Map.Entry;
+ import java.util.Set;
+ 
+ import org.apache.commons.lang.Validate;
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
+ import org.hibernate.validator.Min;
+ import org.hibernate.validator.NotNull;
+ import org.joda.time.LocalDate;
+@@ -77,6 +79,8 @@ import org.navalplanner.business.workingday.ResourcesPerDay;
+ public abstract class ResourceAllocation<T extends DayAssignment> extends
+         BaseEntity {
+ 
++    private static final Log LOG = LogFactory.getLog(ResourceAllocation.class);
++
+     public static <T extends ResourceAllocation<?>> List<T> getSatisfied(
+             Collection<T> resourceAllocations) {
+         Validate.notNull(resourceAllocations);
+@@ -240,8 +244,9 @@ public abstract class ResourceAllocation<T extends DayAssignment> extends
+                 List<ResourcesPerDayModification> allocations) {
+             for (ResourcesPerDayModification r : allocations) {
+                 if (isZero(r.getGoal().getAmount())) {
+-                    throw new IllegalArgumentException(
+-                            "all resources per day must be no zero");
++                    // FIXME: Temporal fix for bug 943, log error instead of
++                    // launching exception
++                    LOG.error("all resources per day must be no zero");
+                 }
+             }
+         }
+
+--------------1.7.0.4--
+
+

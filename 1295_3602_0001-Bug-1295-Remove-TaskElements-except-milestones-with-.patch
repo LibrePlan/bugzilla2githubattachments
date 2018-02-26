@@ -1,0 +1,82 @@
+From c6d256abeb7510bffff0d49f5a04bc64dcdd4caf Mon Sep 17 00:00:00 2001
+From: Manuel Rego Casasnovas <rego@igalia.com>
+Date: Mon, 9 Jan 2012 10:51:38 +0100
+Subject: [PATCH] [Bug #1295] Remove TaskElements (except milestones) with
+ TaskSource null when saving
+
+Possible hack to prevent issue
+
+FEA: ItEr76S04BugFixing
+---
+ .../business/planner/daos/ITaskElementDAO.java     |    2 ++
+ .../business/planner/daos/TaskElementDAO.java      |   10 ++++++++++
+ .../web/planner/order/SaveCommandBuilder.java      |   16 ++++++++++++++++
+ 3 files changed, 28 insertions(+), 0 deletions(-)
+
+diff --git a/libreplan-business/src/main/java/org/libreplan/business/planner/daos/ITaskElementDAO.java b/libreplan-business/src/main/java/org/libreplan/business/planner/daos/ITaskElementDAO.java
+index e63ead9..e9f751f 100644
+--- a/libreplan-business/src/main/java/org/libreplan/business/planner/daos/ITaskElementDAO.java
++++ b/libreplan-business/src/main/java/org/libreplan/business/planner/daos/ITaskElementDAO.java
+@@ -37,4 +37,6 @@ public interface ITaskElementDAO extends IGenericDAO<TaskElement, Long> {
+ 
+     List<TaskElement> listFilteredByDate(Date start, Date end);
+ 
++    List<TaskElement> getTaskElementsNoMilestonesWithoutTaskSource();
++
+ }
+diff --git a/libreplan-business/src/main/java/org/libreplan/business/planner/daos/TaskElementDAO.java b/libreplan-business/src/main/java/org/libreplan/business/planner/daos/TaskElementDAO.java
+index cb50f54..6c99ef9 100644
+--- a/libreplan-business/src/main/java/org/libreplan/business/planner/daos/TaskElementDAO.java
++++ b/libreplan-business/src/main/java/org/libreplan/business/planner/daos/TaskElementDAO.java
+@@ -26,6 +26,7 @@ import java.util.List;
+ 
+ import org.hibernate.Criteria;
+ import org.hibernate.Hibernate;
++import org.hibernate.Query;
+ import org.hibernate.criterion.Restrictions;
+ import org.joda.time.LocalDate;
+ import org.libreplan.business.common.daos.GenericDAOHibernate;
+@@ -118,4 +119,13 @@ public class TaskElementDAO extends GenericDAOHibernate<TaskElement, Long>
+         super.save(taskElement);
+     }
+ 
++    @Override
++    public List<TaskElement> getTaskElementsNoMilestonesWithoutTaskSource() {
++        String strQuery = "FROM TaskElement "
++                + "WHERE id NOT IN (SELECT id FROM TaskSource) AND "
++                + "id NOT IN (SELECT id FROM TaskMilestone)";
++        Query query = getSession().createQuery(strQuery);
++        return query.list();
++    }
++
+ }
+diff --git a/libreplan-webapp/src/main/java/org/libreplan/web/planner/order/SaveCommandBuilder.java b/libreplan-webapp/src/main/java/org/libreplan/web/planner/order/SaveCommandBuilder.java
+index 9f3e208..01676a1 100644
+--- a/libreplan-webapp/src/main/java/org/libreplan/web/planner/order/SaveCommandBuilder.java
++++ b/libreplan-webapp/src/main/java/org/libreplan/web/planner/order/SaveCommandBuilder.java
+@@ -358,6 +358,22 @@ public class SaveCommandBuilder {
+             subcontractedTaskDataDAO.removeOrphanedSubcontractedTaskData();
+ 
+             saveOrderAuthorizations();
++
++            removeTaskElementsWithTaskSourceNull();
++        }
++
++        private void removeTaskElementsWithTaskSourceNull() {
++            List<TaskElement> toRemove = taskElementDAO
++                    .getTaskElementsNoMilestonesWithoutTaskSource();
++            for (TaskElement taskElement : toRemove) {
++                try {
++                    taskElementDAO.remove(taskElement.getId());
++                } catch (InstanceNotFoundException e) {
++                    // Do nothing
++                    // Maybe it was already removed before reaching this point
++                    // so if it's not in the database there isn't any problem
++                }
++            }
+         }
+ 
+         private void saveOrderAuthorizations() {
+-- 
+1.7.7.3
+

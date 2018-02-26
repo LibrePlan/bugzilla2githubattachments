@@ -1,0 +1,55 @@
+From f407a23afebfda6865e67a291cdd4953a5f28085 Mon Sep 17 00:00:00 2001
+From: Manuel Rego Casasnovas <mrego@igalia.com>
+Date: Tue, 8 Dec 2009 09:33:07 +0100
+Subject: [PATCH] ItEr38S05ValidacionEProbasFuncionaisItEr37S06: [Bug #91] WIP. Allowing to set dates after task end date. (Pending to change the task end date)
+
+---
+ .../planner/allocation/StretchesFunctionModel.java |   27 +++++++++++++++++---
+ 1 files changed, 23 insertions(+), 4 deletions(-)
+
+diff --git a/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/allocation/StretchesFunctionModel.java b/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/allocation/StretchesFunctionModel.java
+index f6ea42e..a1b2cea 100644
+--- a/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/allocation/StretchesFunctionModel.java
++++ b/navalplanner-webapp/src/main/java/org/navalplanner/web/planner/allocation/StretchesFunctionModel.java
+@@ -184,15 +184,34 @@ public class StretchesFunctionModel implements IStretchesFunctionModel {
+     @Override
+     public void setStretchDate(Stretch stretch, Date date)
+             throws IllegalArgumentException {
+-        if ((date.compareTo(task.getStartDate()) < 0)
+-                || (date.compareTo(task.getEndDate()) > 0)) {
++        if (date.compareTo(task.getStartDate()) < 0) {
+             throw new IllegalArgumentException(
+-                    _("Stretch date should be between task dates"));
++                    _("Stretch date should be greater or equals than task start date"));
+         }
+ 
+         stretch.setDate(new LocalDate(date));
+ 
+-        long stretchDate = date.getTime();
++        if ((date.compareTo(task.getEndDate()) > 0)
++                || (stretch.getAmountWorkPercentage().compareTo(BigDecimal.ONE) == 0)) {
++            task.setEndDate(date);
++            recalculateStretchesPercentages();
++        } else {
++            calculatePercentage(stretch);
++        }
++    }
++
++    private void recalculateStretchesPercentages() {
++        List<Stretch> stretches = stretchesFunction.getStretches();
++        if (!stretches.isEmpty()) {
++            for (Stretch stretch : stretches) {
++                calculatePercentage(stretch);
++            }
++        }
++    }
++
++    private void calculatePercentage(Stretch stretch) {
++        long stretchDate = stretch.getDate().toDateTimeAtStartOfDay().toDate()
++                .getTime();
+         long startDate = task.getStartDate().getTime();
+         long endDate = task.getEndDate().getTime();
+ 
+-- 
+1.6.0.4
+

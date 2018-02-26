@@ -1,0 +1,80 @@
+From aec177a867d623997d983ee085d75b48ac3242a2 Mon Sep 17 00:00:00 2001
+From: Susana Montes Pedreira <smontes@wirelessgalicia.com>
+Date: Tue, 15 Mar 2011 12:35:17 +0100
+Subject: [PATCH] [Bug #914] add the property 'expandAll' to render the tree with open or closed items
+
+FEA : ItEr72S04BugFixing
+---
+ .../web/orders/OrderElementTreeController.java     |    7 +++++++
+ .../org/navalplanner/web/tree/TreeController.java  |   11 +++++++++++
+ 2 files changed, 18 insertions(+), 0 deletions(-)
+
+diff --git a/navalplanner-webapp/src/main/java/org/navalplanner/web/orders/OrderElementTreeController.java b/navalplanner-webapp/src/main/java/org/navalplanner/web/orders/OrderElementTreeController.java
+index 815d5ab..b51c29d 100644
+--- a/navalplanner-webapp/src/main/java/org/navalplanner/web/orders/OrderElementTreeController.java
++++ b/navalplanner-webapp/src/main/java/org/navalplanner/web/orders/OrderElementTreeController.java
+@@ -331,6 +331,11 @@ public class OrderElementTreeController extends TreeController<OrderElement> {
+         // Is already added?
+         Button button = (Button) ComponentsFinder.findById("expandAllButton", children);
+         if (button != null) {
++            if (button.getSclass().equals("planner-command")) {
++                setExpandAll(false);
++            } else {
++                setExpandAll(true);
++            }
+             return;
+         }
+ 
+@@ -356,6 +361,7 @@ public class OrderElementTreeController extends TreeController<OrderElement> {
+     }
+ 
+     public void expandAll() {
++        setExpandAll(true);
+         Set<Treeitem> childrenSet = new HashSet<Treeitem>();
+         Treechildren children = tree.getTreechildren();
+         if(children != null) {
+@@ -381,6 +387,7 @@ public class OrderElementTreeController extends TreeController<OrderElement> {
+     }
+ 
+     public void collapseAll() {
++        setExpandAll(false);
+         Treechildren children = tree.getTreechildren();
+         for(Treeitem each: (Collection<Treeitem>) children.getItems()) {
+             each.setOpen(false);
+diff --git a/navalplanner-webapp/src/main/java/org/navalplanner/web/tree/TreeController.java b/navalplanner-webapp/src/main/java/org/navalplanner/web/tree/TreeController.java
+index e9ccc6c..833c590 100644
+--- a/navalplanner-webapp/src/main/java/org/navalplanner/web/tree/TreeController.java
++++ b/navalplanner-webapp/src/main/java/org/navalplanner/web/tree/TreeController.java
+@@ -86,6 +86,8 @@ public abstract class TreeController<T extends ITreeNode<T>> extends
+ 
+     private final Class<T> type;
+ 
++    private Boolean expandAll = false;
++
+     public abstract Renderer getRenderer();
+ 
+     protected TreeController(Class<T> type) {
+@@ -612,6 +614,7 @@ public abstract class TreeController<T extends ITreeNode<T>> extends
+             final T currentElement = type.cast(data);
+             createCells(item, currentElement);
+             onDropMoveFromDraggedToTarget();
++            item.setOpen(isExpandAll());
+         }
+ 
+         protected void checkInvalidValues(
+@@ -1055,4 +1058,12 @@ public abstract class TreeController<T extends ITreeNode<T>> extends
+         this.orderElementTreeComponent = orderElementsTree;
+     }
+ 
++    public void setExpandAll(Boolean expandAll) {
++        this.expandAll = expandAll;
++    }
++
++    public Boolean isExpandAll() {
++        return expandAll;
++    }
++
+ }
+-- 
+1.7.3
+

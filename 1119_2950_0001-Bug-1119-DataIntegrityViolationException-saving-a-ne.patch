@@ -1,0 +1,172 @@
+From e58e734d2f408fe51b4995d9bc3ad13980941f2b Mon Sep 17 00:00:00 2001
+From: Cristina Alvarino <cristina.alvarino@comtecsf.es>
+Date: Tue, 2 Aug 2011 14:31:34 +0200
+Subject: [PATCH] [Bug #1119] DataIntegrityViolationException saving a new Process
+
+FEA: ItEr75S04BugFixing
+---
+ .../business/advance/daos/AdvanceTypeDAO.java      |   37 ++++++++++++++++++++
+ .../business/advance/daos/IAdvanceTypeDAO.java     |    9 +++++
+ .../business/advance/entities/AdvanceType.java     |   29 +++++++++++++++-
+ 3 files changed, 74 insertions(+), 1 deletions(-)
+
+diff --git a/navalplanner-business/src/main/java/org/navalplanner/business/advance/daos/AdvanceTypeDAO.java b/navalplanner-business/src/main/java/org/navalplanner/business/advance/daos/AdvanceTypeDAO.java
+index d546f39..f9a60f3 100644
+--- a/navalplanner-business/src/main/java/org/navalplanner/business/advance/daos/AdvanceTypeDAO.java
++++ b/navalplanner-business/src/main/java/org/navalplanner/business/advance/daos/AdvanceTypeDAO.java
+@@ -24,13 +24,17 @@ package org.navalplanner.business.advance.daos;
+ import java.util.Collection;
+ import java.util.List;
+ 
++import org.hibernate.Criteria;
++import org.hibernate.criterion.MatchMode;
+ import org.hibernate.criterion.Restrictions;
+ import org.navalplanner.business.advance.entities.AdvanceAssignment;
+ import org.navalplanner.business.advance.entities.AdvanceType;
+ import org.navalplanner.business.common.daos.GenericDAOHibernate;
++import org.navalplanner.business.common.exceptions.InstanceNotFoundException;
+ import org.springframework.beans.factory.config.BeanDefinition;
+ import org.springframework.context.annotation.Scope;
+ import org.springframework.stereotype.Repository;
++import org.springframework.transaction.annotation.Propagation;
+ import org.springframework.transaction.annotation.Transactional;
+ 
+ /**
+@@ -70,4 +74,37 @@ public class AdvanceTypeDAO extends GenericDAOHibernate<AdvanceType, Long>
+                 Restrictions.eq("advanceType", advanceType)).list().isEmpty();
+     }
+ 
++    @Override
++    @Transactional(readOnly=true)
++    public AdvanceType findByNameCaseInsensitive(String name)
++            throws InstanceNotFoundException {
++        Criteria c = getSession().createCriteria(AdvanceType.class);
++        c.add(Restrictions.ilike("unitName", name, MatchMode.EXACT));
++        AdvanceType result = (AdvanceType) c.uniqueResult();
++
++        if (result == null) {
++            throw new InstanceNotFoundException(name,
++                    getEntityClass().getName());
++        }
++
++        return result;
++    }
++
++    @Override
++    @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
++    public boolean existsByNameInAnotherTransaction(String name) {
++        try {
++            findByNameCaseInsensitive(name);
++        } catch (InstanceNotFoundException e) {
++            return false;
++        }
++        return true;
++    }
++
++    @Override
++    @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
++    public AdvanceType findUniqueByNameInAnotherTransaction(String name)
++            throws InstanceNotFoundException {
++        return findByNameCaseInsensitive(name);
++    }
+ }
+diff --git a/navalplanner-business/src/main/java/org/navalplanner/business/advance/daos/IAdvanceTypeDAO.java b/navalplanner-business/src/main/java/org/navalplanner/business/advance/daos/IAdvanceTypeDAO.java
+index cbd0757..46e7760 100644
+--- a/navalplanner-business/src/main/java/org/navalplanner/business/advance/daos/IAdvanceTypeDAO.java
++++ b/navalplanner-business/src/main/java/org/navalplanner/business/advance/daos/IAdvanceTypeDAO.java
+@@ -26,6 +26,7 @@ import java.util.List;
+ 
+ import org.navalplanner.business.advance.entities.AdvanceType;
+ import org.navalplanner.business.common.daos.IGenericDAO;
++import org.navalplanner.business.common.exceptions.InstanceNotFoundException;
+ 
+ /**
+  * Contract for {@link AdvanceTypeDao}
+@@ -43,4 +44,12 @@ public interface IAdvanceTypeDAO extends IGenericDAO<AdvanceType, Long>{
+ 
+     public boolean isAlreadyInUse(AdvanceType advanceType);
+ 
++    AdvanceType findUniqueByNameInAnotherTransaction(String name)
++            throws InstanceNotFoundException;
++
++    boolean existsByNameInAnotherTransaction(String name);
++
++    AdvanceType findByNameCaseInsensitive(String name)
++            throws InstanceNotFoundException;
++
+ }
+\ No newline at end of file
+diff --git a/navalplanner-business/src/main/java/org/navalplanner/business/advance/entities/AdvanceType.java b/navalplanner-business/src/main/java/org/navalplanner/business/advance/entities/AdvanceType.java
+index d7696e3..cb253eb 100644
+--- a/navalplanner-business/src/main/java/org/navalplanner/business/advance/entities/AdvanceType.java
++++ b/navalplanner-business/src/main/java/org/navalplanner/business/advance/entities/AdvanceType.java
+@@ -26,11 +26,15 @@ import static org.navalplanner.business.i18n.I18nHelper._;
+ import java.math.BigDecimal;
+ 
+ import org.apache.commons.lang.BooleanUtils;
++import org.apache.commons.lang.StringUtils;
+ import org.hibernate.validator.AssertTrue;
+ import org.hibernate.validator.NotEmpty;
+ import org.hibernate.validator.NotNull;
++import org.navalplanner.business.advance.daos.IAdvanceTypeDAO;
+ import org.navalplanner.business.common.BaseEntity;
+ import org.navalplanner.business.common.IHumanIdentifiable;
++import org.navalplanner.business.common.Registry;
++import org.navalplanner.business.common.exceptions.InstanceNotFoundException;
+ import org.navalplanner.business.orders.entities.OrderElement;
+ 
+ /**
+@@ -61,7 +65,6 @@ public class AdvanceType extends BaseEntity implements IHumanIdentifiable{
+                 unitPrecision, active, percentage, qualityForm));
+     }
+ 
+-    @NotEmpty
+     private String unitName;
+ 
+     @NotNull
+@@ -81,6 +84,8 @@ public class AdvanceType extends BaseEntity implements IHumanIdentifiable{
+ 
+     private Boolean qualityForm = false;
+ 
++    private IAdvanceTypeDAO avanceTypeDAO = Registry.getAdvanceTypeDao();
++
+     /**
+      * Constructor for hibernate. Do not use!
+      */
+@@ -106,6 +111,7 @@ public class AdvanceType extends BaseEntity implements IHumanIdentifiable{
+         this.unitName = unitName;
+     }
+ 
++    @NotEmpty(message = "unit name not specified")
+     public String getUnitName() {
+         return this.unitName;
+     }
+@@ -235,4 +241,25 @@ public class AdvanceType extends BaseEntity implements IHumanIdentifiable{
+         return unitName;
+     }
+ 
++    @AssertTrue(message = "the advance type name has to be unique. It is already used")
++    public boolean checkConstraintUniqueName() {
++        if (StringUtils.isBlank(unitName)) {
++            return true;
++        }
++        if (isNewObject()) {
++            return !avanceTypeDAO.existsByNameInAnotherTransaction(unitName);
++        } else {
++            return checkNotExistsOrIsTheSame();
++        }
++    }
++
++    private boolean checkNotExistsOrIsTheSame() {
++        try {
++            AdvanceType advanceType = avanceTypeDAO
++                    .findUniqueByNameInAnotherTransaction(unitName);
++            return advanceType.getId().equals(getId());
++        } catch (InstanceNotFoundException e) {
++            return true;
++        }
++    }
+ }
+-- 
+1.7.0.4
+

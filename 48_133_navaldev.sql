@@ -1,0 +1,6486 @@
+--
+-- PostgreSQL database dump
+--
+
+SET client_encoding = 'LATIN9';
+SET standard_conforming_strings = off;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET escape_string_warning = off;
+
+--
+-- Name: plpgsql; Type: PROCEDURAL LANGUAGE; Schema: -; Owner: postgres
+--
+
+CREATE PROCEDURAL LANGUAGE plpgsql;
+
+
+ALTER PROCEDURAL LANGUAGE plpgsql OWNER TO postgres;
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: advanceassignment; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE advanceassignment (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    reportglobaladvance boolean,
+    advance_type_id bigint
+);
+
+
+ALTER TABLE public.advanceassignment OWNER TO naval;
+
+--
+-- Name: advancemeasurement; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE advancemeasurement (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    date date,
+    value numeric(19,2),
+    advance_assignment_id bigint
+);
+
+
+ALTER TABLE public.advancemeasurement OWNER TO naval;
+
+--
+-- Name: advancetype; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE advancetype (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    unitname character varying(255),
+    defaultmaxvalue numeric(19,4),
+    updatable boolean,
+    unitprecision numeric(19,4),
+    active boolean,
+    percentage boolean
+);
+
+
+ALTER TABLE public.advancetype OWNER TO naval;
+
+--
+-- Name: all_criterions; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE all_criterions (
+    generic_resource_allocation_id bigint NOT NULL,
+    criterion_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.all_criterions OWNER TO naval;
+
+--
+-- Name: assignment_function; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE assignment_function (
+    id bigint NOT NULL,
+    version bigint NOT NULL
+);
+
+
+ALTER TABLE public.assignment_function OWNER TO naval;
+
+--
+-- Name: basecalendar; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE basecalendar (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    name character varying(255)
+);
+
+
+ALTER TABLE public.basecalendar OWNER TO naval;
+
+--
+-- Name: calendardata; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE calendardata (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    parent bigint,
+    expiringdate date,
+    base_calendar_id bigint,
+    position_in_calendar integer
+);
+
+
+ALTER TABLE public.calendardata OWNER TO naval;
+
+--
+-- Name: criterion; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE criterion (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    name character varying(255),
+    active boolean,
+    id_criterion_type bigint NOT NULL,
+    parent bigint
+);
+
+
+ALTER TABLE public.criterion OWNER TO naval;
+
+--
+-- Name: criterion_type_work_report_type; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE criterion_type_work_report_type (
+    work_report_type_id bigint NOT NULL,
+    criterion_type_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.criterion_type_work_report_type OWNER TO naval;
+
+--
+-- Name: criterion_work_report_line; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE criterion_work_report_line (
+    work_report_line_id bigint NOT NULL,
+    criterion_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.criterion_work_report_line OWNER TO naval;
+
+--
+-- Name: criterionhoursgroup; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE criterionhoursgroup (
+    hoursgroupid bigint NOT NULL,
+    criterionid bigint NOT NULL
+);
+
+
+ALTER TABLE public.criterionhoursgroup OWNER TO naval;
+
+--
+-- Name: criterionsatisfaction; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE criterionsatisfaction (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    startdate timestamp without time zone NOT NULL,
+    finishdate timestamp without time zone,
+    isdeleted boolean,
+    criterion bigint NOT NULL,
+    resource bigint NOT NULL
+);
+
+
+ALTER TABLE public.criterionsatisfaction OWNER TO naval;
+
+--
+-- Name: criteriontype; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE criteriontype (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    name character varying(255),
+    description character varying(255),
+    allowsimultaneouscriterionsperresource boolean,
+    allowhierarchy boolean,
+    enabled boolean,
+    resource integer
+);
+
+
+ALTER TABLE public.criteriontype OWNER TO naval;
+
+--
+-- Name: day_assignment; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE day_assignment (
+    id bigint NOT NULL,
+    day_assignment_type character varying(255) NOT NULL,
+    version bigint NOT NULL,
+    hours integer NOT NULL,
+    day date NOT NULL,
+    resource_id bigint NOT NULL,
+    specific_resource_allocation_id bigint,
+    generic_resource_allocation_id bigint
+);
+
+
+ALTER TABLE public.day_assignment OWNER TO naval;
+
+--
+-- Name: dependency; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE dependency (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    origin bigint,
+    destination bigint,
+    type integer
+);
+
+
+ALTER TABLE public.dependency OWNER TO naval;
+
+--
+-- Name: directadvanceassignment; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE directadvanceassignment (
+    advance_assignment_id bigint NOT NULL,
+    direct_order_element_id bigint,
+    maxvalue numeric(19,2)
+);
+
+
+ALTER TABLE public.directadvanceassignment OWNER TO naval;
+
+--
+-- Name: exceptionday; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE exceptionday (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    date date,
+    hours integer,
+    base_calendar_id bigint
+);
+
+
+ALTER TABLE public.exceptionday OWNER TO naval;
+
+--
+-- Name: generic_resource_allocation; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE generic_resource_allocation (
+    resource_allocation_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.generic_resource_allocation OWNER TO naval;
+
+--
+-- Name: hibernate_unique_key; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE hibernate_unique_key (
+    next_hi integer
+);
+
+
+ALTER TABLE public.hibernate_unique_key OWNER TO naval;
+
+--
+-- Name: hoursgroup; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE hoursgroup (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    workinghours integer,
+    percentage numeric(19,2),
+    fixedpercentage boolean,
+    parent_order_line bigint NOT NULL
+);
+
+
+ALTER TABLE public.hoursgroup OWNER TO naval;
+
+--
+-- Name: hoursperday; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE hoursperday (
+    base_calendar_id bigint NOT NULL,
+    hours integer,
+    day_id integer NOT NULL
+);
+
+
+ALTER TABLE public.hoursperday OWNER TO naval;
+
+--
+-- Name: indirectadvanceassignment; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE indirectadvanceassignment (
+    advance_assignment_id bigint NOT NULL,
+    indirect_order_element_id bigint
+);
+
+
+ALTER TABLE public.indirectadvanceassignment OWNER TO naval;
+
+--
+-- Name: label; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE label (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    name character varying(255),
+    label_type_id bigint
+);
+
+
+ALTER TABLE public.label OWNER TO naval;
+
+--
+-- Name: label_type; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE label_type (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    name character varying(255)
+);
+
+
+ALTER TABLE public.label_type OWNER TO naval;
+
+--
+-- Name: order_element_label; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE order_element_label (
+    order_element_id bigint NOT NULL,
+    label_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.order_element_label OWNER TO naval;
+
+--
+-- Name: order_table; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE order_table (
+    orderelementid bigint NOT NULL,
+    responsible character varying(255),
+    customer character varying(255)
+);
+
+
+ALTER TABLE public.order_table OWNER TO naval;
+
+--
+-- Name: orderelement; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE orderelement (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    name character varying(255),
+    initdate timestamp without time zone,
+    enddate timestamp without time zone,
+    mandatoryinit boolean,
+    mandatoryend boolean,
+    description character varying(255),
+    code character varying(255),
+    parent bigint,
+    positionincontainer integer
+);
+
+
+ALTER TABLE public.orderelement OWNER TO naval;
+
+--
+-- Name: orderline; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE orderline (
+    orderelementid bigint NOT NULL
+);
+
+
+ALTER TABLE public.orderline OWNER TO naval;
+
+--
+-- Name: orderlinegroup; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE orderlinegroup (
+    orderelementid bigint NOT NULL
+);
+
+
+ALTER TABLE public.orderlinegroup OWNER TO naval;
+
+--
+-- Name: resource; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE resource (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    calendar bigint
+);
+
+
+ALTER TABLE public.resource OWNER TO naval;
+
+--
+-- Name: resourceallocation; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE resourceallocation (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    resourcesperday numeric(19,2),
+    task bigint,
+    assignment_function bigint
+);
+
+
+ALTER TABLE public.resourceallocation OWNER TO naval;
+
+--
+-- Name: resourcecalendar; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE resourcecalendar (
+    base_calendar_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.resourcecalendar OWNER TO naval;
+
+--
+-- Name: specific_resource_allocation; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE specific_resource_allocation (
+    resource_allocation_id bigint NOT NULL,
+    resource bigint
+);
+
+
+ALTER TABLE public.specific_resource_allocation OWNER TO naval;
+
+--
+-- Name: task; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE task (
+    task_element_id bigint NOT NULL,
+    hoursgroup bigint,
+    calculatedvalue integer
+);
+
+
+ALTER TABLE public.task OWNER TO naval;
+
+--
+-- Name: taskelement; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE taskelement (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    shareofhours integer,
+    name character varying(255),
+    notes character varying(255),
+    startdate timestamp without time zone,
+    enddate timestamp without time zone,
+    order_element_id bigint,
+    parent bigint,
+    base_calendar_id bigint,
+    positioninparent integer
+);
+
+
+ALTER TABLE public.taskelement OWNER TO naval;
+
+--
+-- Name: taskgroup; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE taskgroup (
+    task_element_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.taskgroup OWNER TO naval;
+
+--
+-- Name: taskmilestone; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE taskmilestone (
+    task_element_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.taskmilestone OWNER TO naval;
+
+--
+-- Name: work_report; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE work_report (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    date timestamp without time zone,
+    place character varying(255),
+    responsible character varying(255),
+    work_report_type_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.work_report OWNER TO naval;
+
+--
+-- Name: work_report_line; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE work_report_line (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    numhours integer,
+    work_report_id bigint,
+    resource_id bigint NOT NULL,
+    order_element_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.work_report_line OWNER TO naval;
+
+--
+-- Name: work_report_type; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE work_report_type (
+    id bigint NOT NULL,
+    version bigint NOT NULL,
+    name character varying(255)
+);
+
+
+ALTER TABLE public.work_report_type OWNER TO naval;
+
+--
+-- Name: worker; Type: TABLE; Schema: public; Owner: naval; Tablespace: 
+--
+
+CREATE TABLE worker (
+    worker_id bigint NOT NULL,
+    firstname character varying(255),
+    surname character varying(255),
+    nif character varying(255)
+);
+
+
+ALTER TABLE public.worker OWNER TO naval;
+
+--
+-- Data for Name: advanceassignment; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY advanceassignment (id, version, reportglobaladvance, advance_type_id) FROM stdin;
+407	2	t	1
+408	2	t	1
+406	3	t	1
+411	3	t	2
+417	2	t	2
+405	5	t	1
+412	3	f	2
+404	6	t	1
+\.
+
+
+--
+-- Data for Name: advancemeasurement; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY advancemeasurement (id, version, date, value, advance_assignment_id) FROM stdin;
+6061	3	2009-10-16	20.00	411
+6079	1	2009-10-16	30.00	417
+6080	1	2009-09-29	20.00	417
+\.
+
+
+--
+-- Data for Name: advancetype; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY advancetype (id, version, unitname, defaultmaxvalue, updatable, unitprecision, active, percentage) FROM stdin;
+1	3	children	100.0000	f	0.0100	t	t
+2	2	percentage	100.0000	f	0.0100	t	t
+3	1	units	2147483647.0000	f	1.0000	t	f
+\.
+
+
+--
+-- Data for Name: all_criterions; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY all_criterions (generic_resource_allocation_id, criterion_id) FROM stdin;
+910	206
+911	208
+912	206
+913	208
+914	207
+915	207
+916	208
+917	206
+918	206
+919	206
+\.
+
+
+--
+-- Data for Name: assignment_function; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY assignment_function (id, version) FROM stdin;
+\.
+
+
+--
+-- Data for Name: basecalendar; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY basecalendar (id, version, name) FROM stdin;
+\.
+
+
+--
+-- Data for Name: calendardata; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY calendardata (id, version, parent, expiringdate, base_calendar_id, position_in_calendar) FROM stdin;
+\.
+
+
+--
+-- Data for Name: criterion; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY criterion (id, version, name, active, id_criterion_type, parent) FROM stdin;
+202	14	medicalLeave	t	32768	\N
+203	13	paternityLeave	t	32768	\N
+204	4	hiredResourceWorkingRelationship	t	32772	\N
+205	3	firedResourceWorkingRelationship	t	32772	\N
+206	1	Soldador	t	32771	\N
+207	1	Carpintero	t	32771	\N
+208	1	Pintor	t	32771	\N
+\.
+
+
+--
+-- Data for Name: criterion_type_work_report_type; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY criterion_type_work_report_type (work_report_type_id, criterion_type_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: criterion_work_report_line; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY criterion_work_report_line (work_report_line_id, criterion_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: criterionhoursgroup; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY criterionhoursgroup (hoursgroupid, criterionid) FROM stdin;
+565	207
+566	208
+567	206
+568	206
+569	208
+570	207
+571	208
+572	206
+573	206
+574	206
+\.
+
+
+--
+-- Data for Name: criterionsatisfaction; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY criterionsatisfaction (id, version, startdate, finishdate, isdeleted, criterion, resource) FROM stdin;
+809	1	2009-10-16 10:03:13.437	\N	f	206	710
+810	1	2009-10-16 10:03:35.771	\N	f	208	709
+811	1	2009-10-16 10:03:50.653	\N	f	207	707
+808	2	2009-10-16 10:01:26.978	\N	f	208	707
+812	1	2009-10-16 10:04:01.184	\N	f	206	708
+\.
+
+
+--
+-- Data for Name: criteriontype; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY criteriontype (id, version, name, description, allowsimultaneouscriterionsperresource, allowhierarchy, enabled, resource) FROM stdin;
+32768	15	LEAVE	Leave	f	f	t	1
+32769	11	CATEGORY	Professional category	t	t	t	1
+32770	9	TRAINING	Training courses and labor training	t	t	t	1
+32772	5	WORK_RELATIONSHIP	Relationship of the resource with the enterprise 	f	f	t	1
+32773	1	LOCATION_GROUP	Location where the resource work	t	f	t	0
+32771	8	JOB	Job	t	t	t	1
+\.
+
+
+--
+-- Data for Name: day_assignment; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY day_assignment (id, day_assignment_type, version, hours, day, resource_id, specific_resource_allocation_id, generic_resource_allocation_id) FROM stdin;
+2386	GENERIC_DAY	0	4	2010-11-25	708	\N	912
+2387	GENERIC_DAY	0	4	2010-11-24	710	\N	912
+2388	GENERIC_DAY	0	4	2010-07-25	710	\N	912
+2389	GENERIC_DAY	0	4	2010-09-17	708	\N	912
+2390	GENERIC_DAY	0	4	2009-12-24	708	\N	912
+2391	GENERIC_DAY	0	4	2010-04-12	710	\N	912
+2392	GENERIC_DAY	0	4	2010-07-02	708	\N	912
+2393	GENERIC_DAY	0	4	2010-11-28	708	\N	912
+2394	GENERIC_DAY	0	4	2010-07-14	710	\N	912
+2395	GENERIC_DAY	0	4	2010-01-29	708	\N	912
+2396	GENERIC_DAY	0	4	2010-08-17	710	\N	912
+2397	GENERIC_DAY	0	4	2010-10-18	708	\N	912
+2398	GENERIC_DAY	0	4	2010-06-30	710	\N	912
+2399	GENERIC_DAY	0	4	2010-03-27	708	\N	912
+2400	GENERIC_DAY	0	4	2010-12-19	710	\N	912
+2401	GENERIC_DAY	0	4	2010-04-18	710	\N	912
+2402	GENERIC_DAY	0	4	2010-10-05	708	\N	912
+2403	GENERIC_DAY	0	4	2010-11-09	708	\N	912
+2404	GENERIC_DAY	0	4	2010-04-14	708	\N	912
+2405	GENERIC_DAY	0	4	2010-11-15	710	\N	912
+2406	GENERIC_DAY	0	4	2010-12-31	708	\N	912
+2407	GENERIC_DAY	0	4	2010-09-14	708	\N	912
+2408	GENERIC_DAY	0	4	2010-01-21	710	\N	912
+2409	GENERIC_DAY	0	4	2010-09-24	710	\N	912
+2410	GENERIC_DAY	0	4	2010-06-08	708	\N	912
+2411	GENERIC_DAY	0	4	2010-11-03	710	\N	912
+2412	GENERIC_DAY	0	4	2010-09-26	708	\N	912
+2413	GENERIC_DAY	0	4	2010-08-30	710	\N	912
+2414	GENERIC_DAY	0	4	2010-03-23	710	\N	912
+2415	GENERIC_DAY	0	4	2010-04-26	708	\N	912
+2416	GENERIC_DAY	0	4	2010-01-10	710	\N	912
+2417	GENERIC_DAY	0	4	2010-01-23	708	\N	912
+2418	GENERIC_DAY	0	4	2010-05-04	710	\N	912
+2419	GENERIC_DAY	0	4	2010-03-29	710	\N	912
+2420	GENERIC_DAY	0	4	2010-11-06	710	\N	912
+2421	GENERIC_DAY	0	4	2010-04-21	708	\N	912
+2422	GENERIC_DAY	0	4	2010-06-15	708	\N	912
+2423	GENERIC_DAY	0	4	2010-12-04	708	\N	912
+2424	GENERIC_DAY	0	4	2010-05-11	710	\N	912
+2425	GENERIC_DAY	0	4	2010-01-20	708	\N	912
+2426	GENERIC_DAY	0	4	2010-11-07	708	\N	912
+2427	GENERIC_DAY	0	4	2010-03-15	708	\N	912
+2428	GENERIC_DAY	0	4	2010-05-25	710	\N	912
+2429	GENERIC_DAY	0	4	2010-09-08	710	\N	912
+2430	GENERIC_DAY	0	4	2010-09-27	710	\N	912
+2431	GENERIC_DAY	0	4	2010-10-01	710	\N	912
+2432	GENERIC_DAY	0	4	2010-10-22	710	\N	912
+2433	GENERIC_DAY	0	4	2010-05-10	708	\N	912
+2434	GENERIC_DAY	0	4	2010-09-12	708	\N	912
+2435	GENERIC_DAY	0	4	2010-02-14	708	\N	912
+2436	GENERIC_DAY	0	4	2010-01-09	708	\N	912
+2437	GENERIC_DAY	0	4	2010-09-05	710	\N	912
+2438	GENERIC_DAY	0	4	2010-05-06	710	\N	912
+2439	GENERIC_DAY	0	4	2010-12-08	708	\N	912
+2440	GENERIC_DAY	0	4	2010-10-15	708	\N	912
+2441	GENERIC_DAY	0	4	2010-09-22	710	\N	912
+2442	GENERIC_DAY	0	4	2010-10-28	708	\N	912
+2443	GENERIC_DAY	0	4	2010-11-29	710	\N	912
+2444	GENERIC_DAY	0	4	2010-09-15	708	\N	912
+2445	GENERIC_DAY	0	4	2010-09-25	710	\N	912
+2446	GENERIC_DAY	0	4	2010-03-09	710	\N	912
+2447	GENERIC_DAY	0	4	2010-05-26	708	\N	912
+2448	GENERIC_DAY	0	4	2010-08-18	710	\N	912
+2449	GENERIC_DAY	0	4	2010-12-20	710	\N	912
+2450	GENERIC_DAY	0	4	2010-03-16	708	\N	912
+2451	GENERIC_DAY	0	4	2010-06-23	710	\N	912
+2452	GENERIC_DAY	0	4	2010-08-11	710	\N	912
+2453	GENERIC_DAY	0	4	2010-12-03	710	\N	912
+2454	GENERIC_DAY	0	4	2010-12-01	708	\N	912
+2455	GENERIC_DAY	0	4	2010-12-28	708	\N	912
+2456	GENERIC_DAY	0	4	2010-07-07	708	\N	912
+2457	GENERIC_DAY	0	4	2010-12-02	710	\N	912
+2458	GENERIC_DAY	0	4	2010-07-27	710	\N	912
+2459	GENERIC_DAY	0	4	2010-05-15	708	\N	912
+2460	GENERIC_DAY	0	4	2010-11-13	708	\N	912
+2461	GENERIC_DAY	0	4	2010-02-13	708	\N	912
+2462	GENERIC_DAY	0	4	2010-04-19	710	\N	912
+2463	GENERIC_DAY	0	4	2010-12-01	710	\N	912
+2464	GENERIC_DAY	0	4	2010-03-30	708	\N	912
+2465	GENERIC_DAY	0	4	2010-04-02	710	\N	912
+2466	GENERIC_DAY	0	4	2010-09-27	708	\N	912
+2467	GENERIC_DAY	0	4	2010-08-29	710	\N	912
+2468	GENERIC_DAY	0	4	2010-02-22	710	\N	912
+2469	GENERIC_DAY	0	4	2010-09-10	710	\N	912
+2470	GENERIC_DAY	0	4	2010-01-30	710	\N	912
+2471	GENERIC_DAY	0	4	2010-04-17	708	\N	912
+2472	GENERIC_DAY	0	4	2010-01-03	710	\N	912
+2473	GENERIC_DAY	0	4	2010-06-02	708	\N	912
+2474	GENERIC_DAY	0	4	2010-09-04	708	\N	912
+2475	GENERIC_DAY	0	4	2010-07-15	710	\N	912
+2476	GENERIC_DAY	0	4	2010-03-11	710	\N	912
+2477	GENERIC_DAY	0	4	2010-09-05	708	\N	912
+2478	GENERIC_DAY	0	4	2010-04-17	710	\N	912
+2479	GENERIC_DAY	0	4	2010-02-21	708	\N	912
+2480	GENERIC_DAY	0	4	2010-08-22	710	\N	912
+2481	GENERIC_DAY	0	4	2010-02-18	708	\N	912
+2482	GENERIC_DAY	0	4	2010-04-03	710	\N	912
+2483	GENERIC_DAY	0	4	2010-09-16	708	\N	912
+2484	GENERIC_DAY	0	4	2010-06-02	710	\N	912
+2485	GENERIC_DAY	0	4	2010-10-29	708	\N	912
+2486	GENERIC_DAY	0	4	2010-07-08	710	\N	912
+2487	GENERIC_DAY	0	4	2010-03-12	708	\N	912
+2488	GENERIC_DAY	0	4	2010-06-06	710	\N	912
+2489	GENERIC_DAY	0	4	2010-01-11	708	\N	912
+2490	GENERIC_DAY	0	4	2010-06-29	710	\N	912
+2491	GENERIC_DAY	0	4	2010-08-28	708	\N	912
+2492	GENERIC_DAY	0	4	2010-09-20	708	\N	912
+2493	GENERIC_DAY	0	4	2010-02-24	708	\N	912
+2494	GENERIC_DAY	0	4	2010-07-27	708	\N	912
+2495	GENERIC_DAY	0	4	2010-04-01	708	\N	912
+2496	GENERIC_DAY	0	4	2010-12-18	710	\N	912
+2497	GENERIC_DAY	0	4	2010-09-21	708	\N	912
+2498	GENERIC_DAY	0	4	2010-02-26	710	\N	912
+2499	GENERIC_DAY	0	4	2010-10-11	708	\N	912
+2500	GENERIC_DAY	0	4	2010-09-16	710	\N	912
+2501	GENERIC_DAY	0	4	2010-06-12	708	\N	912
+2502	GENERIC_DAY	0	4	2011-01-02	708	\N	912
+2503	GENERIC_DAY	0	4	2010-02-14	710	\N	912
+2504	GENERIC_DAY	0	4	2010-05-18	708	\N	912
+2505	GENERIC_DAY	0	4	2010-06-11	708	\N	912
+2506	GENERIC_DAY	0	4	2010-07-19	710	\N	912
+2507	GENERIC_DAY	0	4	2010-12-13	708	\N	912
+2508	GENERIC_DAY	0	4	2010-09-04	710	\N	912
+2509	GENERIC_DAY	0	4	2010-10-15	710	\N	912
+2510	GENERIC_DAY	0	4	2010-03-16	710	\N	912
+2511	GENERIC_DAY	0	4	2010-09-25	708	\N	912
+2512	GENERIC_DAY	0	4	2010-01-19	708	\N	912
+2513	GENERIC_DAY	0	4	2010-11-20	708	\N	912
+2514	GENERIC_DAY	0	4	2010-02-03	710	\N	912
+2515	GENERIC_DAY	0	4	2010-03-19	708	\N	912
+2516	GENERIC_DAY	0	4	2010-12-20	708	\N	912
+2517	GENERIC_DAY	0	4	2010-11-10	708	\N	912
+2518	GENERIC_DAY	0	4	2010-11-14	708	\N	912
+2519	GENERIC_DAY	0	4	2010-11-13	710	\N	912
+2520	GENERIC_DAY	0	4	2010-05-31	710	\N	912
+2521	GENERIC_DAY	0	4	2010-01-20	710	\N	912
+2522	GENERIC_DAY	0	4	2010-11-08	708	\N	912
+2523	GENERIC_DAY	0	4	2010-09-09	708	\N	912
+2524	GENERIC_DAY	0	4	2010-06-25	710	\N	912
+2525	GENERIC_DAY	0	4	2010-04-06	708	\N	912
+2526	GENERIC_DAY	0	4	2010-03-20	710	\N	912
+2527	GENERIC_DAY	0	4	2009-12-28	708	\N	912
+2528	GENERIC_DAY	0	4	2010-11-05	708	\N	912
+2529	GENERIC_DAY	0	4	2010-11-18	710	\N	912
+2530	GENERIC_DAY	0	4	2010-12-26	708	\N	912
+2531	GENERIC_DAY	0	4	2010-09-30	708	\N	912
+2532	GENERIC_DAY	0	4	2010-04-30	710	\N	912
+2533	GENERIC_DAY	0	4	2010-12-06	710	\N	912
+2534	GENERIC_DAY	0	4	2010-05-31	708	\N	912
+2535	GENERIC_DAY	0	4	2010-07-13	710	\N	912
+2536	GENERIC_DAY	0	4	2010-06-01	708	\N	912
+2537	GENERIC_DAY	0	4	2010-06-03	708	\N	912
+2538	GENERIC_DAY	0	4	2010-06-09	708	\N	912
+2539	GENERIC_DAY	0	4	2009-12-27	710	\N	912
+2540	GENERIC_DAY	0	4	2010-11-16	710	\N	912
+2541	GENERIC_DAY	0	4	2010-10-02	710	\N	912
+2542	GENERIC_DAY	0	4	2010-09-28	710	\N	912
+2543	GENERIC_DAY	0	4	2010-12-21	708	\N	912
+2544	GENERIC_DAY	0	4	2010-10-14	710	\N	912
+2545	GENERIC_DAY	0	4	2010-02-24	710	\N	912
+2546	GENERIC_DAY	0	4	2011-01-01	708	\N	912
+2547	GENERIC_DAY	0	4	2010-10-22	708	\N	912
+2548	GENERIC_DAY	0	4	2010-07-28	708	\N	912
+2549	GENERIC_DAY	0	4	2010-07-20	708	\N	912
+2550	GENERIC_DAY	0	4	2010-04-22	710	\N	912
+2551	GENERIC_DAY	0	4	2010-09-22	708	\N	912
+2552	GENERIC_DAY	0	4	2010-08-22	708	\N	912
+2553	GENERIC_DAY	0	4	2010-10-03	708	\N	912
+2554	GENERIC_DAY	0	4	2010-07-24	708	\N	912
+2555	GENERIC_DAY	0	4	2010-05-06	708	\N	912
+2556	GENERIC_DAY	0	4	2010-05-07	708	\N	912
+2557	GENERIC_DAY	0	4	2010-01-05	708	\N	912
+2558	GENERIC_DAY	0	4	2010-04-24	708	\N	912
+2559	GENERIC_DAY	0	4	2010-10-20	710	\N	912
+2560	GENERIC_DAY	0	4	2010-01-28	710	\N	912
+2561	GENERIC_DAY	0	4	2010-05-05	710	\N	912
+2562	GENERIC_DAY	0	4	2010-07-10	710	\N	912
+2563	GENERIC_DAY	0	4	2010-05-23	708	\N	912
+2564	GENERIC_DAY	0	4	2010-10-21	708	\N	912
+2565	GENERIC_DAY	0	4	2010-04-27	710	\N	912
+2566	GENERIC_DAY	0	4	2010-12-16	708	\N	912
+2567	GENERIC_DAY	0	4	2010-09-30	710	\N	912
+2568	GENERIC_DAY	0	4	2010-08-11	708	\N	912
+2569	GENERIC_DAY	0	4	2010-09-06	710	\N	912
+2570	GENERIC_DAY	0	4	2010-07-13	708	\N	912
+2571	GENERIC_DAY	0	4	2010-04-12	708	\N	912
+2572	GENERIC_DAY	0	4	2010-07-22	708	\N	912
+2573	GENERIC_DAY	0	4	2010-09-18	710	\N	912
+2574	GENERIC_DAY	0	4	2010-09-19	708	\N	912
+2575	GENERIC_DAY	0	4	2010-09-07	708	\N	912
+2576	GENERIC_DAY	0	4	2010-03-01	708	\N	912
+2577	GENERIC_DAY	0	4	2010-04-11	708	\N	912
+2578	GENERIC_DAY	0	4	2010-02-02	708	\N	912
+2579	GENERIC_DAY	0	4	2010-11-20	710	\N	912
+2580	GENERIC_DAY	0	4	2010-03-08	710	\N	912
+2581	GENERIC_DAY	0	4	2010-05-11	708	\N	912
+2582	GENERIC_DAY	0	4	2010-10-21	710	\N	912
+2583	GENERIC_DAY	0	4	2010-10-04	710	\N	912
+2584	GENERIC_DAY	0	4	2010-07-21	708	\N	912
+2585	GENERIC_DAY	0	4	2010-01-06	708	\N	912
+2586	GENERIC_DAY	0	4	2010-07-18	708	\N	912
+2587	GENERIC_DAY	0	4	2010-11-30	708	\N	912
+2588	GENERIC_DAY	0	4	2010-07-15	708	\N	912
+2589	GENERIC_DAY	0	4	2010-11-01	710	\N	912
+2590	GENERIC_DAY	0	4	2010-11-27	708	\N	912
+2591	GENERIC_DAY	0	4	2010-02-01	710	\N	912
+2592	GENERIC_DAY	0	4	2010-09-13	710	\N	912
+2593	GENERIC_DAY	0	4	2010-08-27	708	\N	912
+2594	GENERIC_DAY	0	4	2010-03-04	708	\N	912
+2595	GENERIC_DAY	0	4	2010-06-29	708	\N	912
+2596	GENERIC_DAY	0	4	2009-12-29	710	\N	912
+2597	GENERIC_DAY	0	4	2010-06-22	710	\N	912
+2598	GENERIC_DAY	0	4	2010-07-20	710	\N	912
+2599	GENERIC_DAY	0	4	2010-12-11	710	\N	912
+2600	GENERIC_DAY	0	4	2010-02-23	708	\N	912
+2601	GENERIC_DAY	0	4	2010-08-29	708	\N	912
+2602	GENERIC_DAY	0	4	2010-09-09	710	\N	912
+2603	GENERIC_DAY	0	4	2010-08-18	708	\N	912
+2604	GENERIC_DAY	0	4	2010-02-04	708	\N	912
+2605	GENERIC_DAY	0	4	2010-03-05	708	\N	912
+2606	GENERIC_DAY	0	4	2010-04-21	710	\N	912
+2607	GENERIC_DAY	0	4	2010-07-11	710	\N	912
+2608	GENERIC_DAY	0	4	2010-03-24	710	\N	912
+2609	GENERIC_DAY	0	4	2010-10-08	710	\N	912
+2610	GENERIC_DAY	0	4	2010-09-20	710	\N	912
+2611	GENERIC_DAY	0	4	2010-11-24	708	\N	912
+2612	GENERIC_DAY	0	4	2010-03-09	708	\N	912
+2613	GENERIC_DAY	0	4	2010-07-08	708	\N	912
+2614	GENERIC_DAY	0	4	2010-12-09	708	\N	912
+2615	GENERIC_DAY	0	4	2010-12-02	708	\N	912
+2616	GENERIC_DAY	0	4	2010-10-13	708	\N	912
+2617	GENERIC_DAY	0	4	2010-02-23	710	\N	912
+2618	GENERIC_DAY	0	4	2010-11-19	710	\N	912
+2619	GENERIC_DAY	0	4	2010-01-27	710	\N	912
+2620	GENERIC_DAY	0	4	2010-08-26	710	\N	912
+2621	GENERIC_DAY	0	4	2010-05-20	710	\N	912
+2622	GENERIC_DAY	0	4	2010-11-12	708	\N	912
+2623	GENERIC_DAY	0	4	2010-08-25	708	\N	912
+2624	GENERIC_DAY	0	4	2010-03-01	710	\N	912
+2625	GENERIC_DAY	0	4	2010-04-04	708	\N	912
+2626	GENERIC_DAY	0	4	2010-10-30	708	\N	912
+2627	GENERIC_DAY	0	4	2010-12-06	708	\N	912
+2628	GENERIC_DAY	0	4	2010-05-21	710	\N	912
+2629	GENERIC_DAY	0	4	2010-09-03	710	\N	912
+2630	GENERIC_DAY	0	4	2010-07-17	708	\N	912
+2631	GENERIC_DAY	0	4	2010-04-02	708	\N	912
+2632	GENERIC_DAY	0	4	2010-07-07	710	\N	912
+2633	GENERIC_DAY	0	4	2010-02-11	708	\N	912
+2634	GENERIC_DAY	0	4	2010-03-19	710	\N	912
+2635	GENERIC_DAY	0	4	2010-05-03	708	\N	912
+2636	GENERIC_DAY	0	4	2010-05-12	708	\N	912
+2637	GENERIC_DAY	0	4	2009-12-25	710	\N	912
+2638	GENERIC_DAY	0	4	2010-02-01	708	\N	912
+2639	GENERIC_DAY	0	4	2010-05-12	710	\N	912
+2640	GENERIC_DAY	0	4	2010-06-01	710	\N	912
+2641	GENERIC_DAY	0	4	2010-03-07	708	\N	912
+2642	GENERIC_DAY	0	4	2010-02-08	710	\N	912
+2643	GENERIC_DAY	0	4	2010-04-27	708	\N	912
+2644	GENERIC_DAY	0	4	2010-03-20	708	\N	912
+2645	GENERIC_DAY	0	4	2010-05-19	708	\N	912
+2646	GENERIC_DAY	0	4	2010-07-21	710	\N	912
+2647	GENERIC_DAY	0	4	2010-01-12	710	\N	912
+2648	GENERIC_DAY	0	4	2010-03-31	710	\N	912
+2649	GENERIC_DAY	0	4	2010-11-28	710	\N	912
+2650	GENERIC_DAY	0	4	2010-04-13	710	\N	912
+2651	GENERIC_DAY	0	4	2010-03-04	710	\N	912
+2652	GENERIC_DAY	0	4	2010-06-04	710	\N	912
+2653	GENERIC_DAY	0	4	2010-05-24	708	\N	912
+2654	GENERIC_DAY	0	4	2010-12-05	708	\N	912
+2655	GENERIC_DAY	0	4	2010-02-17	710	\N	912
+2656	GENERIC_DAY	0	4	2010-08-28	710	\N	912
+2657	GENERIC_DAY	0	4	2010-02-27	710	\N	912
+2658	GENERIC_DAY	0	4	2010-05-16	708	\N	912
+2659	GENERIC_DAY	0	4	2010-10-29	710	\N	912
+2660	GENERIC_DAY	0	4	2010-05-14	710	\N	912
+2661	GENERIC_DAY	0	4	2010-11-04	710	\N	912
+2662	GENERIC_DAY	0	4	2010-11-10	710	\N	912
+2663	GENERIC_DAY	0	4	2010-10-19	708	\N	912
+2664	GENERIC_DAY	0	4	2010-06-28	708	\N	912
+2665	GENERIC_DAY	0	4	2010-12-09	710	\N	912
+2666	GENERIC_DAY	0	4	2010-06-25	708	\N	912
+2667	GENERIC_DAY	0	4	2010-08-30	708	\N	912
+2668	GENERIC_DAY	0	4	2010-07-26	708	\N	912
+2669	GENERIC_DAY	0	4	2010-03-26	710	\N	912
+2670	GENERIC_DAY	0	4	2010-01-02	708	\N	912
+2671	GENERIC_DAY	0	4	2010-09-19	710	\N	912
+2672	GENERIC_DAY	0	4	2010-07-23	710	\N	912
+2673	GENERIC_DAY	0	4	2010-04-04	710	\N	912
+2674	GENERIC_DAY	0	4	2010-04-07	708	\N	912
+2675	GENERIC_DAY	0	4	2010-04-05	710	\N	912
+2676	GENERIC_DAY	0	4	2010-04-29	708	\N	912
+2677	GENERIC_DAY	0	4	2010-02-25	710	\N	912
+2678	GENERIC_DAY	0	4	2010-12-30	710	\N	912
+2679	GENERIC_DAY	0	4	2010-10-19	710	\N	912
+2680	GENERIC_DAY	0	4	2010-08-20	708	\N	912
+2681	GENERIC_DAY	0	4	2010-12-26	710	\N	912
+2682	GENERIC_DAY	0	4	2010-10-13	710	\N	912
+2683	GENERIC_DAY	0	4	2010-07-06	708	\N	912
+2684	GENERIC_DAY	0	4	2010-03-22	710	\N	912
+2685	GENERIC_DAY	0	4	2010-06-21	710	\N	912
+2686	GENERIC_DAY	0	4	2010-08-02	710	\N	912
+2687	GENERIC_DAY	0	4	2010-02-02	710	\N	912
+2688	GENERIC_DAY	0	4	2010-06-18	710	\N	912
+2689	GENERIC_DAY	0	4	2010-05-27	710	\N	912
+2690	GENERIC_DAY	0	4	2010-02-16	710	\N	912
+2691	GENERIC_DAY	0	4	2010-05-01	710	\N	912
+2692	GENERIC_DAY	0	4	2009-12-26	708	\N	912
+2693	GENERIC_DAY	0	4	2010-05-09	710	\N	912
+2694	GENERIC_DAY	0	4	2010-07-03	710	\N	912
+2695	GENERIC_DAY	0	4	2010-06-17	708	\N	912
+2696	GENERIC_DAY	0	4	2010-09-23	708	\N	912
+2697	GENERIC_DAY	0	4	2010-05-05	708	\N	912
+2698	GENERIC_DAY	0	4	2010-10-16	710	\N	912
+2699	GENERIC_DAY	0	4	2010-01-23	710	\N	912
+2700	GENERIC_DAY	0	4	2010-02-10	710	\N	912
+2701	GENERIC_DAY	0	4	2010-04-30	708	\N	912
+2702	GENERIC_DAY	0	4	2010-02-10	708	\N	912
+2703	GENERIC_DAY	0	4	2010-12-10	710	\N	912
+2704	GENERIC_DAY	0	4	2010-10-10	708	\N	912
+2705	GENERIC_DAY	0	4	2010-02-28	708	\N	912
+2706	GENERIC_DAY	0	4	2010-02-16	708	\N	912
+2707	GENERIC_DAY	0	4	2010-05-10	710	\N	912
+2708	GENERIC_DAY	0	4	2009-12-26	710	\N	912
+2709	GENERIC_DAY	0	4	2010-11-04	708	\N	912
+2710	GENERIC_DAY	0	4	2010-08-04	710	\N	912
+2711	GENERIC_DAY	0	4	2010-07-28	710	\N	912
+2712	GENERIC_DAY	0	4	2010-02-05	708	\N	912
+2713	GENERIC_DAY	0	4	2010-05-19	710	\N	912
+2714	GENERIC_DAY	0	4	2010-02-06	710	\N	912
+2715	GENERIC_DAY	0	4	2010-08-09	710	\N	912
+2716	GENERIC_DAY	0	4	2010-01-22	710	\N	912
+2717	GENERIC_DAY	0	4	2010-04-23	708	\N	912
+2718	GENERIC_DAY	0	4	2010-06-19	710	\N	912
+2719	GENERIC_DAY	0	4	2010-07-23	708	\N	912
+2720	GENERIC_DAY	0	4	2010-06-04	708	\N	912
+2721	GENERIC_DAY	0	4	2010-03-03	708	\N	912
+2722	GENERIC_DAY	0	4	2010-03-02	710	\N	912
+2723	GENERIC_DAY	0	4	2010-02-19	710	\N	912
+2724	GENERIC_DAY	0	4	2010-02-12	710	\N	912
+2725	GENERIC_DAY	0	4	2010-01-07	708	\N	912
+2726	GENERIC_DAY	0	4	2010-07-31	710	\N	912
+2727	GENERIC_DAY	0	4	2010-04-23	710	\N	912
+2728	GENERIC_DAY	0	4	2010-03-21	710	\N	912
+2729	GENERIC_DAY	0	4	2010-01-25	710	\N	912
+2730	GENERIC_DAY	0	4	2010-08-01	708	\N	912
+2731	GENERIC_DAY	0	4	2010-05-13	710	\N	912
+2732	GENERIC_DAY	0	4	2010-08-01	710	\N	912
+2733	GENERIC_DAY	0	4	2010-02-07	710	\N	912
+2734	GENERIC_DAY	0	4	2010-06-17	710	\N	912
+2735	GENERIC_DAY	0	4	2010-08-03	708	\N	912
+2736	GENERIC_DAY	0	4	2010-01-27	708	\N	912
+2737	GENERIC_DAY	0	4	2011-01-01	710	\N	912
+2738	GENERIC_DAY	0	4	2010-01-15	710	\N	912
+2739	GENERIC_DAY	0	4	2010-01-28	708	\N	912
+2740	GENERIC_DAY	0	4	2010-04-16	708	\N	912
+2741	GENERIC_DAY	0	4	2010-08-03	710	\N	912
+2742	GENERIC_DAY	0	4	2010-02-18	710	\N	912
+2743	GENERIC_DAY	0	4	2009-12-31	708	\N	912
+2744	GENERIC_DAY	0	4	2009-12-25	708	\N	912
+2745	GENERIC_DAY	0	4	2010-04-08	710	\N	912
+2746	GENERIC_DAY	0	4	2010-09-10	708	\N	912
+2747	GENERIC_DAY	0	4	2010-05-30	708	\N	912
+2748	GENERIC_DAY	0	4	2010-12-24	708	\N	912
+2749	GENERIC_DAY	0	4	2010-08-16	710	\N	912
+2750	GENERIC_DAY	0	4	2010-08-04	708	\N	912
+2751	GENERIC_DAY	0	4	2010-08-06	708	\N	912
+2752	GENERIC_DAY	0	4	2010-02-13	710	\N	912
+2753	GENERIC_DAY	0	4	2010-03-21	708	\N	912
+2754	GENERIC_DAY	0	4	2010-10-16	708	\N	912
+2755	GENERIC_DAY	0	4	2010-07-16	710	\N	912
+2756	GENERIC_DAY	0	4	2010-12-16	710	\N	912
+2757	GENERIC_DAY	0	4	2010-09-02	708	\N	912
+2758	GENERIC_DAY	0	4	2010-12-17	708	\N	912
+2759	GENERIC_DAY	0	4	2010-08-19	708	\N	912
+2760	GENERIC_DAY	0	4	2010-07-05	710	\N	912
+2761	GENERIC_DAY	0	4	2010-03-15	710	\N	912
+2762	GENERIC_DAY	0	4	2010-11-02	710	\N	912
+2763	GENERIC_DAY	0	4	2010-03-28	708	\N	912
+2764	GENERIC_DAY	0	4	2010-02-15	708	\N	912
+2765	GENERIC_DAY	0	4	2010-02-06	708	\N	912
+2766	GENERIC_DAY	0	4	2010-08-08	708	\N	912
+2767	GENERIC_DAY	0	4	2010-04-15	708	\N	912
+2768	GENERIC_DAY	0	4	2010-03-11	708	\N	912
+2769	GENERIC_DAY	0	4	2010-01-26	708	\N	912
+2770	GENERIC_DAY	0	4	2010-07-14	708	\N	912
+2771	GENERIC_DAY	0	4	2010-12-15	710	\N	912
+2772	GENERIC_DAY	0	4	2010-02-20	710	\N	912
+2773	GENERIC_DAY	0	4	2010-07-06	710	\N	912
+2774	GENERIC_DAY	0	4	2010-04-20	710	\N	912
+2775	GENERIC_DAY	0	4	2010-06-20	708	\N	912
+2776	GENERIC_DAY	0	4	2010-07-25	708	\N	912
+2777	GENERIC_DAY	0	4	2010-10-26	708	\N	912
+2778	GENERIC_DAY	0	4	2010-10-14	708	\N	912
+2779	GENERIC_DAY	0	4	2010-01-03	708	\N	912
+2780	GENERIC_DAY	0	4	2010-06-16	708	\N	912
+2781	GENERIC_DAY	0	4	2010-08-21	708	\N	912
+2782	GENERIC_DAY	0	4	2010-04-11	710	\N	912
+2783	GENERIC_DAY	0	4	2010-05-08	710	\N	912
+2784	GENERIC_DAY	0	4	2010-06-28	710	\N	912
+2785	GENERIC_DAY	0	4	2010-08-25	710	\N	912
+2786	GENERIC_DAY	0	4	2009-12-31	710	\N	912
+2787	GENERIC_DAY	0	4	2010-06-23	708	\N	912
+2788	GENERIC_DAY	0	4	2010-10-18	710	\N	912
+2789	GENERIC_DAY	0	4	2010-07-29	708	\N	912
+2790	GENERIC_DAY	0	4	2010-01-05	710	\N	912
+2791	GENERIC_DAY	0	4	2010-11-16	708	\N	912
+2792	GENERIC_DAY	0	4	2010-08-15	710	\N	912
+2793	GENERIC_DAY	0	4	2010-12-07	708	\N	912
+2794	GENERIC_DAY	0	4	2010-06-30	708	\N	912
+2795	GENERIC_DAY	0	4	2010-12-17	710	\N	912
+2796	GENERIC_DAY	0	4	2010-03-08	708	\N	912
+2797	GENERIC_DAY	0	4	2010-03-23	708	\N	912
+2798	GENERIC_DAY	0	4	2010-06-21	708	\N	912
+2799	GENERIC_DAY	0	4	2010-07-12	710	\N	912
+2800	GENERIC_DAY	0	4	2010-03-07	710	\N	912
+2801	GENERIC_DAY	0	4	2010-10-31	710	\N	912
+2802	GENERIC_DAY	0	4	2010-05-28	708	\N	912
+2803	GENERIC_DAY	0	4	2010-07-29	710	\N	912
+2804	GENERIC_DAY	0	4	2010-10-04	708	\N	912
+2805	GENERIC_DAY	0	4	2010-02-15	710	\N	912
+2806	GENERIC_DAY	0	4	2010-11-08	710	\N	912
+2807	GENERIC_DAY	0	4	2010-08-02	708	\N	912
+2808	GENERIC_DAY	0	4	2010-09-01	710	\N	912
+2809	GENERIC_DAY	0	4	2010-08-07	708	\N	912
+2810	GENERIC_DAY	0	4	2010-11-17	710	\N	912
+2811	GENERIC_DAY	0	4	2010-10-07	708	\N	912
+2812	GENERIC_DAY	0	4	2010-03-17	708	\N	912
+2813	GENERIC_DAY	0	4	2010-01-15	708	\N	912
+2814	GENERIC_DAY	0	4	2010-03-31	708	\N	912
+2815	GENERIC_DAY	0	4	2010-07-09	710	\N	912
+2816	GENERIC_DAY	0	4	2010-12-03	708	\N	912
+2817	GENERIC_DAY	0	4	2010-10-28	710	\N	912
+2818	GENERIC_DAY	0	4	2010-08-16	708	\N	912
+2819	GENERIC_DAY	0	4	2010-03-27	710	\N	912
+2820	GENERIC_DAY	0	4	2010-05-02	708	\N	912
+2821	GENERIC_DAY	0	4	2010-01-04	708	\N	912
+2822	GENERIC_DAY	0	4	2010-08-06	710	\N	912
+2823	GENERIC_DAY	0	4	2010-04-05	708	\N	912
+2824	GENERIC_DAY	0	4	2010-02-05	710	\N	912
+2825	GENERIC_DAY	0	4	2010-03-14	710	\N	912
+2826	GENERIC_DAY	0	4	2010-05-14	708	\N	912
+2827	GENERIC_DAY	0	4	2010-09-14	710	\N	912
+2828	GENERIC_DAY	0	4	2010-03-14	708	\N	912
+2829	GENERIC_DAY	0	4	2010-04-01	710	\N	912
+2830	GENERIC_DAY	0	4	2010-12-29	710	\N	912
+2831	GENERIC_DAY	0	4	2010-06-09	710	\N	912
+2832	GENERIC_DAY	0	4	2010-11-23	708	\N	912
+2833	GENERIC_DAY	0	4	2010-12-18	708	\N	912
+2834	GENERIC_DAY	0	4	2010-08-13	710	\N	912
+2835	GENERIC_DAY	0	4	2010-03-25	710	\N	912
+2836	GENERIC_DAY	0	4	2010-04-10	710	\N	912
+2837	GENERIC_DAY	0	4	2010-09-29	708	\N	912
+2838	GENERIC_DAY	0	4	2010-08-21	710	\N	912
+2839	GENERIC_DAY	0	4	2010-08-05	708	\N	912
+2840	GENERIC_DAY	0	4	2010-03-02	708	\N	912
+2841	GENERIC_DAY	0	4	2010-07-31	708	\N	912
+2842	GENERIC_DAY	0	4	2010-05-04	708	\N	912
+2843	GENERIC_DAY	0	4	2010-10-17	710	\N	912
+2844	GENERIC_DAY	0	4	2010-04-06	710	\N	912
+2845	GENERIC_DAY	0	4	2010-01-14	708	\N	912
+2846	GENERIC_DAY	0	4	2010-11-03	708	\N	912
+2847	GENERIC_DAY	0	4	2010-09-29	710	\N	912
+2848	GENERIC_DAY	0	4	2010-12-25	710	\N	912
+2849	GENERIC_DAY	0	4	2010-12-22	708	\N	912
+2850	GENERIC_DAY	0	4	2010-11-11	710	\N	912
+2851	GENERIC_DAY	0	4	2010-07-04	708	\N	912
+2852	GENERIC_DAY	0	4	2010-09-11	710	\N	912
+2853	GENERIC_DAY	0	4	2010-05-30	710	\N	912
+2854	GENERIC_DAY	0	4	2010-10-12	708	\N	912
+2855	GENERIC_DAY	0	4	2010-04-29	710	\N	912
+2856	GENERIC_DAY	0	4	2010-06-18	708	\N	912
+2857	GENERIC_DAY	0	4	2010-07-18	710	\N	912
+2858	GENERIC_DAY	0	4	2010-11-29	708	\N	912
+2859	GENERIC_DAY	0	4	2010-12-15	708	\N	912
+2860	GENERIC_DAY	0	4	2010-11-06	708	\N	912
+2861	GENERIC_DAY	0	4	2010-12-27	710	\N	912
+2862	GENERIC_DAY	0	4	2010-12-12	710	\N	912
+2863	GENERIC_DAY	0	4	2010-10-06	708	\N	912
+2864	GENERIC_DAY	0	4	2010-06-05	708	\N	912
+2865	GENERIC_DAY	0	4	2010-11-14	710	\N	912
+2866	GENERIC_DAY	0	4	2010-09-08	708	\N	912
+2867	GENERIC_DAY	0	4	2010-12-23	710	\N	912
+2868	GENERIC_DAY	0	4	2009-12-27	708	\N	912
+2869	GENERIC_DAY	0	4	2010-08-23	708	\N	912
+2870	GENERIC_DAY	0	4	2010-11-11	708	\N	912
+2871	GENERIC_DAY	0	4	2010-05-15	710	\N	912
+2872	GENERIC_DAY	0	4	2010-06-19	708	\N	912
+2873	GENERIC_DAY	0	4	2010-01-24	710	\N	912
+2874	GENERIC_DAY	0	4	2010-07-16	708	\N	912
+2875	GENERIC_DAY	0	4	2010-05-21	708	\N	912
+2876	GENERIC_DAY	0	4	2010-08-19	710	\N	912
+2877	GENERIC_DAY	0	4	2010-02-09	710	\N	912
+2878	GENERIC_DAY	0	4	2010-03-18	710	\N	912
+2879	GENERIC_DAY	0	4	2010-06-24	708	\N	912
+2880	GENERIC_DAY	0	4	2010-03-10	708	\N	912
+2881	GENERIC_DAY	0	4	2010-06-03	710	\N	912
+2882	GENERIC_DAY	0	4	2010-11-21	710	\N	912
+2883	GENERIC_DAY	0	4	2010-12-19	708	\N	912
+2884	GENERIC_DAY	0	4	2010-02-28	710	\N	912
+2885	GENERIC_DAY	0	4	2010-01-13	710	\N	912
+2886	GENERIC_DAY	0	4	2010-01-12	708	\N	912
+2887	GENERIC_DAY	0	4	2010-01-08	708	\N	912
+2888	GENERIC_DAY	0	4	2010-03-30	710	\N	912
+2889	GENERIC_DAY	0	4	2010-08-24	708	\N	912
+2890	GENERIC_DAY	0	4	2010-03-06	710	\N	912
+2891	GENERIC_DAY	0	4	2010-08-27	710	\N	912
+2892	GENERIC_DAY	0	4	2010-08-15	708	\N	912
+2893	GENERIC_DAY	0	4	2010-03-10	710	\N	912
+2894	GENERIC_DAY	0	4	2010-01-16	708	\N	912
+2895	GENERIC_DAY	0	4	2010-05-28	710	\N	912
+2896	GENERIC_DAY	0	4	2010-07-05	708	\N	912
+2897	GENERIC_DAY	0	4	2010-11-15	708	\N	912
+2898	GENERIC_DAY	0	4	2010-10-01	708	\N	912
+2899	GENERIC_DAY	0	4	2010-02-11	710	\N	912
+2900	GENERIC_DAY	0	4	2010-04-24	710	\N	912
+2901	GENERIC_DAY	0	4	2010-11-01	708	\N	912
+2902	GENERIC_DAY	0	4	2010-05-09	708	\N	912
+2903	GENERIC_DAY	0	4	2010-07-30	710	\N	912
+2904	GENERIC_DAY	0	4	2010-01-10	708	\N	912
+2905	GENERIC_DAY	0	4	2010-10-23	708	\N	912
+2906	GENERIC_DAY	0	4	2010-03-26	708	\N	912
+2907	GENERIC_DAY	0	4	2010-04-10	708	\N	912
+2908	GENERIC_DAY	0	4	2010-11-12	710	\N	912
+2909	GENERIC_DAY	0	4	2010-11-26	710	\N	912
+2910	GENERIC_DAY	0	4	2010-09-17	710	\N	912
+2911	GENERIC_DAY	0	4	2010-05-24	710	\N	912
+2912	GENERIC_DAY	0	4	2010-10-20	708	\N	912
+2913	GENERIC_DAY	0	4	2010-07-11	708	\N	912
+2914	GENERIC_DAY	0	4	2010-01-17	708	\N	912
+2915	GENERIC_DAY	0	4	2010-01-14	710	\N	912
+2916	GENERIC_DAY	0	4	2010-01-18	710	\N	912
+2917	GENERIC_DAY	0	4	2010-05-26	710	\N	912
+2918	GENERIC_DAY	0	4	2010-07-01	710	\N	912
+2919	GENERIC_DAY	0	4	2010-05-22	710	\N	912
+2920	GENERIC_DAY	0	4	2010-04-07	710	\N	912
+2921	GENERIC_DAY	0	4	2010-12-13	710	\N	912
+2922	GENERIC_DAY	0	4	2010-01-06	710	\N	912
+2923	GENERIC_DAY	0	4	2010-04-18	708	\N	912
+2924	GENERIC_DAY	0	4	2010-10-26	710	\N	912
+2925	GENERIC_DAY	0	4	2010-09-28	708	\N	912
+2926	GENERIC_DAY	0	4	2010-04-22	708	\N	912
+2927	GENERIC_DAY	0	4	2010-11-22	710	\N	912
+2928	GENERIC_DAY	0	4	2010-10-25	708	\N	912
+2929	GENERIC_DAY	0	4	2010-02-19	708	\N	912
+2930	GENERIC_DAY	0	4	2010-01-22	708	\N	912
+2931	GENERIC_DAY	0	4	2010-11-23	710	\N	912
+2932	GENERIC_DAY	0	4	2010-06-06	708	\N	912
+2933	GENERIC_DAY	0	4	2010-07-22	710	\N	912
+2934	GENERIC_DAY	0	4	2010-04-09	708	\N	912
+2935	GENERIC_DAY	0	4	2010-03-05	710	\N	912
+2936	GENERIC_DAY	0	4	2010-02-22	708	\N	912
+2937	GENERIC_DAY	0	4	2010-06-05	710	\N	912
+2938	GENERIC_DAY	0	4	2010-03-22	708	\N	912
+2939	GENERIC_DAY	0	4	2010-12-22	710	\N	912
+2940	GENERIC_DAY	0	4	2010-02-21	710	\N	912
+2941	GENERIC_DAY	0	4	2010-05-01	708	\N	912
+2942	GENERIC_DAY	0	4	2010-01-04	710	\N	912
+2943	GENERIC_DAY	0	4	2010-06-26	708	\N	912
+2944	GENERIC_DAY	0	4	2010-04-13	708	\N	912
+2945	GENERIC_DAY	0	4	2010-06-14	708	\N	912
+2946	GENERIC_DAY	0	4	2010-11-07	710	\N	912
+2947	GENERIC_DAY	0	4	2010-12-21	710	\N	912
+2948	GENERIC_DAY	0	4	2009-12-30	710	\N	912
+2949	GENERIC_DAY	0	4	2010-01-01	710	\N	912
+2950	GENERIC_DAY	0	4	2010-07-04	710	\N	912
+2951	GENERIC_DAY	0	4	2010-08-10	710	\N	912
+2952	GENERIC_DAY	0	4	2010-05-23	710	\N	912
+2953	GENERIC_DAY	0	4	2010-01-30	708	\N	912
+2954	GENERIC_DAY	0	4	2010-12-11	708	\N	912
+2955	GENERIC_DAY	0	4	2010-05-13	708	\N	912
+2956	GENERIC_DAY	0	4	2010-01-09	710	\N	912
+2957	GENERIC_DAY	0	4	2010-06-15	710	\N	912
+2958	GENERIC_DAY	0	4	2010-11-02	708	\N	912
+2959	GENERIC_DAY	0	4	2010-06-20	710	\N	912
+2960	GENERIC_DAY	0	4	2010-08-12	708	\N	912
+2961	GENERIC_DAY	0	4	2010-08-05	710	\N	912
+2962	GENERIC_DAY	0	4	2010-09-26	710	\N	912
+2963	GENERIC_DAY	0	4	2010-01-31	708	\N	912
+2964	GENERIC_DAY	0	4	2010-01-17	710	\N	912
+2965	GENERIC_DAY	0	4	2010-05-08	708	\N	912
+2966	GENERIC_DAY	0	4	2010-07-12	708	\N	912
+2967	GENERIC_DAY	0	4	2010-11-18	708	\N	912
+2968	GENERIC_DAY	0	4	2010-10-05	710	\N	912
+2969	GENERIC_DAY	0	4	2010-05-20	708	\N	912
+2970	GENERIC_DAY	0	4	2010-10-23	710	\N	912
+2971	GENERIC_DAY	0	4	2010-08-14	708	\N	912
+2972	GENERIC_DAY	0	4	2010-09-07	710	\N	912
+2973	GENERIC_DAY	0	4	2010-01-13	708	\N	912
+2974	GENERIC_DAY	0	4	2009-12-24	710	\N	912
+2975	GENERIC_DAY	0	4	2010-06-12	710	\N	912
+2976	GENERIC_DAY	0	4	2010-12-29	708	\N	912
+2977	GENERIC_DAY	0	4	2010-03-12	710	\N	912
+2978	GENERIC_DAY	0	4	2009-12-29	708	\N	912
+2979	GENERIC_DAY	0	4	2010-12-07	710	\N	912
+2980	GENERIC_DAY	0	4	2010-11-25	710	\N	912
+2981	GENERIC_DAY	0	4	2010-07-02	710	\N	912
+2982	GENERIC_DAY	0	4	2010-02-27	708	\N	912
+2983	GENERIC_DAY	0	4	2010-10-24	708	\N	912
+2984	GENERIC_DAY	0	4	2010-04-25	708	\N	912
+2985	GENERIC_DAY	0	4	2010-06-26	710	\N	912
+2986	GENERIC_DAY	0	4	2010-09-01	708	\N	912
+2987	GENERIC_DAY	0	4	2010-07-09	708	\N	912
+2988	GENERIC_DAY	0	4	2010-05-22	708	\N	912
+2989	GENERIC_DAY	0	4	2010-06-13	710	\N	912
+2990	GENERIC_DAY	0	4	2010-05-07	710	\N	912
+2991	GENERIC_DAY	0	4	2010-02-03	708	\N	912
+2992	GENERIC_DAY	0	4	2010-03-29	708	\N	912
+2993	GENERIC_DAY	0	4	2010-01-16	710	\N	912
+2994	GENERIC_DAY	0	4	2010-09-02	710	\N	912
+2995	GENERIC_DAY	0	4	2010-08-13	708	\N	912
+2996	GENERIC_DAY	0	4	2010-09-06	708	\N	912
+2997	GENERIC_DAY	0	4	2010-10-24	710	\N	912
+2998	GENERIC_DAY	0	4	2010-01-18	708	\N	912
+2999	GENERIC_DAY	0	4	2010-05-27	708	\N	912
+3000	GENERIC_DAY	0	4	2010-09-21	710	\N	912
+3001	GENERIC_DAY	0	4	2010-06-13	708	\N	912
+3002	GENERIC_DAY	0	4	2010-12-28	710	\N	912
+3003	GENERIC_DAY	0	4	2010-01-07	710	\N	912
+3004	GENERIC_DAY	0	4	2010-12-12	708	\N	912
+3005	GENERIC_DAY	0	4	2010-01-29	710	\N	912
+3006	GENERIC_DAY	0	4	2010-11-09	710	\N	912
+3007	GENERIC_DAY	0	4	2010-04-28	710	\N	912
+3008	GENERIC_DAY	0	4	2010-12-14	710	\N	912
+3009	GENERIC_DAY	0	4	2010-09-24	708	\N	912
+3010	GENERIC_DAY	0	4	2010-09-11	708	\N	912
+3011	GENERIC_DAY	0	4	2010-11-27	710	\N	912
+3012	GENERIC_DAY	0	4	2010-05-18	710	\N	912
+3013	GENERIC_DAY	0	4	2010-10-27	708	\N	912
+3014	GENERIC_DAY	0	4	2010-08-14	710	\N	912
+3015	GENERIC_DAY	0	4	2010-02-04	710	\N	912
+3016	GENERIC_DAY	0	4	2010-03-13	708	\N	912
+3017	GENERIC_DAY	0	4	2010-06-24	710	\N	912
+3018	GENERIC_DAY	0	4	2010-07-26	710	\N	912
+3019	GENERIC_DAY	0	4	2010-06-08	710	\N	912
+3020	GENERIC_DAY	0	4	2010-02-17	708	\N	912
+3021	GENERIC_DAY	0	4	2010-12-23	708	\N	912
+3022	GENERIC_DAY	0	4	2010-03-06	708	\N	912
+3023	GENERIC_DAY	0	4	2010-05-16	710	\N	912
+3024	GENERIC_DAY	0	4	2010-01-01	708	\N	912
+3025	GENERIC_DAY	0	4	2010-07-19	708	\N	912
+3026	GENERIC_DAY	0	4	2010-03-17	710	\N	912
+3027	GENERIC_DAY	0	4	2010-03-18	708	\N	912
+3028	GENERIC_DAY	0	4	2010-10-25	710	\N	912
+3029	GENERIC_DAY	0	4	2010-09-15	710	\N	912
+3030	GENERIC_DAY	0	4	2010-04-26	710	\N	912
+3031	GENERIC_DAY	0	4	2010-06-07	710	\N	912
+3032	GENERIC_DAY	0	4	2010-10-12	710	\N	912
+3033	GENERIC_DAY	0	4	2010-05-25	708	\N	912
+3034	GENERIC_DAY	0	4	2010-01-08	710	\N	912
+3035	GENERIC_DAY	0	4	2010-11-26	708	\N	912
+3036	GENERIC_DAY	0	4	2010-02-26	708	\N	912
+3037	GENERIC_DAY	0	4	2010-04-16	710	\N	912
+3038	GENERIC_DAY	0	4	2010-06-16	710	\N	912
+3039	GENERIC_DAY	0	4	2010-03-03	710	\N	912
+3040	GENERIC_DAY	0	4	2010-08-17	708	\N	912
+3041	GENERIC_DAY	0	4	2010-07-03	708	\N	912
+3042	GENERIC_DAY	0	4	2010-05-29	710	\N	912
+3043	GENERIC_DAY	0	4	2010-06-07	708	\N	912
+3044	GENERIC_DAY	0	4	2010-08-12	710	\N	912
+3045	GENERIC_DAY	0	4	2011-01-02	710	\N	912
+3046	GENERIC_DAY	0	4	2010-08-24	710	\N	912
+3047	GENERIC_DAY	0	4	2010-08-31	710	\N	912
+3048	GENERIC_DAY	0	4	2009-12-28	710	\N	912
+3049	GENERIC_DAY	0	4	2010-05-29	708	\N	912
+3050	GENERIC_DAY	0	4	2010-06-11	710	\N	912
+3051	GENERIC_DAY	0	4	2010-09-23	710	\N	912
+3052	GENERIC_DAY	0	4	2009-12-30	708	\N	912
+3053	GENERIC_DAY	0	4	2010-05-03	710	\N	912
+3054	GENERIC_DAY	0	4	2010-12-04	710	\N	912
+3055	GENERIC_DAY	0	4	2010-06-10	708	\N	912
+3056	GENERIC_DAY	0	4	2010-08-23	710	\N	912
+3057	GENERIC_DAY	0	4	2010-07-30	708	\N	912
+3058	GENERIC_DAY	0	4	2010-10-31	708	\N	912
+3059	GENERIC_DAY	0	4	2010-01-31	710	\N	912
+3060	GENERIC_DAY	0	4	2010-05-17	708	\N	912
+3061	GENERIC_DAY	0	4	2010-12-30	708	\N	912
+3062	GENERIC_DAY	0	4	2010-07-17	710	\N	912
+3063	GENERIC_DAY	0	4	2010-03-24	708	\N	912
+3064	GENERIC_DAY	0	4	2010-05-02	710	\N	912
+3065	GENERIC_DAY	0	4	2010-04-19	708	\N	912
+3066	GENERIC_DAY	0	4	2010-06-27	710	\N	912
+3067	GENERIC_DAY	0	4	2010-10-11	710	\N	912
+3068	GENERIC_DAY	0	4	2010-10-06	710	\N	912
+3069	GENERIC_DAY	0	4	2010-04-14	710	\N	912
+3070	GENERIC_DAY	0	4	2010-12-25	708	\N	912
+3071	GENERIC_DAY	0	4	2010-10-09	708	\N	912
+3072	GENERIC_DAY	0	4	2010-04-09	710	\N	912
+3073	GENERIC_DAY	0	4	2010-04-15	710	\N	912
+3074	GENERIC_DAY	0	4	2010-11-30	710	\N	912
+3075	GENERIC_DAY	0	4	2010-03-25	708	\N	912
+3076	GENERIC_DAY	0	4	2010-04-28	708	\N	912
+3077	GENERIC_DAY	0	4	2010-04-08	708	\N	912
+3078	GENERIC_DAY	0	4	2010-04-03	708	\N	912
+3079	GENERIC_DAY	0	4	2010-11-19	708	\N	912
+3080	GENERIC_DAY	0	4	2010-10-17	708	\N	912
+3081	GENERIC_DAY	0	4	2010-04-20	708	\N	912
+3082	GENERIC_DAY	0	4	2010-05-17	710	\N	912
+3083	GENERIC_DAY	0	4	2010-06-10	710	\N	912
+3084	GENERIC_DAY	0	4	2010-01-02	710	\N	912
+3085	GENERIC_DAY	0	4	2010-10-27	710	\N	912
+3086	GENERIC_DAY	0	4	2010-08-31	708	\N	912
+3087	GENERIC_DAY	0	4	2010-01-26	710	\N	912
+3088	GENERIC_DAY	0	4	2010-10-08	708	\N	912
+3089	GENERIC_DAY	0	4	2010-09-18	708	\N	912
+3090	GENERIC_DAY	0	4	2010-11-21	708	\N	912
+3091	GENERIC_DAY	0	4	2010-07-24	710	\N	912
+3092	GENERIC_DAY	0	4	2010-07-10	708	\N	912
+3093	GENERIC_DAY	0	4	2010-12-08	710	\N	912
+3094	GENERIC_DAY	0	4	2010-01-19	710	\N	912
+3095	GENERIC_DAY	0	4	2010-01-24	708	\N	912
+3096	GENERIC_DAY	0	4	2010-09-12	710	\N	912
+3097	GENERIC_DAY	0	4	2010-12-14	708	\N	912
+3098	GENERIC_DAY	0	4	2010-02-08	708	\N	912
+3099	GENERIC_DAY	0	4	2010-03-28	710	\N	912
+3100	GENERIC_DAY	0	4	2010-10-03	710	\N	912
+3101	GENERIC_DAY	0	4	2010-02-20	708	\N	912
+3102	GENERIC_DAY	0	4	2010-08-20	710	\N	912
+3103	GENERIC_DAY	0	4	2010-12-05	710	\N	912
+3104	GENERIC_DAY	0	4	2010-12-10	708	\N	912
+3105	GENERIC_DAY	0	4	2010-06-22	708	\N	912
+3106	GENERIC_DAY	0	4	2010-08-26	708	\N	912
+3107	GENERIC_DAY	0	4	2010-06-27	708	\N	912
+3108	GENERIC_DAY	0	4	2010-10-09	710	\N	912
+3109	GENERIC_DAY	0	4	2010-12-31	710	\N	912
+3110	GENERIC_DAY	0	4	2010-07-01	708	\N	912
+3111	GENERIC_DAY	0	4	2010-12-24	710	\N	912
+3112	GENERIC_DAY	0	4	2010-11-22	708	\N	912
+3113	GENERIC_DAY	0	4	2010-11-05	710	\N	912
+3114	GENERIC_DAY	0	4	2010-08-09	708	\N	912
+3115	GENERIC_DAY	0	4	2010-10-30	710	\N	912
+3116	GENERIC_DAY	0	4	2010-10-07	710	\N	912
+3117	GENERIC_DAY	0	4	2010-03-13	710	\N	912
+3118	GENERIC_DAY	0	4	2010-09-03	708	\N	912
+3119	GENERIC_DAY	0	4	2010-01-25	708	\N	912
+3120	GENERIC_DAY	0	4	2010-06-14	710	\N	912
+3121	GENERIC_DAY	0	4	2010-04-25	710	\N	912
+3122	GENERIC_DAY	0	4	2010-11-17	708	\N	912
+3123	GENERIC_DAY	0	4	2010-10-10	710	\N	912
+3124	GENERIC_DAY	0	4	2010-08-10	708	\N	912
+3125	GENERIC_DAY	0	4	2010-09-13	708	\N	912
+3126	GENERIC_DAY	0	4	2010-08-07	710	\N	912
+3127	GENERIC_DAY	0	4	2010-02-12	708	\N	912
+3128	GENERIC_DAY	0	4	2010-01-21	708	\N	912
+3129	GENERIC_DAY	0	4	2010-12-27	708	\N	912
+3130	GENERIC_DAY	0	4	2010-08-08	710	\N	912
+3131	GENERIC_DAY	0	4	2010-10-02	708	\N	912
+3132	GENERIC_DAY	0	4	2010-02-25	708	\N	912
+3133	GENERIC_DAY	0	4	2010-02-09	708	\N	912
+3134	GENERIC_DAY	0	4	2010-01-11	710	\N	912
+3135	GENERIC_DAY	0	4	2010-02-07	708	\N	912
+3136	GENERIC_DAY	0	8	2009-11-29	707	\N	913
+3137	GENERIC_DAY	0	8	2010-01-05	707	\N	913
+3138	GENERIC_DAY	0	8	2010-01-01	707	\N	913
+3139	GENERIC_DAY	0	8	2009-12-05	709	\N	913
+3140	GENERIC_DAY	0	8	2009-12-07	709	\N	913
+3141	GENERIC_DAY	0	8	2009-12-17	709	\N	913
+3142	GENERIC_DAY	0	8	2009-12-24	707	\N	913
+3143	GENERIC_DAY	0	8	2009-12-09	707	\N	913
+3144	GENERIC_DAY	0	8	2009-12-04	707	\N	913
+3145	GENERIC_DAY	0	8	2009-12-15	707	\N	913
+3146	GENERIC_DAY	0	8	2010-01-10	709	\N	913
+3147	GENERIC_DAY	0	8	2010-01-10	707	\N	913
+3148	GENERIC_DAY	0	8	2009-11-22	707	\N	913
+3149	GENERIC_DAY	0	8	2009-11-30	707	\N	913
+3150	GENERIC_DAY	0	8	2009-11-24	707	\N	913
+3151	GENERIC_DAY	0	8	2009-11-23	707	\N	913
+3152	GENERIC_DAY	0	8	2009-12-20	707	\N	913
+3153	GENERIC_DAY	0	8	2009-12-25	709	\N	913
+3154	GENERIC_DAY	0	8	2009-12-05	707	\N	913
+3155	GENERIC_DAY	0	8	2009-12-13	707	\N	913
+3156	GENERIC_DAY	0	8	2009-12-30	709	\N	913
+3157	GENERIC_DAY	0	8	2009-11-17	709	\N	913
+3158	GENERIC_DAY	0	8	2009-12-31	709	\N	913
+3159	GENERIC_DAY	0	8	2009-12-12	709	\N	913
+3160	GENERIC_DAY	0	8	2009-12-03	709	\N	913
+3161	GENERIC_DAY	0	8	2009-11-18	709	\N	913
+3162	GENERIC_DAY	0	8	2009-11-30	709	\N	913
+3163	GENERIC_DAY	0	8	2010-01-05	709	\N	913
+3164	GENERIC_DAY	0	8	2009-11-16	709	\N	913
+3165	GENERIC_DAY	0	8	2009-12-25	707	\N	913
+3166	GENERIC_DAY	0	8	2009-12-04	709	\N	913
+3167	GENERIC_DAY	0	8	2009-12-12	707	\N	913
+3168	GENERIC_DAY	0	8	2009-11-23	709	\N	913
+3169	GENERIC_DAY	0	8	2009-12-14	709	\N	913
+3170	GENERIC_DAY	0	8	2010-01-14	707	\N	913
+3171	GENERIC_DAY	0	8	2009-12-29	707	\N	913
+3172	GENERIC_DAY	0	8	2009-12-23	707	\N	913
+3173	GENERIC_DAY	0	8	2009-12-21	707	\N	913
+3174	GENERIC_DAY	0	8	2009-11-20	707	\N	913
+3175	GENERIC_DAY	0	8	2009-12-28	707	\N	913
+3176	GENERIC_DAY	0	8	2009-12-07	707	\N	913
+3177	GENERIC_DAY	0	8	2009-12-19	709	\N	913
+3178	GENERIC_DAY	0	8	2009-11-19	707	\N	913
+3179	GENERIC_DAY	0	8	2009-12-18	707	\N	913
+3180	GENERIC_DAY	0	8	2010-01-04	709	\N	913
+3181	GENERIC_DAY	0	8	2009-11-21	709	\N	913
+3182	GENERIC_DAY	0	8	2009-12-11	709	\N	913
+3183	GENERIC_DAY	0	8	2009-11-17	707	\N	913
+3184	GENERIC_DAY	0	8	2009-12-08	709	\N	913
+3185	GENERIC_DAY	0	8	2009-12-09	709	\N	913
+3186	GENERIC_DAY	0	8	2010-01-12	709	\N	913
+3187	GENERIC_DAY	0	8	2009-11-20	709	\N	913
+3188	GENERIC_DAY	0	8	2009-12-28	709	\N	913
+3189	GENERIC_DAY	0	8	2009-11-21	707	\N	913
+3190	GENERIC_DAY	0	8	2010-01-07	709	\N	913
+3191	GENERIC_DAY	0	8	2009-11-29	709	\N	913
+3192	GENERIC_DAY	0	8	2009-11-28	707	\N	913
+3193	GENERIC_DAY	0	8	2009-12-14	707	\N	913
+3194	GENERIC_DAY	0	8	2009-12-18	709	\N	913
+3195	GENERIC_DAY	0	8	2009-12-27	709	\N	913
+3196	GENERIC_DAY	0	8	2009-12-08	707	\N	913
+3197	GENERIC_DAY	0	8	2009-12-01	707	\N	913
+3198	GENERIC_DAY	0	8	2009-12-15	709	\N	913
+3199	GENERIC_DAY	0	8	2009-12-10	707	\N	913
+3200	GENERIC_DAY	0	8	2010-01-02	707	\N	913
+3201	GENERIC_DAY	0	8	2009-12-24	709	\N	913
+3202	GENERIC_DAY	0	8	2009-11-18	707	\N	913
+3203	GENERIC_DAY	0	8	2010-01-13	707	\N	913
+3204	GENERIC_DAY	0	8	2009-12-22	707	\N	913
+3205	GENERIC_DAY	0	8	2009-11-28	709	\N	913
+3206	GENERIC_DAY	0	8	2009-11-19	709	\N	913
+3207	GENERIC_DAY	0	8	2009-12-16	709	\N	913
+3208	GENERIC_DAY	0	8	2009-12-31	707	\N	913
+3209	GENERIC_DAY	0	8	2010-01-08	709	\N	913
+3210	GENERIC_DAY	0	8	2010-01-11	707	\N	913
+3211	GENERIC_DAY	0	8	2010-01-15	707	\N	913
+3212	GENERIC_DAY	0	8	2009-11-26	707	\N	913
+3213	GENERIC_DAY	0	8	2010-01-01	709	\N	913
+3214	GENERIC_DAY	0	8	2010-01-13	709	\N	913
+3215	GENERIC_DAY	0	8	2009-12-21	709	\N	913
+3216	GENERIC_DAY	0	8	2009-12-19	707	\N	913
+3217	GENERIC_DAY	0	8	2009-12-03	707	\N	913
+3218	GENERIC_DAY	0	8	2009-11-27	707	\N	913
+3219	GENERIC_DAY	0	8	2009-12-11	707	\N	913
+3220	GENERIC_DAY	0	4	2010-01-16	709	\N	913
+3221	GENERIC_DAY	0	8	2009-12-23	709	\N	913
+3222	GENERIC_DAY	0	8	2009-11-15	707	\N	913
+3223	GENERIC_DAY	0	8	2009-11-25	707	\N	913
+3224	GENERIC_DAY	0	8	2009-12-16	707	\N	913
+3225	GENERIC_DAY	0	8	2009-11-24	709	\N	913
+3226	GENERIC_DAY	0	8	2009-12-22	709	\N	913
+3227	GENERIC_DAY	0	8	2009-12-02	707	\N	913
+3228	GENERIC_DAY	0	8	2009-12-06	709	\N	913
+3229	GENERIC_DAY	0	8	2009-12-01	709	\N	913
+3230	GENERIC_DAY	0	8	2009-12-20	709	\N	913
+3231	GENERIC_DAY	0	8	2009-12-27	707	\N	913
+3232	GENERIC_DAY	0	8	2010-01-09	709	\N	913
+3233	GENERIC_DAY	0	8	2009-12-13	709	\N	913
+3234	GENERIC_DAY	0	8	2010-01-06	709	\N	913
+3235	GENERIC_DAY	0	8	2009-11-25	709	\N	913
+3236	GENERIC_DAY	0	8	2010-01-12	707	\N	913
+3237	GENERIC_DAY	0	8	2009-11-15	709	\N	913
+3238	GENERIC_DAY	0	8	2009-12-29	709	\N	913
+3239	GENERIC_DAY	0	8	2010-01-02	709	\N	913
+3240	GENERIC_DAY	0	8	2010-01-09	707	\N	913
+3241	GENERIC_DAY	0	4	2010-01-16	707	\N	913
+3242	GENERIC_DAY	0	8	2010-01-06	707	\N	913
+3243	GENERIC_DAY	0	8	2010-01-08	707	\N	913
+3244	GENERIC_DAY	0	8	2010-01-11	709	\N	913
+3245	GENERIC_DAY	0	8	2010-01-03	709	\N	913
+3246	GENERIC_DAY	0	8	2009-11-16	707	\N	913
+3247	GENERIC_DAY	0	8	2009-12-10	709	\N	913
+3248	GENERIC_DAY	0	8	2009-12-26	709	\N	913
+3249	GENERIC_DAY	0	8	2010-01-07	707	\N	913
+3250	GENERIC_DAY	0	8	2009-11-27	709	\N	913
+3251	GENERIC_DAY	0	8	2009-12-17	707	\N	913
+3252	GENERIC_DAY	0	8	2009-12-30	707	\N	913
+3253	GENERIC_DAY	0	8	2009-12-06	707	\N	913
+3254	GENERIC_DAY	0	8	2010-01-14	709	\N	913
+3255	GENERIC_DAY	0	8	2010-01-15	709	\N	913
+3256	GENERIC_DAY	0	8	2009-11-26	709	\N	913
+3257	GENERIC_DAY	0	8	2009-12-26	707	\N	913
+3258	GENERIC_DAY	0	8	2010-01-04	707	\N	913
+3259	GENERIC_DAY	0	8	2010-01-03	707	\N	913
+3260	GENERIC_DAY	0	8	2009-12-02	709	\N	913
+3261	GENERIC_DAY	0	8	2009-11-22	709	\N	913
+3262	GENERIC_DAY	0	8	2009-12-07	707	\N	914
+3263	GENERIC_DAY	0	8	2009-12-09	707	\N	914
+3264	GENERIC_DAY	0	8	2009-11-11	707	\N	914
+3265	GENERIC_DAY	0	8	2009-11-19	707	\N	914
+3266	GENERIC_DAY	0	8	2009-11-27	707	\N	914
+3267	GENERIC_DAY	0	8	2009-11-05	707	\N	914
+3268	GENERIC_DAY	0	8	2009-12-17	707	\N	914
+3269	GENERIC_DAY	0	8	2009-10-22	707	\N	914
+3270	GENERIC_DAY	0	8	2009-11-18	707	\N	914
+3271	GENERIC_DAY	0	8	2009-11-23	707	\N	914
+3272	GENERIC_DAY	0	8	2009-12-20	707	\N	914
+3273	GENERIC_DAY	0	8	2009-11-20	707	\N	914
+3274	GENERIC_DAY	0	8	2009-10-24	707	\N	914
+3275	GENERIC_DAY	0	8	2009-11-01	707	\N	914
+3276	GENERIC_DAY	0	8	2009-12-19	707	\N	914
+3277	GENERIC_DAY	0	8	2009-12-04	707	\N	914
+3278	GENERIC_DAY	0	8	2009-10-23	707	\N	914
+3279	GENERIC_DAY	0	8	2009-11-26	707	\N	914
+3280	GENERIC_DAY	0	8	2009-11-09	707	\N	914
+3281	GENERIC_DAY	0	8	2009-11-17	707	\N	914
+3282	GENERIC_DAY	0	8	2009-12-18	707	\N	914
+3283	GENERIC_DAY	0	8	2009-11-12	707	\N	914
+3284	GENERIC_DAY	0	8	2009-10-28	707	\N	914
+3285	GENERIC_DAY	0	8	2009-12-08	707	\N	914
+3286	GENERIC_DAY	0	8	2009-10-26	707	\N	914
+3287	GENERIC_DAY	0	8	2009-11-03	707	\N	914
+3288	GENERIC_DAY	0	8	2009-11-04	707	\N	914
+3289	GENERIC_DAY	0	8	2009-12-03	707	\N	914
+3290	GENERIC_DAY	0	8	2009-12-12	707	\N	914
+3291	GENERIC_DAY	0	8	2009-11-24	707	\N	914
+3292	GENERIC_DAY	0	8	2009-12-10	707	\N	914
+3293	GENERIC_DAY	0	8	2009-11-29	707	\N	914
+3294	GENERIC_DAY	0	8	2009-12-21	707	\N	914
+3295	GENERIC_DAY	0	8	2009-12-11	707	\N	914
+3296	GENERIC_DAY	0	8	2009-10-27	707	\N	914
+3297	GENERIC_DAY	0	8	2009-11-06	707	\N	914
+3298	GENERIC_DAY	0	8	2009-10-29	707	\N	914
+3299	GENERIC_DAY	0	8	2009-10-31	707	\N	914
+3300	GENERIC_DAY	0	8	2009-10-25	707	\N	914
+3301	GENERIC_DAY	0	8	2009-11-21	707	\N	914
+3302	GENERIC_DAY	0	8	2009-11-25	707	\N	914
+3303	GENERIC_DAY	0	8	2009-12-01	707	\N	914
+3304	GENERIC_DAY	0	8	2009-11-22	707	\N	914
+3305	GENERIC_DAY	0	8	2009-12-05	707	\N	914
+3306	GENERIC_DAY	0	8	2009-11-30	707	\N	914
+3307	GENERIC_DAY	0	8	2009-11-08	707	\N	914
+3308	GENERIC_DAY	0	8	2009-10-30	707	\N	914
+3309	GENERIC_DAY	0	8	2009-11-16	707	\N	914
+3310	GENERIC_DAY	0	8	2009-11-13	707	\N	914
+3311	GENERIC_DAY	0	8	2009-11-14	707	\N	914
+3312	GENERIC_DAY	0	8	2009-11-10	707	\N	914
+3313	GENERIC_DAY	0	8	2009-12-02	707	\N	914
+3314	GENERIC_DAY	0	8	2009-11-15	707	\N	914
+3315	GENERIC_DAY	0	4	2009-12-22	707	\N	914
+3316	GENERIC_DAY	0	8	2009-12-15	707	\N	914
+3317	GENERIC_DAY	0	8	2009-11-28	707	\N	914
+3318	GENERIC_DAY	0	8	2009-12-14	707	\N	914
+3319	GENERIC_DAY	0	8	2009-12-06	707	\N	914
+3320	GENERIC_DAY	0	8	2009-12-13	707	\N	914
+3321	GENERIC_DAY	0	8	2009-10-21	707	\N	914
+3322	GENERIC_DAY	0	8	2009-11-02	707	\N	914
+3323	GENERIC_DAY	0	8	2009-12-16	707	\N	914
+3324	GENERIC_DAY	0	8	2009-11-07	707	\N	914
+1136	GENERIC_DAY	3	4	2010-04-01	710	\N	910
+1137	GENERIC_DAY	3	4	2010-05-25	710	\N	910
+1138	GENERIC_DAY	3	4	2010-06-23	710	\N	910
+1139	GENERIC_DAY	3	4	2010-05-18	708	\N	910
+1140	GENERIC_DAY	3	4	2010-08-19	708	\N	910
+1141	GENERIC_DAY	3	4	2010-03-10	708	\N	910
+1142	GENERIC_DAY	3	4	2010-04-02	710	\N	910
+1143	GENERIC_DAY	3	4	2010-02-24	708	\N	910
+1144	GENERIC_DAY	3	4	2010-05-22	708	\N	910
+1145	GENERIC_DAY	3	4	2010-08-04	710	\N	910
+1146	GENERIC_DAY	3	4	2010-04-13	710	\N	910
+1147	GENERIC_DAY	3	4	2010-06-09	708	\N	910
+1148	GENERIC_DAY	3	4	2010-08-14	708	\N	910
+1149	GENERIC_DAY	3	4	2010-04-28	708	\N	910
+1150	GENERIC_DAY	3	4	2010-01-05	710	\N	910
+1151	GENERIC_DAY	3	4	2010-06-26	708	\N	910
+1152	GENERIC_DAY	3	4	2010-01-30	710	\N	910
+1153	GENERIC_DAY	3	4	2010-05-24	710	\N	910
+1154	GENERIC_DAY	3	4	2010-08-05	708	\N	910
+1155	GENERIC_DAY	3	4	2010-03-18	708	\N	910
+1156	GENERIC_DAY	3	4	2010-03-10	710	\N	910
+1157	GENERIC_DAY	3	4	2010-05-17	710	\N	910
+1158	GENERIC_DAY	3	4	2010-03-28	710	\N	910
+1159	GENERIC_DAY	3	4	2010-07-02	710	\N	910
+1160	GENERIC_DAY	3	4	2010-06-30	708	\N	910
+1161	GENERIC_DAY	3	4	2010-03-09	710	\N	910
+1162	GENERIC_DAY	3	4	2010-02-18	708	\N	910
+1163	GENERIC_DAY	3	4	2010-08-28	710	\N	910
+1164	GENERIC_DAY	3	4	2010-07-28	708	\N	910
+1165	GENERIC_DAY	3	4	2010-04-03	710	\N	910
+1166	GENERIC_DAY	3	4	2009-12-25	708	\N	910
+1167	GENERIC_DAY	3	4	2010-08-20	708	\N	910
+1168	GENERIC_DAY	3	4	2010-03-16	708	\N	910
+1169	GENERIC_DAY	3	4	2010-04-23	708	\N	910
+1170	GENERIC_DAY	3	4	2010-04-14	708	\N	910
+1171	GENERIC_DAY	3	4	2010-04-26	710	\N	910
+1172	GENERIC_DAY	3	4	2010-07-08	710	\N	910
+1173	GENERIC_DAY	3	4	2010-06-13	708	\N	910
+1174	GENERIC_DAY	3	4	2010-05-28	710	\N	910
+1175	GENERIC_DAY	3	4	2009-12-23	708	\N	910
+1176	GENERIC_DAY	3	4	2010-01-31	708	\N	910
+1177	GENERIC_DAY	3	4	2010-06-17	708	\N	910
+1178	GENERIC_DAY	3	4	2010-07-22	710	\N	910
+1179	GENERIC_DAY	3	4	2010-04-30	708	\N	910
+1180	GENERIC_DAY	3	4	2010-02-10	710	\N	910
+1181	GENERIC_DAY	3	4	2010-05-09	708	\N	910
+1182	GENERIC_DAY	3	4	2010-04-01	708	\N	910
+1183	GENERIC_DAY	3	4	2010-04-30	710	\N	910
+1184	GENERIC_DAY	3	4	2010-08-27	710	\N	910
+1185	GENERIC_DAY	3	4	2010-07-08	708	\N	910
+1186	GENERIC_DAY	3	4	2010-04-24	708	\N	910
+1187	GENERIC_DAY	3	4	2010-04-25	710	\N	910
+1188	GENERIC_DAY	3	4	2010-08-01	708	\N	910
+1189	GENERIC_DAY	3	4	2010-04-15	710	\N	910
+1190	GENERIC_DAY	3	4	2010-04-29	710	\N	910
+1191	GENERIC_DAY	3	4	2009-12-22	708	\N	910
+1192	GENERIC_DAY	3	4	2010-06-22	710	\N	910
+1193	GENERIC_DAY	3	4	2010-01-06	708	\N	910
+1194	GENERIC_DAY	3	4	2010-02-19	708	\N	910
+1195	GENERIC_DAY	3	4	2010-07-25	710	\N	910
+1196	GENERIC_DAY	3	4	2010-07-17	710	\N	910
+1197	GENERIC_DAY	3	4	2010-02-02	710	\N	910
+1198	GENERIC_DAY	3	4	2010-06-24	710	\N	910
+1199	GENERIC_DAY	3	4	2010-02-08	710	\N	910
+1200	GENERIC_DAY	3	4	2010-01-20	708	\N	910
+1201	GENERIC_DAY	3	4	2010-05-26	708	\N	910
+1202	GENERIC_DAY	3	4	2010-06-16	710	\N	910
+1203	GENERIC_DAY	3	4	2010-07-31	708	\N	910
+1204	GENERIC_DAY	3	4	2010-01-21	708	\N	910
+1205	GENERIC_DAY	3	4	2010-01-13	710	\N	910
+1206	GENERIC_DAY	3	4	2010-04-19	710	\N	910
+1207	GENERIC_DAY	3	4	2010-08-10	708	\N	910
+1208	GENERIC_DAY	3	4	2010-06-27	708	\N	910
+1209	GENERIC_DAY	3	4	2010-07-31	710	\N	910
+1210	GENERIC_DAY	3	4	2010-03-07	708	\N	910
+1211	GENERIC_DAY	3	4	2010-05-23	710	\N	910
+1212	GENERIC_DAY	3	4	2010-01-17	710	\N	910
+1213	GENERIC_DAY	3	4	2010-02-07	710	\N	910
+1214	GENERIC_DAY	3	4	2010-08-17	708	\N	910
+1215	GENERIC_DAY	3	4	2010-05-14	710	\N	910
+1216	GENERIC_DAY	3	4	2010-04-04	708	\N	910
+1217	GENERIC_DAY	3	4	2010-03-13	708	\N	910
+1218	GENERIC_DAY	3	4	2010-08-24	710	\N	910
+1219	GENERIC_DAY	3	4	2009-12-26	708	\N	910
+1220	GENERIC_DAY	3	4	2010-06-02	708	\N	910
+1221	GENERIC_DAY	3	4	2010-02-26	710	\N	910
+1222	GENERIC_DAY	3	4	2009-12-27	710	\N	910
+1223	GENERIC_DAY	3	4	2010-03-21	710	\N	910
+1224	GENERIC_DAY	3	4	2010-03-27	710	\N	910
+1225	GENERIC_DAY	3	4	2010-04-12	710	\N	910
+1226	GENERIC_DAY	3	4	2010-02-23	708	\N	910
+1227	GENERIC_DAY	3	4	2010-04-22	708	\N	910
+1228	GENERIC_DAY	3	4	2010-08-15	710	\N	910
+1229	GENERIC_DAY	3	4	2010-05-10	710	\N	910
+1230	GENERIC_DAY	3	4	2010-05-04	708	\N	910
+1231	GENERIC_DAY	3	4	2010-02-20	710	\N	910
+1232	GENERIC_DAY	3	4	2010-05-12	708	\N	910
+1233	GENERIC_DAY	3	4	2010-06-19	708	\N	910
+1234	GENERIC_DAY	3	4	2010-08-26	708	\N	910
+1235	GENERIC_DAY	3	4	2010-03-04	708	\N	910
+1236	GENERIC_DAY	3	4	2010-03-13	710	\N	910
+1237	GENERIC_DAY	3	4	2010-04-25	708	\N	910
+1238	GENERIC_DAY	3	4	2010-05-02	708	\N	910
+1239	GENERIC_DAY	3	4	2010-02-17	710	\N	910
+1240	GENERIC_DAY	3	4	2010-01-27	710	\N	910
+1241	GENERIC_DAY	3	4	2010-02-04	710	\N	910
+1242	GENERIC_DAY	3	4	2010-05-15	710	\N	910
+1243	GENERIC_DAY	3	4	2010-01-04	710	\N	910
+1244	GENERIC_DAY	3	4	2010-07-18	708	\N	910
+1245	GENERIC_DAY	3	4	2010-01-24	708	\N	910
+1246	GENERIC_DAY	3	4	2010-05-16	708	\N	910
+1247	GENERIC_DAY	3	4	2010-02-20	708	\N	910
+1248	GENERIC_DAY	3	4	2010-01-03	710	\N	910
+1249	GENERIC_DAY	3	4	2010-03-16	710	\N	910
+1250	GENERIC_DAY	3	4	2010-07-01	708	\N	910
+1251	GENERIC_DAY	3	4	2010-06-11	710	\N	910
+1252	GENERIC_DAY	3	4	2010-07-29	710	\N	910
+1253	GENERIC_DAY	3	4	2010-08-17	710	\N	910
+1254	GENERIC_DAY	3	4	2010-02-14	708	\N	910
+1255	GENERIC_DAY	3	4	2010-03-29	708	\N	910
+1256	GENERIC_DAY	3	4	2010-01-03	708	\N	910
+1257	GENERIC_DAY	3	4	2010-01-29	708	\N	910
+1258	GENERIC_DAY	3	4	2010-05-24	708	\N	910
+1259	GENERIC_DAY	3	4	2010-05-30	708	\N	910
+1260	GENERIC_DAY	3	4	2010-03-20	708	\N	910
+1261	GENERIC_DAY	3	4	2010-03-01	708	\N	910
+1262	GENERIC_DAY	3	4	2010-04-03	708	\N	910
+1263	GENERIC_DAY	3	4	2010-03-14	710	\N	910
+1264	GENERIC_DAY	3	4	2010-07-29	708	\N	910
+1265	GENERIC_DAY	3	4	2010-06-28	708	\N	910
+1266	GENERIC_DAY	3	4	2010-03-17	710	\N	910
+1267	GENERIC_DAY	3	4	2010-03-05	708	\N	910
+1268	GENERIC_DAY	3	4	2010-05-03	708	\N	910
+1269	GENERIC_DAY	3	4	2010-05-09	710	\N	910
+1270	GENERIC_DAY	3	4	2010-01-02	708	\N	910
+1271	GENERIC_DAY	3	4	2010-03-27	708	\N	910
+1272	GENERIC_DAY	3	4	2010-05-28	708	\N	910
+1273	GENERIC_DAY	3	4	2010-05-16	710	\N	910
+1274	GENERIC_DAY	3	4	2010-05-05	708	\N	910
+1275	GENERIC_DAY	3	4	2010-01-07	710	\N	910
+1276	GENERIC_DAY	3	4	2010-07-12	708	\N	910
+1277	GENERIC_DAY	3	4	2010-03-23	710	\N	910
+1278	GENERIC_DAY	3	4	2010-03-08	708	\N	910
+1279	GENERIC_DAY	3	4	2010-05-17	708	\N	910
+1280	GENERIC_DAY	3	4	2010-03-21	708	\N	910
+1281	GENERIC_DAY	3	4	2009-12-31	710	\N	910
+1282	GENERIC_DAY	3	4	2010-06-07	708	\N	910
+1283	GENERIC_DAY	3	4	2010-06-29	710	\N	910
+1284	GENERIC_DAY	3	4	2010-08-02	710	\N	910
+1285	GENERIC_DAY	3	4	2010-03-20	710	\N	910
+1286	GENERIC_DAY	3	4	2010-03-30	708	\N	910
+1287	GENERIC_DAY	3	4	2010-03-04	710	\N	910
+1288	GENERIC_DAY	3	4	2009-12-30	710	\N	910
+1289	GENERIC_DAY	3	4	2010-08-26	710	\N	910
+1290	GENERIC_DAY	3	4	2010-06-10	710	\N	910
+1291	GENERIC_DAY	3	4	2010-06-20	708	\N	910
+1292	GENERIC_DAY	3	4	2010-06-27	710	\N	910
+1293	GENERIC_DAY	3	4	2010-06-23	708	\N	910
+1294	GENERIC_DAY	3	4	2010-06-08	710	\N	910
+1295	GENERIC_DAY	3	4	2010-06-09	710	\N	910
+1296	GENERIC_DAY	3	4	2010-03-25	708	\N	910
+1297	GENERIC_DAY	3	4	2010-08-10	710	\N	910
+1298	GENERIC_DAY	3	4	2010-04-26	708	\N	910
+1299	GENERIC_DAY	3	4	2010-06-01	708	\N	910
+1300	GENERIC_DAY	3	4	2010-08-21	708	\N	910
+1301	GENERIC_DAY	3	4	2010-03-06	708	\N	910
+1302	GENERIC_DAY	3	4	2010-07-05	708	\N	910
+1303	GENERIC_DAY	3	4	2010-04-20	708	\N	910
+1304	GENERIC_DAY	3	4	2010-08-06	708	\N	910
+1305	GENERIC_DAY	3	4	2010-03-23	708	\N	910
+1306	GENERIC_DAY	3	4	2010-01-15	710	\N	910
+1307	GENERIC_DAY	3	4	2010-02-15	708	\N	910
+1308	GENERIC_DAY	3	4	2010-04-19	708	\N	910
+1309	GENERIC_DAY	3	4	2010-07-12	710	\N	910
+1310	GENERIC_DAY	3	4	2010-05-25	708	\N	910
+1311	GENERIC_DAY	3	4	2010-04-27	708	\N	910
+1312	GENERIC_DAY	3	4	2010-06-06	710	\N	910
+1313	GENERIC_DAY	3	4	2010-07-26	708	\N	910
+1314	GENERIC_DAY	3	4	2010-02-18	710	\N	910
+1315	GENERIC_DAY	3	4	2010-07-19	708	\N	910
+1316	GENERIC_DAY	3	4	2010-04-04	710	\N	910
+1317	GENERIC_DAY	3	4	2010-02-03	710	\N	910
+1318	GENERIC_DAY	3	4	2010-05-08	708	\N	910
+1319	GENERIC_DAY	3	4	2010-07-04	708	\N	910
+1320	GENERIC_DAY	3	4	2009-12-25	710	\N	910
+1321	GENERIC_DAY	3	4	2010-05-05	710	\N	910
+1322	GENERIC_DAY	3	4	2010-06-10	708	\N	910
+1323	GENERIC_DAY	3	4	2010-02-25	710	\N	910
+1324	GENERIC_DAY	3	4	2010-04-29	708	\N	910
+1325	GENERIC_DAY	3	4	2010-04-18	708	\N	910
+1326	GENERIC_DAY	3	4	2010-04-21	708	\N	910
+1327	GENERIC_DAY	3	4	2010-02-01	708	\N	910
+1328	GENERIC_DAY	3	4	2010-05-26	710	\N	910
+1329	GENERIC_DAY	3	4	2010-07-09	708	\N	910
+1330	GENERIC_DAY	3	4	2010-05-01	710	\N	910
+1331	GENERIC_DAY	3	4	2010-01-13	708	\N	910
+1332	GENERIC_DAY	3	4	2010-07-16	708	\N	910
+1333	GENERIC_DAY	3	4	2010-05-07	708	\N	910
+1334	GENERIC_DAY	3	4	2010-05-20	708	\N	910
+1335	GENERIC_DAY	3	4	2010-01-02	710	\N	910
+1336	GENERIC_DAY	3	4	2010-08-15	708	\N	910
+1337	GENERIC_DAY	3	4	2010-01-20	710	\N	910
+1338	GENERIC_DAY	3	4	2010-05-30	710	\N	910
+1339	GENERIC_DAY	3	4	2010-05-12	710	\N	910
+1340	GENERIC_DAY	3	4	2010-07-19	710	\N	910
+1341	GENERIC_DAY	3	4	2010-05-29	708	\N	910
+1342	GENERIC_DAY	3	4	2010-07-21	710	\N	910
+1343	GENERIC_DAY	3	4	2010-08-14	710	\N	910
+1344	GENERIC_DAY	3	4	2010-07-14	710	\N	910
+1345	GENERIC_DAY	3	4	2010-08-23	708	\N	910
+1346	GENERIC_DAY	3	4	2010-04-18	710	\N	910
+1347	GENERIC_DAY	3	4	2010-03-12	708	\N	910
+1348	GENERIC_DAY	3	4	2010-01-05	708	\N	910
+1349	GENERIC_DAY	3	4	2010-08-12	708	\N	910
+1350	GENERIC_DAY	3	4	2010-03-29	710	\N	910
+1351	GENERIC_DAY	3	4	2010-02-09	710	\N	910
+1352	GENERIC_DAY	3	4	2010-07-10	710	\N	910
+1353	GENERIC_DAY	3	4	2010-01-08	710	\N	910
+1354	GENERIC_DAY	3	4	2010-02-28	710	\N	910
+1355	GENERIC_DAY	3	4	2010-05-15	708	\N	910
+1356	GENERIC_DAY	3	4	2010-07-30	708	\N	910
+1357	GENERIC_DAY	3	4	2010-07-13	710	\N	910
+1358	GENERIC_DAY	3	4	2010-08-05	710	\N	910
+1359	GENERIC_DAY	3	4	2010-01-14	710	\N	910
+1360	GENERIC_DAY	3	4	2010-01-01	710	\N	910
+1361	GENERIC_DAY	3	4	2010-05-04	710	\N	910
+1362	GENERIC_DAY	3	4	2010-02-06	708	\N	910
+1363	GENERIC_DAY	3	4	2010-08-22	710	\N	910
+1364	GENERIC_DAY	3	4	2010-01-18	708	\N	910
+1365	GENERIC_DAY	3	4	2010-07-27	708	\N	910
+1366	GENERIC_DAY	3	4	2010-01-27	708	\N	910
+1367	GENERIC_DAY	3	4	2010-07-14	708	\N	910
+1368	GENERIC_DAY	3	4	2010-03-17	708	\N	910
+1369	GENERIC_DAY	3	4	2010-04-21	710	\N	910
+1370	GENERIC_DAY	3	4	2010-05-27	708	\N	910
+1371	GENERIC_DAY	3	4	2010-02-08	708	\N	910
+1372	GENERIC_DAY	3	4	2010-03-02	710	\N	910
+1373	GENERIC_DAY	3	4	2010-01-26	710	\N	910
+1374	GENERIC_DAY	3	4	2010-03-31	708	\N	910
+1375	GENERIC_DAY	3	4	2010-07-24	708	\N	910
+1376	GENERIC_DAY	3	4	2010-04-07	710	\N	910
+1377	GENERIC_DAY	3	4	2010-06-15	708	\N	910
+1378	GENERIC_DAY	3	4	2010-08-03	710	\N	910
+1379	GENERIC_DAY	3	4	2010-01-09	708	\N	910
+1380	GENERIC_DAY	3	4	2010-03-03	710	\N	910
+1381	GENERIC_DAY	3	4	2010-02-07	708	\N	910
+1382	GENERIC_DAY	3	4	2010-03-18	710	\N	910
+1383	GENERIC_DAY	3	4	2010-01-10	710	\N	910
+1384	GENERIC_DAY	3	4	2010-04-27	710	\N	910
+1385	GENERIC_DAY	3	4	2010-07-24	710	\N	910
+1386	GENERIC_DAY	3	4	2010-02-16	708	\N	910
+1387	GENERIC_DAY	3	4	2010-08-13	708	\N	910
+1388	GENERIC_DAY	3	4	2010-03-01	710	\N	910
+1389	GENERIC_DAY	3	4	2010-02-24	710	\N	910
+1390	GENERIC_DAY	3	4	2010-07-15	710	\N	910
+1391	GENERIC_DAY	3	4	2010-01-10	708	\N	910
+1392	GENERIC_DAY	3	4	2010-06-04	710	\N	910
+1393	GENERIC_DAY	3	4	2010-06-19	710	\N	910
+1394	GENERIC_DAY	3	4	2010-08-28	708	\N	910
+1395	GENERIC_DAY	3	4	2010-06-06	708	\N	910
+1396	GENERIC_DAY	3	4	2010-05-27	710	\N	910
+1397	GENERIC_DAY	3	4	2010-06-18	710	\N	910
+1398	GENERIC_DAY	3	4	2010-03-26	710	\N	910
+1399	GENERIC_DAY	3	4	2010-03-11	710	\N	910
+1400	GENERIC_DAY	3	4	2010-06-12	710	\N	910
+1401	GENERIC_DAY	3	4	2010-03-05	710	\N	910
+1402	GENERIC_DAY	3	4	2010-03-30	710	\N	910
+1403	GENERIC_DAY	3	4	2010-08-11	708	\N	910
+1404	GENERIC_DAY	3	4	2010-07-09	710	\N	910
+1405	GENERIC_DAY	3	4	2010-04-13	708	\N	910
+1406	GENERIC_DAY	3	4	2010-01-18	710	\N	910
+1407	GENERIC_DAY	3	4	2010-06-02	710	\N	910
+1408	GENERIC_DAY	3	4	2010-03-11	708	\N	910
+1409	GENERIC_DAY	3	4	2010-07-26	710	\N	910
+1410	GENERIC_DAY	3	4	2010-01-04	708	\N	910
+1411	GENERIC_DAY	3	4	2010-08-11	710	\N	910
+1412	GENERIC_DAY	3	4	2010-02-17	708	\N	910
+1413	GENERIC_DAY	3	4	2010-02-15	710	\N	910
+1414	GENERIC_DAY	3	4	2010-01-28	710	\N	910
+1415	GENERIC_DAY	3	4	2010-08-22	708	\N	910
+1416	GENERIC_DAY	3	4	2010-07-18	710	\N	910
+1417	GENERIC_DAY	3	4	2010-01-11	710	\N	910
+1418	GENERIC_DAY	3	4	2010-04-24	710	\N	910
+1419	GENERIC_DAY	3	4	2010-03-31	710	\N	910
+1420	GENERIC_DAY	3	4	2010-01-25	708	\N	910
+1421	GENERIC_DAY	3	4	2010-05-14	708	\N	910
+1422	GENERIC_DAY	3	4	2010-03-06	710	\N	910
+1423	GENERIC_DAY	3	4	2010-06-14	708	\N	910
+1424	GENERIC_DAY	3	4	2010-06-08	708	\N	910
+1425	GENERIC_DAY	3	4	2010-08-09	710	\N	910
+1426	GENERIC_DAY	3	4	2009-12-28	710	\N	910
+1427	GENERIC_DAY	3	4	2010-05-03	710	\N	910
+1428	GENERIC_DAY	3	4	2010-01-06	710	\N	910
+1429	GENERIC_DAY	3	4	2010-02-09	708	\N	910
+1430	GENERIC_DAY	3	4	2010-06-21	708	\N	910
+1431	GENERIC_DAY	3	4	2010-08-16	708	\N	910
+1432	GENERIC_DAY	3	4	2010-01-14	708	\N	910
+1433	GENERIC_DAY	3	4	2010-02-02	708	\N	910
+1434	GENERIC_DAY	3	4	2009-12-22	710	\N	910
+1435	GENERIC_DAY	3	4	2010-05-31	710	\N	910
+1436	GENERIC_DAY	3	4	2010-03-07	710	\N	910
+1437	GENERIC_DAY	3	4	2010-04-05	710	\N	910
+1438	GENERIC_DAY	3	4	2010-04-08	708	\N	910
+1439	GENERIC_DAY	3	4	2010-04-15	708	\N	910
+1440	GENERIC_DAY	3	4	2010-06-03	710	\N	910
+1441	GENERIC_DAY	3	4	2010-02-22	710	\N	910
+1442	GENERIC_DAY	3	4	2010-07-27	710	\N	910
+1443	GENERIC_DAY	3	4	2010-07-20	708	\N	910
+1444	GENERIC_DAY	3	4	2010-07-04	710	\N	910
+1445	GENERIC_DAY	3	4	2010-06-12	708	\N	910
+1446	GENERIC_DAY	3	4	2010-03-24	708	\N	910
+1447	GENERIC_DAY	3	4	2009-12-24	710	\N	910
+1448	GENERIC_DAY	3	4	2009-12-23	710	\N	910
+1449	GENERIC_DAY	3	4	2010-06-29	708	\N	910
+1450	GENERIC_DAY	3	4	2010-02-11	710	\N	910
+1451	GENERIC_DAY	3	4	2010-08-08	708	\N	910
+1452	GENERIC_DAY	3	4	2010-05-31	708	\N	910
+1453	GENERIC_DAY	3	4	2010-03-26	708	\N	910
+1454	GENERIC_DAY	3	4	2010-01-01	708	\N	910
+1455	GENERIC_DAY	3	4	2010-06-13	710	\N	910
+1456	GENERIC_DAY	3	4	2010-06-03	708	\N	910
+1457	GENERIC_DAY	3	4	2010-05-19	708	\N	910
+1458	GENERIC_DAY	3	4	2010-04-09	708	\N	910
+1459	GENERIC_DAY	3	4	2010-08-09	708	\N	910
+1460	GENERIC_DAY	3	4	2009-12-28	708	\N	910
+1461	GENERIC_DAY	3	4	2010-03-28	708	\N	910
+1462	GENERIC_DAY	3	4	2009-12-31	708	\N	910
+1463	GENERIC_DAY	3	4	2010-06-24	708	\N	910
+1464	GENERIC_DAY	3	4	2009-12-24	708	\N	910
+1465	GENERIC_DAY	3	4	2010-01-15	708	\N	910
+1466	GENERIC_DAY	3	4	2010-07-02	708	\N	910
+1467	GENERIC_DAY	3	4	2010-01-07	708	\N	910
+1468	GENERIC_DAY	3	4	2010-08-27	708	\N	910
+1469	GENERIC_DAY	3	4	2010-08-07	710	\N	910
+1470	GENERIC_DAY	3	4	2010-01-23	708	\N	910
+1471	GENERIC_DAY	3	4	2010-04-17	710	\N	910
+1472	GENERIC_DAY	3	4	2010-08-12	710	\N	910
+1473	GENERIC_DAY	3	4	2010-01-19	708	\N	910
+1474	GENERIC_DAY	3	4	2010-01-23	710	\N	910
+1475	GENERIC_DAY	3	4	2010-01-19	710	\N	910
+1476	GENERIC_DAY	3	4	2010-07-03	710	\N	910
+1477	GENERIC_DAY	3	4	2010-07-01	710	\N	910
+1478	GENERIC_DAY	3	4	2010-08-20	710	\N	910
+1479	GENERIC_DAY	3	4	2010-07-06	708	\N	910
+1480	GENERIC_DAY	3	4	2010-02-06	710	\N	910
+1481	GENERIC_DAY	3	4	2010-08-07	708	\N	910
+1482	GENERIC_DAY	3	4	2010-04-06	708	\N	910
+1483	GENERIC_DAY	3	4	2010-08-18	710	\N	910
+1484	GENERIC_DAY	3	4	2010-04-12	708	\N	910
+1485	GENERIC_DAY	3	4	2010-08-04	708	\N	910
+1486	GENERIC_DAY	3	4	2010-07-07	708	\N	910
+1487	GENERIC_DAY	3	4	2010-01-31	710	\N	910
+1488	GENERIC_DAY	3	4	2010-02-27	708	\N	910
+1489	GENERIC_DAY	3	4	2010-07-23	710	\N	910
+1490	GENERIC_DAY	3	4	2010-07-16	710	\N	910
+1491	GENERIC_DAY	3	4	2010-04-08	710	\N	910
+1492	GENERIC_DAY	3	4	2010-04-10	708	\N	910
+1493	GENERIC_DAY	3	4	2010-05-13	710	\N	910
+1494	GENERIC_DAY	3	4	2010-01-11	708	\N	910
+1495	GENERIC_DAY	3	4	2010-01-08	708	\N	910
+1496	GENERIC_DAY	3	4	2010-02-13	708	\N	910
+1497	GENERIC_DAY	3	4	2010-01-16	708	\N	910
+1498	GENERIC_DAY	3	4	2010-04-11	710	\N	910
+1499	GENERIC_DAY	3	4	2010-03-02	708	\N	910
+1500	GENERIC_DAY	3	4	2010-07-03	708	\N	910
+1501	GENERIC_DAY	3	4	2010-06-30	710	\N	910
+1502	GENERIC_DAY	3	4	2010-01-12	710	\N	910
+1503	GENERIC_DAY	3	4	2010-05-11	710	\N	910
+1504	GENERIC_DAY	3	4	2010-07-21	708	\N	910
+1505	GENERIC_DAY	3	4	2010-01-29	710	\N	910
+1506	GENERIC_DAY	3	4	2010-07-05	710	\N	910
+1507	GENERIC_DAY	3	4	2010-04-14	710	\N	910
+1508	GENERIC_DAY	3	4	2010-07-13	708	\N	910
+1509	GENERIC_DAY	3	4	2010-08-01	710	\N	910
+1510	GENERIC_DAY	3	4	2010-01-12	708	\N	910
+1511	GENERIC_DAY	3	4	2010-04-06	710	\N	910
+1512	GENERIC_DAY	3	4	2010-06-17	710	\N	910
+1513	GENERIC_DAY	3	4	2010-06-15	710	\N	910
+1514	GENERIC_DAY	3	4	2010-03-08	710	\N	910
+1515	GENERIC_DAY	3	4	2010-01-22	708	\N	910
+1516	GENERIC_DAY	3	4	2010-04-16	708	\N	910
+1517	GENERIC_DAY	3	4	2010-08-25	710	\N	910
+1518	GENERIC_DAY	3	4	2010-04-20	710	\N	910
+1519	GENERIC_DAY	3	4	2010-06-01	710	\N	910
+1520	GENERIC_DAY	3	4	2010-06-21	710	\N	910
+1521	GENERIC_DAY	3	4	2010-08-23	710	\N	910
+1522	GENERIC_DAY	3	4	2010-05-19	710	\N	910
+1523	GENERIC_DAY	3	4	2010-03-03	708	\N	910
+1524	GENERIC_DAY	3	4	2010-02-10	708	\N	910
+1525	GENERIC_DAY	3	4	2010-05-22	710	\N	910
+1526	GENERIC_DAY	3	4	2009-12-29	710	\N	910
+1527	GENERIC_DAY	3	4	2010-07-23	708	\N	910
+1528	GENERIC_DAY	3	4	2010-06-04	708	\N	910
+1529	GENERIC_DAY	3	4	2010-06-07	710	\N	910
+1530	GENERIC_DAY	3	4	2010-02-28	708	\N	910
+1531	GENERIC_DAY	3	4	2010-01-30	708	\N	910
+1532	GENERIC_DAY	3	4	2010-02-23	710	\N	910
+1533	GENERIC_DAY	3	4	2010-08-24	708	\N	910
+1534	GENERIC_DAY	3	4	2010-02-19	710	\N	910
+1535	GENERIC_DAY	3	4	2010-04-28	710	\N	910
+1536	GENERIC_DAY	3	4	2010-03-22	708	\N	910
+1537	GENERIC_DAY	3	4	2010-03-22	710	\N	910
+1538	GENERIC_DAY	3	4	2010-07-22	708	\N	910
+1539	GENERIC_DAY	3	4	2010-02-26	708	\N	910
+1540	GENERIC_DAY	3	4	2010-02-12	710	\N	910
+1541	GENERIC_DAY	3	4	2010-01-24	710	\N	910
+1542	GENERIC_DAY	3	4	2010-04-23	710	\N	910
+1543	GENERIC_DAY	3	4	2010-02-22	708	\N	910
+1544	GENERIC_DAY	3	4	2010-07-06	710	\N	910
+1545	GENERIC_DAY	3	4	2010-05-18	710	\N	910
+1546	GENERIC_DAY	3	4	2010-06-16	708	\N	910
+1547	GENERIC_DAY	3	4	2010-02-16	710	\N	910
+1548	GENERIC_DAY	3	4	2010-05-06	708	\N	910
+1549	GENERIC_DAY	3	4	2010-06-05	710	\N	910
+1550	GENERIC_DAY	3	4	2009-12-27	708	\N	910
+1551	GENERIC_DAY	3	4	2010-05-07	710	\N	910
+1552	GENERIC_DAY	3	4	2010-05-06	710	\N	910
+1553	GENERIC_DAY	3	4	2010-07-15	708	\N	910
+1554	GENERIC_DAY	3	4	2010-05-21	710	\N	910
+1555	GENERIC_DAY	3	4	2010-07-17	708	\N	910
+1556	GENERIC_DAY	3	4	2010-07-30	710	\N	910
+1557	GENERIC_DAY	3	4	2010-01-09	710	\N	910
+1558	GENERIC_DAY	3	4	2010-08-19	710	\N	910
+1559	GENERIC_DAY	3	4	2010-01-22	710	\N	910
+1560	GENERIC_DAY	3	4	2010-06-26	710	\N	910
+1561	GENERIC_DAY	3	4	2010-08-13	710	\N	910
+1562	GENERIC_DAY	3	4	2010-07-10	708	\N	910
+1563	GENERIC_DAY	3	4	2010-08-03	708	\N	910
+1564	GENERIC_DAY	3	4	2010-04-16	710	\N	910
+1565	GENERIC_DAY	3	4	2010-06-11	708	\N	910
+1566	GENERIC_DAY	3	4	2010-03-09	708	\N	910
+1567	GENERIC_DAY	3	4	2010-03-15	710	\N	910
+1568	GENERIC_DAY	3	4	2010-07-11	708	\N	910
+1569	GENERIC_DAY	3	4	2010-06-20	710	\N	910
+1570	GENERIC_DAY	3	4	2010-05-08	710	\N	910
+1571	GENERIC_DAY	3	4	2010-07-25	708	\N	910
+1572	GENERIC_DAY	3	4	2010-04-07	708	\N	910
+1573	GENERIC_DAY	3	4	2009-12-30	708	\N	910
+1574	GENERIC_DAY	3	4	2010-04-10	710	\N	910
+1575	GENERIC_DAY	3	4	2010-06-25	710	\N	910
+1576	GENERIC_DAY	3	4	2010-06-25	708	\N	910
+1577	GENERIC_DAY	3	4	2010-03-19	710	\N	910
+1578	GENERIC_DAY	3	4	2010-04-11	708	\N	910
+1579	GENERIC_DAY	3	4	2010-04-17	708	\N	910
+1580	GENERIC_DAY	3	4	2010-08-25	708	\N	910
+1581	GENERIC_DAY	3	4	2010-02-27	710	\N	910
+1582	GENERIC_DAY	3	4	2010-05-10	708	\N	910
+1583	GENERIC_DAY	3	4	2010-05-29	710	\N	910
+1584	GENERIC_DAY	3	4	2010-07-20	710	\N	910
+1585	GENERIC_DAY	3	4	2010-05-20	710	\N	910
+1586	GENERIC_DAY	3	4	2010-05-01	708	\N	910
+1587	GENERIC_DAY	3	4	2010-02-03	708	\N	910
+1588	GENERIC_DAY	3	4	2010-06-22	708	\N	910
+1589	GENERIC_DAY	3	4	2010-07-11	710	\N	910
+1590	GENERIC_DAY	3	4	2010-02-11	708	\N	910
+1591	GENERIC_DAY	3	4	2010-02-04	708	\N	910
+1592	GENERIC_DAY	3	4	2010-08-16	710	\N	910
+1593	GENERIC_DAY	3	4	2010-01-16	710	\N	910
+1594	GENERIC_DAY	3	4	2010-02-05	708	\N	910
+1595	GENERIC_DAY	3	4	2010-02-12	708	\N	910
+1596	GENERIC_DAY	3	4	2010-08-21	710	\N	910
+1597	GENERIC_DAY	3	4	2010-02-05	710	\N	910
+1598	GENERIC_DAY	3	4	2010-07-07	710	\N	910
+1599	GENERIC_DAY	3	4	2010-06-14	710	\N	910
+1600	GENERIC_DAY	3	4	2010-04-02	708	\N	910
+1601	GENERIC_DAY	3	4	2010-04-22	710	\N	910
+1602	GENERIC_DAY	3	4	2010-01-25	710	\N	910
+1603	GENERIC_DAY	3	4	2009-12-29	708	\N	910
+1604	GENERIC_DAY	3	4	2010-08-02	708	\N	910
+1605	GENERIC_DAY	3	4	2010-03-25	710	\N	910
+1606	GENERIC_DAY	3	4	2010-08-18	708	\N	910
+1607	GENERIC_DAY	3	4	2010-01-21	710	\N	910
+1608	GENERIC_DAY	3	4	2010-06-05	708	\N	910
+1609	GENERIC_DAY	3	4	2010-01-26	708	\N	910
+1610	GENERIC_DAY	3	4	2010-03-12	710	\N	910
+1611	GENERIC_DAY	3	4	2010-02-25	708	\N	910
+1612	GENERIC_DAY	3	4	2010-03-19	708	\N	910
+1613	GENERIC_DAY	3	4	2010-05-23	708	\N	910
+1614	GENERIC_DAY	3	4	2010-02-21	708	\N	910
+1615	GENERIC_DAY	3	4	2010-06-18	708	\N	910
+1616	GENERIC_DAY	3	4	2010-03-14	708	\N	910
+1617	GENERIC_DAY	3	4	2010-02-21	710	\N	910
+1618	GENERIC_DAY	3	4	2010-05-13	708	\N	910
+1619	GENERIC_DAY	3	4	2010-01-28	708	\N	910
+1620	GENERIC_DAY	3	4	2010-06-28	710	\N	910
+1621	GENERIC_DAY	3	4	2010-01-17	708	\N	910
+1622	GENERIC_DAY	3	4	2010-05-11	708	\N	910
+1623	GENERIC_DAY	3	4	2010-04-09	710	\N	910
+1624	GENERIC_DAY	3	4	2009-12-26	710	\N	910
+1625	GENERIC_DAY	3	4	2010-02-01	710	\N	910
+1626	GENERIC_DAY	3	4	2010-02-14	710	\N	910
+1627	GENERIC_DAY	3	4	2010-05-21	708	\N	910
+1628	GENERIC_DAY	3	4	2010-02-13	710	\N	910
+1629	GENERIC_DAY	3	4	2010-08-06	710	\N	910
+1630	GENERIC_DAY	3	4	2010-04-05	708	\N	910
+1631	GENERIC_DAY	3	4	2010-03-24	710	\N	910
+1632	GENERIC_DAY	3	4	2010-07-28	710	\N	910
+1633	GENERIC_DAY	3	4	2010-05-02	710	\N	910
+1634	GENERIC_DAY	3	4	2010-08-08	710	\N	910
+1635	GENERIC_DAY	3	4	2010-03-15	708	\N	910
+1636	GENERIC_DAY	3	4	2010-04-04	707	\N	911
+1637	GENERIC_DAY	3	4	2010-08-17	709	\N	911
+1638	GENERIC_DAY	3	4	2011-02-22	709	\N	911
+1639	GENERIC_DAY	3	4	2010-07-05	709	\N	911
+1640	GENERIC_DAY	3	4	2011-02-17	709	\N	911
+1641	GENERIC_DAY	3	4	2010-04-27	707	\N	911
+1642	GENERIC_DAY	3	4	2010-07-17	707	\N	911
+1643	GENERIC_DAY	3	4	2010-08-27	707	\N	911
+1644	GENERIC_DAY	3	4	2011-03-12	709	\N	911
+1645	GENERIC_DAY	3	4	2011-01-13	709	\N	911
+1646	GENERIC_DAY	3	4	2010-12-27	709	\N	911
+1647	GENERIC_DAY	3	4	2010-07-04	707	\N	911
+1648	GENERIC_DAY	3	4	2010-12-22	709	\N	911
+1649	GENERIC_DAY	3	4	2010-06-09	707	\N	911
+1650	GENERIC_DAY	3	4	2011-03-16	709	\N	911
+1651	GENERIC_DAY	3	4	2011-01-04	707	\N	911
+1652	GENERIC_DAY	3	4	2010-04-21	707	\N	911
+1653	GENERIC_DAY	3	4	2010-05-04	707	\N	911
+1654	GENERIC_DAY	3	4	2011-02-21	709	\N	911
+1655	GENERIC_DAY	3	4	2010-07-29	707	\N	911
+1656	GENERIC_DAY	3	4	2010-08-03	707	\N	911
+1657	GENERIC_DAY	3	4	2011-03-21	707	\N	911
+1658	GENERIC_DAY	3	4	2011-01-25	707	\N	911
+1659	GENERIC_DAY	3	4	2010-10-28	707	\N	911
+1660	GENERIC_DAY	3	4	2010-06-29	707	\N	911
+1661	GENERIC_DAY	3	4	2011-02-13	709	\N	911
+1662	GENERIC_DAY	3	4	2010-07-12	709	\N	911
+1663	GENERIC_DAY	3	4	2010-08-31	709	\N	911
+1664	GENERIC_DAY	3	4	2010-07-25	709	\N	911
+1665	GENERIC_DAY	3	4	2010-09-15	709	\N	911
+1666	GENERIC_DAY	3	4	2011-03-22	707	\N	911
+1667	GENERIC_DAY	3	4	2010-12-13	709	\N	911
+1668	GENERIC_DAY	3	4	2011-02-20	709	\N	911
+1669	GENERIC_DAY	3	4	2010-12-04	707	\N	911
+1670	GENERIC_DAY	3	4	2010-10-10	707	\N	911
+1671	GENERIC_DAY	3	4	2010-09-17	709	\N	911
+1672	GENERIC_DAY	3	4	2010-04-01	707	\N	911
+1673	GENERIC_DAY	3	4	2010-05-09	707	\N	911
+1674	GENERIC_DAY	3	4	2010-07-10	709	\N	911
+1675	GENERIC_DAY	3	4	2010-07-08	707	\N	911
+1676	GENERIC_DAY	3	4	2011-01-27	707	\N	911
+1677	GENERIC_DAY	3	4	2010-09-04	709	\N	911
+1678	GENERIC_DAY	3	4	2010-04-30	709	\N	911
+1679	GENERIC_DAY	3	4	2010-10-27	707	\N	911
+1680	GENERIC_DAY	3	4	2010-08-22	709	\N	911
+1681	GENERIC_DAY	3	4	2011-02-13	707	\N	911
+1682	GENERIC_DAY	3	4	2010-04-23	707	\N	911
+1683	GENERIC_DAY	3	4	2010-10-03	707	\N	911
+1684	GENERIC_DAY	3	4	2010-09-12	707	\N	911
+1685	GENERIC_DAY	3	4	2010-04-16	707	\N	911
+1686	GENERIC_DAY	3	4	2010-09-28	709	\N	911
+1687	GENERIC_DAY	3	4	2010-11-14	707	\N	911
+1688	GENERIC_DAY	3	4	2010-06-09	709	\N	911
+1689	GENERIC_DAY	3	4	2011-03-19	709	\N	911
+1690	GENERIC_DAY	3	4	2010-07-13	709	\N	911
+1691	GENERIC_DAY	3	4	2010-06-25	707	\N	911
+1692	GENERIC_DAY	3	4	2010-10-04	707	\N	911
+1693	GENERIC_DAY	3	4	2010-07-01	707	\N	911
+1694	GENERIC_DAY	3	4	2010-11-12	709	\N	911
+1695	GENERIC_DAY	3	4	2010-05-07	707	\N	911
+1696	GENERIC_DAY	3	4	2010-08-09	707	\N	911
+1697	GENERIC_DAY	3	4	2010-09-15	707	\N	911
+1698	GENERIC_DAY	3	4	2010-11-25	707	\N	911
+1699	GENERIC_DAY	3	4	2010-09-19	709	\N	911
+1700	GENERIC_DAY	3	4	2011-04-07	707	\N	911
+1701	GENERIC_DAY	3	4	2010-11-23	709	\N	911
+1702	GENERIC_DAY	3	4	2010-08-07	707	\N	911
+1703	GENERIC_DAY	3	4	2010-11-27	709	\N	911
+1704	GENERIC_DAY	3	4	2010-06-12	709	\N	911
+1705	GENERIC_DAY	3	4	2010-08-28	709	\N	911
+1706	GENERIC_DAY	3	4	2010-09-22	707	\N	911
+1707	GENERIC_DAY	3	4	2011-04-03	709	\N	911
+1708	GENERIC_DAY	3	4	2011-03-26	709	\N	911
+1709	GENERIC_DAY	3	4	2010-12-06	709	\N	911
+1710	GENERIC_DAY	3	4	2010-08-02	707	\N	911
+1711	GENERIC_DAY	3	4	2011-03-08	709	\N	911
+1712	GENERIC_DAY	3	4	2010-08-20	707	\N	911
+1713	GENERIC_DAY	3	4	2010-11-24	709	\N	911
+1714	GENERIC_DAY	3	4	2010-04-28	707	\N	911
+1715	GENERIC_DAY	3	4	2011-01-14	709	\N	911
+1716	GENERIC_DAY	3	4	2010-06-19	709	\N	911
+1717	GENERIC_DAY	3	4	2010-11-17	709	\N	911
+1718	GENERIC_DAY	3	4	2010-04-24	709	\N	911
+1719	GENERIC_DAY	3	4	2010-10-28	709	\N	911
+1720	GENERIC_DAY	3	4	2011-03-01	709	\N	911
+1721	GENERIC_DAY	3	4	2010-07-15	709	\N	911
+1722	GENERIC_DAY	3	4	2011-03-06	709	\N	911
+1723	GENERIC_DAY	3	4	2011-01-06	709	\N	911
+1724	GENERIC_DAY	3	4	2011-03-17	709	\N	911
+1725	GENERIC_DAY	3	4	2010-05-25	709	\N	911
+1726	GENERIC_DAY	3	4	2010-05-14	709	\N	911
+1727	GENERIC_DAY	3	4	2011-01-01	709	\N	911
+1728	GENERIC_DAY	3	4	2011-01-16	709	\N	911
+1729	GENERIC_DAY	3	4	2010-05-24	709	\N	911
+1730	GENERIC_DAY	3	4	2010-10-06	707	\N	911
+1731	GENERIC_DAY	3	4	2010-12-19	707	\N	911
+1732	GENERIC_DAY	3	4	2011-01-06	707	\N	911
+1733	GENERIC_DAY	3	4	2010-10-22	707	\N	911
+1734	GENERIC_DAY	3	4	2010-07-22	707	\N	911
+1735	GENERIC_DAY	3	4	2010-04-25	707	\N	911
+1736	GENERIC_DAY	3	4	2010-05-10	707	\N	911
+1737	GENERIC_DAY	3	4	2011-03-25	709	\N	911
+1738	GENERIC_DAY	3	4	2011-03-23	707	\N	911
+1739	GENERIC_DAY	3	4	2010-06-30	709	\N	911
+1740	GENERIC_DAY	3	4	2011-04-04	707	\N	911
+1741	GENERIC_DAY	3	4	2011-01-22	709	\N	911
+1742	GENERIC_DAY	3	4	2011-02-09	709	\N	911
+1743	GENERIC_DAY	3	4	2011-02-19	709	\N	911
+1744	GENERIC_DAY	3	4	2011-02-10	709	\N	911
+1745	GENERIC_DAY	3	4	2010-05-28	709	\N	911
+1746	GENERIC_DAY	3	4	2011-04-02	707	\N	911
+1747	GENERIC_DAY	3	4	2010-07-19	709	\N	911
+1748	GENERIC_DAY	3	4	2011-03-08	707	\N	911
+1749	GENERIC_DAY	3	4	2010-04-15	707	\N	911
+1750	GENERIC_DAY	3	4	2010-10-20	709	\N	911
+1751	GENERIC_DAY	3	4	2011-03-02	709	\N	911
+1752	GENERIC_DAY	3	4	2010-04-05	707	\N	911
+1753	GENERIC_DAY	3	4	2011-02-14	707	\N	911
+1754	GENERIC_DAY	3	4	2010-06-13	709	\N	911
+1755	GENERIC_DAY	3	4	2010-04-06	707	\N	911
+1756	GENERIC_DAY	3	4	2010-07-11	709	\N	911
+1757	GENERIC_DAY	3	4	2010-09-01	709	\N	911
+1758	GENERIC_DAY	3	4	2010-11-19	707	\N	911
+1759	GENERIC_DAY	3	4	2010-04-18	709	\N	911
+1760	GENERIC_DAY	3	4	2010-12-30	709	\N	911
+1761	GENERIC_DAY	3	4	2010-09-12	709	\N	911
+1762	GENERIC_DAY	3	4	2010-10-17	709	\N	911
+1763	GENERIC_DAY	3	4	2011-01-26	707	\N	911
+1764	GENERIC_DAY	3	4	2010-11-05	709	\N	911
+1765	GENERIC_DAY	3	4	2010-05-20	709	\N	911
+1766	GENERIC_DAY	3	4	2010-05-15	709	\N	911
+1767	GENERIC_DAY	3	4	2010-10-21	707	\N	911
+1768	GENERIC_DAY	3	4	2011-01-07	709	\N	911
+1769	GENERIC_DAY	3	4	2010-10-20	707	\N	911
+1770	GENERIC_DAY	3	4	2010-06-23	707	\N	911
+1771	GENERIC_DAY	3	4	2010-10-08	707	\N	911
+1772	GENERIC_DAY	3	4	2011-02-22	707	\N	911
+1773	GENERIC_DAY	3	4	2010-08-25	709	\N	911
+1774	GENERIC_DAY	3	4	2010-11-29	707	\N	911
+1775	GENERIC_DAY	3	4	2010-06-01	709	\N	911
+1776	GENERIC_DAY	3	4	2010-06-03	707	\N	911
+1777	GENERIC_DAY	3	4	2010-06-03	709	\N	911
+1778	GENERIC_DAY	3	4	2011-02-15	709	\N	911
+1779	GENERIC_DAY	3	4	2010-06-23	709	\N	911
+1780	GENERIC_DAY	3	4	2010-06-20	707	\N	911
+1781	GENERIC_DAY	3	4	2010-05-11	709	\N	911
+1782	GENERIC_DAY	3	4	2010-05-30	709	\N	911
+1783	GENERIC_DAY	3	4	2010-10-02	709	\N	911
+1784	GENERIC_DAY	3	4	2010-07-21	709	\N	911
+1785	GENERIC_DAY	3	4	2010-11-30	709	\N	911
+1786	GENERIC_DAY	3	4	2010-04-25	709	\N	911
+1787	GENERIC_DAY	3	4	2010-04-29	707	\N	911
+1788	GENERIC_DAY	3	4	2011-03-20	709	\N	911
+1789	GENERIC_DAY	3	4	2010-04-03	709	\N	911
+1790	GENERIC_DAY	3	4	2010-09-30	707	\N	911
+1791	GENERIC_DAY	3	4	2010-06-24	707	\N	911
+1792	GENERIC_DAY	3	4	2010-06-04	709	\N	911
+1793	GENERIC_DAY	3	4	2010-08-31	707	\N	911
+1794	GENERIC_DAY	3	4	2011-01-18	709	\N	911
+1795	GENERIC_DAY	3	4	2010-04-23	709	\N	911
+1796	GENERIC_DAY	3	4	2010-09-21	707	\N	911
+1797	GENERIC_DAY	3	4	2011-03-29	709	\N	911
+1798	GENERIC_DAY	3	4	2010-08-15	707	\N	911
+1799	GENERIC_DAY	3	4	2010-06-29	709	\N	911
+1800	GENERIC_DAY	3	4	2011-01-24	709	\N	911
+1801	GENERIC_DAY	3	4	2011-03-05	709	\N	911
+1802	GENERIC_DAY	3	4	2010-11-20	707	\N	911
+1803	GENERIC_DAY	3	4	2010-04-19	709	\N	911
+1804	GENERIC_DAY	3	4	2010-09-03	707	\N	911
+1805	GENERIC_DAY	3	4	2010-10-18	709	\N	911
+1806	GENERIC_DAY	3	4	2010-05-26	709	\N	911
+1807	GENERIC_DAY	3	4	2010-10-12	707	\N	911
+1808	GENERIC_DAY	3	4	2010-07-24	707	\N	911
+1809	GENERIC_DAY	3	4	2010-12-25	707	\N	911
+1810	GENERIC_DAY	3	4	2011-03-17	707	\N	911
+1811	GENERIC_DAY	3	4	2010-06-14	707	\N	911
+1812	GENERIC_DAY	3	4	2011-04-10	707	\N	911
+1813	GENERIC_DAY	3	4	2010-07-23	709	\N	911
+1814	GENERIC_DAY	3	4	2010-08-29	707	\N	911
+1815	GENERIC_DAY	3	4	2011-03-03	709	\N	911
+1816	GENERIC_DAY	3	4	2010-12-18	707	\N	911
+1817	GENERIC_DAY	3	4	2010-05-30	707	\N	911
+1818	GENERIC_DAY	3	4	2011-03-29	707	\N	911
+1819	GENERIC_DAY	3	4	2011-01-28	707	\N	911
+1820	GENERIC_DAY	3	4	2010-05-08	709	\N	911
+1821	GENERIC_DAY	3	4	2010-12-18	709	\N	911
+1822	GENERIC_DAY	3	4	2010-09-04	707	\N	911
+1823	GENERIC_DAY	3	4	2011-03-22	709	\N	911
+1824	GENERIC_DAY	3	4	2010-12-02	707	\N	911
+1825	GENERIC_DAY	3	4	2011-03-09	709	\N	911
+1826	GENERIC_DAY	3	4	2010-12-07	707	\N	911
+1827	GENERIC_DAY	3	4	2010-10-30	707	\N	911
+1828	GENERIC_DAY	3	4	2010-07-30	709	\N	911
+1829	GENERIC_DAY	3	4	2010-04-07	709	\N	911
+1830	GENERIC_DAY	3	4	2010-04-15	709	\N	911
+1831	GENERIC_DAY	3	4	2011-03-12	707	\N	911
+1832	GENERIC_DAY	3	4	2010-09-24	707	\N	911
+1833	GENERIC_DAY	3	4	2011-02-17	707	\N	911
+1834	GENERIC_DAY	3	4	2010-09-05	707	\N	911
+1835	GENERIC_DAY	3	4	2010-09-06	707	\N	911
+1836	GENERIC_DAY	3	4	2011-01-10	709	\N	911
+1837	GENERIC_DAY	3	4	2010-12-21	709	\N	911
+1838	GENERIC_DAY	3	4	2010-04-30	707	\N	911
+1839	GENERIC_DAY	3	4	2010-05-23	709	\N	911
+1840	GENERIC_DAY	3	4	2010-12-21	707	\N	911
+1841	GENERIC_DAY	3	4	2010-06-15	707	\N	911
+1842	GENERIC_DAY	3	4	2010-06-01	707	\N	911
+1843	GENERIC_DAY	3	4	2011-03-04	707	\N	911
+1844	GENERIC_DAY	3	4	2010-07-02	707	\N	911
+1845	GENERIC_DAY	3	4	2010-10-29	707	\N	911
+1846	GENERIC_DAY	3	4	2010-06-20	709	\N	911
+1847	GENERIC_DAY	3	4	2010-08-26	709	\N	911
+1848	GENERIC_DAY	3	4	2010-11-26	709	\N	911
+1849	GENERIC_DAY	3	4	2010-12-03	709	\N	911
+1850	GENERIC_DAY	3	4	2011-04-05	707	\N	911
+1851	GENERIC_DAY	3	4	2010-04-08	709	\N	911
+1852	GENERIC_DAY	3	4	2010-08-18	707	\N	911
+1853	GENERIC_DAY	3	4	2011-03-13	709	\N	911
+1854	GENERIC_DAY	3	4	2010-06-11	707	\N	911
+1855	GENERIC_DAY	3	4	2010-06-17	709	\N	911
+1856	GENERIC_DAY	3	4	2010-04-29	709	\N	911
+1857	GENERIC_DAY	3	4	2010-11-22	709	\N	911
+1858	GENERIC_DAY	3	4	2010-09-17	707	\N	911
+1859	GENERIC_DAY	3	4	2011-03-10	707	\N	911
+1860	GENERIC_DAY	3	4	2010-04-02	707	\N	911
+1861	GENERIC_DAY	3	4	2010-12-12	709	\N	911
+1862	GENERIC_DAY	3	4	2010-11-10	707	\N	911
+1863	GENERIC_DAY	3	4	2010-10-18	707	\N	911
+1864	GENERIC_DAY	3	4	2010-07-09	709	\N	911
+1865	GENERIC_DAY	3	4	2010-06-25	709	\N	911
+1866	GENERIC_DAY	3	4	2010-07-16	709	\N	911
+1867	GENERIC_DAY	3	4	2011-01-23	709	\N	911
+1868	GENERIC_DAY	3	4	2010-12-23	707	\N	911
+1869	GENERIC_DAY	3	4	2010-08-04	707	\N	911
+1870	GENERIC_DAY	3	4	2010-08-21	707	\N	911
+1871	GENERIC_DAY	3	4	2010-10-25	709	\N	911
+1872	GENERIC_DAY	3	4	2011-02-03	707	\N	911
+1873	GENERIC_DAY	3	4	2010-06-16	709	\N	911
+1874	GENERIC_DAY	3	4	2011-03-24	709	\N	911
+1875	GENERIC_DAY	3	4	2011-03-02	707	\N	911
+1876	GENERIC_DAY	3	4	2010-05-17	707	\N	911
+1877	GENERIC_DAY	3	4	2010-05-26	707	\N	911
+1878	GENERIC_DAY	3	4	2010-07-14	707	\N	911
+1879	GENERIC_DAY	3	4	2010-11-14	709	\N	911
+1880	GENERIC_DAY	3	4	2011-02-01	707	\N	911
+1881	GENERIC_DAY	3	4	2010-11-06	709	\N	911
+1882	GENERIC_DAY	3	4	2011-03-19	707	\N	911
+1883	GENERIC_DAY	3	4	2011-03-11	707	\N	911
+1884	GENERIC_DAY	3	4	2010-05-19	709	\N	911
+1885	GENERIC_DAY	3	4	2010-11-22	707	\N	911
+1886	GENERIC_DAY	3	4	2010-09-10	709	\N	911
+1887	GENERIC_DAY	3	4	2011-03-18	709	\N	911
+1888	GENERIC_DAY	3	4	2010-09-02	707	\N	911
+1889	GENERIC_DAY	3	4	2010-09-09	709	\N	911
+1890	GENERIC_DAY	3	4	2011-02-15	707	\N	911
+1891	GENERIC_DAY	3	4	2011-01-13	707	\N	911
+1892	GENERIC_DAY	3	4	2010-12-05	709	\N	911
+1893	GENERIC_DAY	3	4	2010-11-03	709	\N	911
+1894	GENERIC_DAY	3	4	2011-01-27	709	\N	911
+1895	GENERIC_DAY	3	4	2010-07-18	707	\N	911
+1896	GENERIC_DAY	3	4	2010-10-22	709	\N	911
+1897	GENERIC_DAY	3	4	2010-07-28	709	\N	911
+1898	GENERIC_DAY	3	4	2010-07-29	709	\N	911
+1899	GENERIC_DAY	3	4	2010-11-15	709	\N	911
+1900	GENERIC_DAY	3	4	2010-09-08	709	\N	911
+1901	GENERIC_DAY	3	4	2011-02-27	709	\N	911
+1902	GENERIC_DAY	3	4	2011-02-08	709	\N	911
+1903	GENERIC_DAY	3	4	2010-05-15	707	\N	911
+1904	GENERIC_DAY	3	4	2010-04-14	707	\N	911
+1905	GENERIC_DAY	3	4	2010-08-01	707	\N	911
+1906	GENERIC_DAY	3	4	2011-02-26	707	\N	911
+1907	GENERIC_DAY	3	4	2011-01-11	709	\N	911
+1908	GENERIC_DAY	3	4	2011-03-15	707	\N	911
+1909	GENERIC_DAY	3	4	2010-12-20	709	\N	911
+1910	GENERIC_DAY	3	4	2010-07-31	707	\N	911
+1911	GENERIC_DAY	3	4	2010-12-08	709	\N	911
+1912	GENERIC_DAY	3	4	2010-11-19	709	\N	911
+1913	GENERIC_DAY	3	4	2011-02-18	709	\N	911
+1914	GENERIC_DAY	3	4	2010-04-26	707	\N	911
+1915	GENERIC_DAY	3	4	2010-09-03	709	\N	911
+1916	GENERIC_DAY	3	4	2010-12-23	709	\N	911
+1917	GENERIC_DAY	3	4	2010-10-13	709	\N	911
+1918	GENERIC_DAY	3	4	2010-08-14	709	\N	911
+1919	GENERIC_DAY	3	4	2011-01-05	707	\N	911
+1920	GENERIC_DAY	3	4	2010-05-07	709	\N	911
+1921	GENERIC_DAY	3	4	2010-12-29	707	\N	911
+1922	GENERIC_DAY	3	4	2010-08-28	707	\N	911
+1923	GENERIC_DAY	3	4	2010-10-04	709	\N	911
+1924	GENERIC_DAY	3	4	2011-02-02	707	\N	911
+1925	GENERIC_DAY	3	4	2010-08-14	707	\N	911
+1926	GENERIC_DAY	3	4	2010-09-16	707	\N	911
+1927	GENERIC_DAY	3	4	2010-08-10	709	\N	911
+1928	GENERIC_DAY	3	4	2011-02-24	707	\N	911
+1929	GENERIC_DAY	3	4	2011-02-24	709	\N	911
+1930	GENERIC_DAY	3	4	2010-04-12	709	\N	911
+1931	GENERIC_DAY	3	4	2010-09-26	707	\N	911
+1932	GENERIC_DAY	3	4	2010-12-27	707	\N	911
+1933	GENERIC_DAY	3	4	2010-04-17	707	\N	911
+1934	GENERIC_DAY	3	4	2010-08-05	707	\N	911
+1935	GENERIC_DAY	3	4	2010-04-03	707	\N	911
+1936	GENERIC_DAY	3	4	2010-04-12	707	\N	911
+1937	GENERIC_DAY	3	4	2010-07-11	707	\N	911
+1938	GENERIC_DAY	3	4	2010-11-21	707	\N	911
+1939	GENERIC_DAY	3	4	2010-06-07	707	\N	911
+1940	GENERIC_DAY	3	4	2010-04-08	707	\N	911
+1941	GENERIC_DAY	3	4	2010-09-27	709	\N	911
+1942	GENERIC_DAY	3	4	2011-02-28	709	\N	911
+1943	GENERIC_DAY	3	4	2010-06-02	707	\N	911
+1944	GENERIC_DAY	3	4	2010-09-25	707	\N	911
+1945	GENERIC_DAY	3	4	2011-02-26	709	\N	911
+1946	GENERIC_DAY	3	4	2011-01-05	709	\N	911
+1947	GENERIC_DAY	3	4	2010-09-25	709	\N	911
+1948	GENERIC_DAY	3	4	2010-12-24	709	\N	911
+1949	GENERIC_DAY	3	4	2010-06-04	707	\N	911
+1950	GENERIC_DAY	3	4	2010-09-20	707	\N	911
+1951	GENERIC_DAY	3	4	2010-05-23	707	\N	911
+1952	GENERIC_DAY	3	4	2010-05-25	707	\N	911
+1953	GENERIC_DAY	3	4	2010-10-11	707	\N	911
+1954	GENERIC_DAY	3	4	2011-01-28	709	\N	911
+1955	GENERIC_DAY	3	4	2011-01-20	709	\N	911
+1956	GENERIC_DAY	3	4	2011-01-31	709	\N	911
+1957	GENERIC_DAY	3	4	2010-04-14	709	\N	911
+1958	GENERIC_DAY	3	4	2010-11-05	707	\N	911
+1959	GENERIC_DAY	3	4	2010-05-01	709	\N	911
+1960	GENERIC_DAY	3	4	2010-07-12	707	\N	911
+1961	GENERIC_DAY	3	4	2010-12-05	707	\N	911
+1962	GENERIC_DAY	3	4	2010-09-28	707	\N	911
+1963	GENERIC_DAY	3	4	2010-10-03	709	\N	911
+1964	GENERIC_DAY	3	4	2010-10-24	707	\N	911
+1965	GENERIC_DAY	3	4	2011-03-07	707	\N	911
+1966	GENERIC_DAY	3	4	2010-11-11	707	\N	911
+1967	GENERIC_DAY	3	4	2011-01-15	709	\N	911
+1968	GENERIC_DAY	3	4	2010-05-24	707	\N	911
+1969	GENERIC_DAY	3	4	2011-03-25	707	\N	911
+1970	GENERIC_DAY	3	4	2010-04-05	709	\N	911
+1971	GENERIC_DAY	3	4	2010-10-21	709	\N	911
+1972	GENERIC_DAY	3	4	2011-03-04	709	\N	911
+1973	GENERIC_DAY	3	4	2010-05-29	707	\N	911
+1974	GENERIC_DAY	3	4	2011-02-06	709	\N	911
+1975	GENERIC_DAY	3	4	2010-11-18	707	\N	911
+1976	GENERIC_DAY	3	4	2010-10-14	707	\N	911
+1977	GENERIC_DAY	3	4	2010-10-15	709	\N	911
+1978	GENERIC_DAY	3	4	2010-12-14	709	\N	911
+1979	GENERIC_DAY	3	4	2010-09-29	709	\N	911
+1980	GENERIC_DAY	3	4	2010-11-28	709	\N	911
+1981	GENERIC_DAY	3	4	2010-05-13	707	\N	911
+1982	GENERIC_DAY	3	4	2011-01-20	707	\N	911
+1983	GENERIC_DAY	3	4	2011-01-22	707	\N	911
+1984	GENERIC_DAY	3	4	2010-12-26	707	\N	911
+1985	GENERIC_DAY	3	4	2010-10-19	709	\N	911
+1986	GENERIC_DAY	3	4	2011-02-28	707	\N	911
+1987	GENERIC_DAY	3	4	2011-04-10	709	\N	911
+1988	GENERIC_DAY	3	4	2010-10-11	709	\N	911
+1989	GENERIC_DAY	3	4	2010-07-28	707	\N	911
+1990	GENERIC_DAY	3	4	2011-04-08	707	\N	911
+1991	GENERIC_DAY	3	4	2010-12-29	709	\N	911
+1992	GENERIC_DAY	3	4	2010-11-11	709	\N	911
+1993	GENERIC_DAY	3	4	2010-12-28	707	\N	911
+1994	GENERIC_DAY	3	4	2010-06-13	707	\N	911
+1995	GENERIC_DAY	3	4	2010-10-08	709	\N	911
+1996	GENERIC_DAY	3	4	2010-08-24	707	\N	911
+1997	GENERIC_DAY	3	4	2010-06-19	707	\N	911
+1998	GENERIC_DAY	3	4	2010-08-20	709	\N	911
+1999	GENERIC_DAY	3	4	2010-10-25	707	\N	911
+2000	GENERIC_DAY	3	4	2010-05-22	707	\N	911
+2001	GENERIC_DAY	3	4	2010-10-16	707	\N	911
+2002	GENERIC_DAY	3	4	2010-06-08	707	\N	911
+2003	GENERIC_DAY	3	4	2010-12-09	709	\N	911
+2004	GENERIC_DAY	3	4	2010-06-07	709	\N	911
+2005	GENERIC_DAY	3	4	2010-10-27	709	\N	911
+2006	GENERIC_DAY	3	4	2010-04-10	707	\N	911
+2007	GENERIC_DAY	3	4	2010-08-12	707	\N	911
+2008	GENERIC_DAY	3	4	2010-10-09	707	\N	911
+2009	GENERIC_DAY	3	4	2010-06-18	709	\N	911
+2010	GENERIC_DAY	3	4	2011-03-16	707	\N	911
+2011	GENERIC_DAY	3	4	2011-03-11	709	\N	911
+2012	GENERIC_DAY	3	4	2010-06-11	709	\N	911
+2013	GENERIC_DAY	3	4	2010-05-02	707	\N	911
+2014	GENERIC_DAY	3	4	2010-08-17	707	\N	911
+2015	GENERIC_DAY	3	4	2010-06-22	707	\N	911
+2016	GENERIC_DAY	3	4	2010-04-24	707	\N	911
+2017	GENERIC_DAY	3	4	2010-04-07	707	\N	911
+2018	GENERIC_DAY	3	4	2011-02-12	709	\N	911
+2019	GENERIC_DAY	3	4	2011-02-12	707	\N	911
+2020	GENERIC_DAY	3	4	2010-07-01	709	\N	911
+2021	GENERIC_DAY	3	4	2010-09-11	709	\N	911
+2022	GENERIC_DAY	3	4	2010-12-12	707	\N	911
+2023	GENERIC_DAY	3	4	2010-07-03	709	\N	911
+2024	GENERIC_DAY	3	4	2011-01-16	707	\N	911
+2025	GENERIC_DAY	3	4	2010-09-01	707	\N	911
+2026	GENERIC_DAY	3	4	2010-12-02	709	\N	911
+2027	GENERIC_DAY	3	4	2010-08-26	707	\N	911
+2028	GENERIC_DAY	3	4	2010-08-29	709	\N	911
+2029	GENERIC_DAY	3	4	2011-03-18	707	\N	911
+2030	GENERIC_DAY	3	4	2010-05-31	709	\N	911
+2031	GENERIC_DAY	3	4	2010-09-30	709	\N	911
+2032	GENERIC_DAY	3	4	2011-01-10	707	\N	911
+2033	GENERIC_DAY	3	4	2010-05-10	709	\N	911
+2034	GENERIC_DAY	3	4	2010-07-08	709	\N	911
+2035	GENERIC_DAY	3	4	2010-11-09	707	\N	911
+2036	GENERIC_DAY	3	4	2010-10-30	709	\N	911
+2037	GENERIC_DAY	3	4	2011-02-02	709	\N	911
+2038	GENERIC_DAY	3	4	2010-07-03	707	\N	911
+2039	GENERIC_DAY	3	4	2010-08-03	709	\N	911
+2040	GENERIC_DAY	3	4	2010-12-07	709	\N	911
+2041	GENERIC_DAY	3	4	2010-07-26	707	\N	911
+2042	GENERIC_DAY	3	4	2011-04-05	709	\N	911
+2043	GENERIC_DAY	3	4	2010-06-12	707	\N	911
+2044	GENERIC_DAY	3	4	2010-11-04	707	\N	911
+2045	GENERIC_DAY	3	4	2011-03-07	709	\N	911
+2046	GENERIC_DAY	3	4	2011-03-20	707	\N	911
+2047	GENERIC_DAY	3	4	2010-09-21	709	\N	911
+2048	GENERIC_DAY	3	4	2010-10-23	707	\N	911
+2049	GENERIC_DAY	3	4	2010-10-07	709	\N	911
+2050	GENERIC_DAY	3	4	2011-04-09	707	\N	911
+2051	GENERIC_DAY	3	4	2010-10-06	709	\N	911
+2052	GENERIC_DAY	3	4	2010-06-14	709	\N	911
+2053	GENERIC_DAY	3	4	2010-10-09	709	\N	911
+2054	GENERIC_DAY	3	4	2010-08-23	707	\N	911
+2055	GENERIC_DAY	3	4	2010-10-14	709	\N	911
+2056	GENERIC_DAY	3	4	2010-05-28	707	\N	911
+2057	GENERIC_DAY	3	4	2010-05-22	709	\N	911
+2058	GENERIC_DAY	3	4	2010-04-10	709	\N	911
+2059	GENERIC_DAY	3	4	2010-07-22	709	\N	911
+2060	GENERIC_DAY	3	4	2011-02-18	707	\N	911
+2061	GENERIC_DAY	3	4	2011-01-02	707	\N	911
+2062	GENERIC_DAY	3	4	2011-04-03	707	\N	911
+2063	GENERIC_DAY	3	4	2010-12-10	707	\N	911
+2064	GENERIC_DAY	3	4	2010-10-05	709	\N	911
+2065	GENERIC_DAY	3	4	2010-07-19	707	\N	911
+2066	GENERIC_DAY	3	4	2010-11-13	707	\N	911
+2067	GENERIC_DAY	3	4	2010-06-05	707	\N	911
+2068	GENERIC_DAY	3	4	2010-05-09	709	\N	911
+2069	GENERIC_DAY	3	4	2010-07-05	707	\N	911
+2070	GENERIC_DAY	3	4	2010-05-01	707	\N	911
+2071	GENERIC_DAY	3	4	2010-08-10	707	\N	911
+2072	GENERIC_DAY	3	4	2010-09-10	707	\N	911
+2073	GENERIC_DAY	3	4	2011-04-04	709	\N	911
+2074	GENERIC_DAY	3	4	2010-10-10	709	\N	911
+2075	GENERIC_DAY	3	4	2010-08-16	707	\N	911
+2076	GENERIC_DAY	3	4	2010-12-15	709	\N	911
+2077	GENERIC_DAY	3	4	2010-04-04	709	\N	911
+2078	GENERIC_DAY	3	4	2011-01-03	707	\N	911
+2079	GENERIC_DAY	3	4	2010-04-09	709	\N	911
+2080	GENERIC_DAY	3	4	2010-07-23	707	\N	911
+2081	GENERIC_DAY	3	4	2010-06-28	707	\N	911
+2082	GENERIC_DAY	3	4	2010-08-19	709	\N	911
+2083	GENERIC_DAY	3	4	2010-11-27	707	\N	911
+2084	GENERIC_DAY	3	4	2010-11-08	709	\N	911
+2085	GENERIC_DAY	3	4	2010-07-07	709	\N	911
+2086	GENERIC_DAY	3	4	2011-03-01	707	\N	911
+2087	GENERIC_DAY	3	4	2010-08-23	709	\N	911
+2088	GENERIC_DAY	3	4	2010-06-18	707	\N	911
+2089	GENERIC_DAY	3	4	2011-01-11	707	\N	911
+2090	GENERIC_DAY	3	4	2010-12-31	707	\N	911
+2091	GENERIC_DAY	3	4	2011-01-23	707	\N	911
+2092	GENERIC_DAY	3	4	2010-05-16	707	\N	911
+2093	GENERIC_DAY	3	4	2010-04-06	709	\N	911
+2094	GENERIC_DAY	3	4	2010-08-11	707	\N	911
+2095	GENERIC_DAY	3	4	2011-02-23	709	\N	911
+2096	GENERIC_DAY	3	4	2010-10-23	709	\N	911
+2097	GENERIC_DAY	3	4	2010-07-04	709	\N	911
+2098	GENERIC_DAY	3	4	2010-04-21	709	\N	911
+2099	GENERIC_DAY	3	4	2011-01-30	709	\N	911
+2100	GENERIC_DAY	3	4	2011-01-01	707	\N	911
+2101	GENERIC_DAY	3	4	2011-01-07	707	\N	911
+2102	GENERIC_DAY	3	4	2010-11-12	707	\N	911
+2103	GENERIC_DAY	3	4	2010-12-03	707	\N	911
+2104	GENERIC_DAY	3	4	2010-05-18	707	\N	911
+2105	GENERIC_DAY	3	4	2010-08-22	707	\N	911
+2106	GENERIC_DAY	3	4	2011-03-28	707	\N	911
+2107	GENERIC_DAY	3	4	2010-07-25	707	\N	911
+2108	GENERIC_DAY	3	4	2011-02-16	707	\N	911
+2109	GENERIC_DAY	3	4	2010-05-13	709	\N	911
+2110	GENERIC_DAY	3	4	2010-09-13	707	\N	911
+2111	GENERIC_DAY	3	4	2010-06-02	709	\N	911
+2112	GENERIC_DAY	3	4	2010-11-26	707	\N	911
+2113	GENERIC_DAY	3	4	2011-02-23	707	\N	911
+2114	GENERIC_DAY	3	4	2010-11-18	709	\N	911
+2115	GENERIC_DAY	3	4	2010-12-17	707	\N	911
+2116	GENERIC_DAY	3	4	2011-02-20	707	\N	911
+2117	GENERIC_DAY	3	4	2010-06-06	707	\N	911
+2118	GENERIC_DAY	3	4	2011-02-08	707	\N	911
+2119	GENERIC_DAY	3	4	2011-01-15	707	\N	911
+2120	GENERIC_DAY	3	4	2010-11-10	709	\N	911
+2121	GENERIC_DAY	3	4	2010-11-07	709	\N	911
+2122	GENERIC_DAY	3	4	2010-12-20	707	\N	911
+2123	GENERIC_DAY	3	4	2010-06-10	709	\N	911
+2124	GENERIC_DAY	3	4	2011-04-02	709	\N	911
+2125	GENERIC_DAY	3	4	2011-03-27	707	\N	911
+2126	GENERIC_DAY	3	4	2010-09-11	707	\N	911
+2127	GENERIC_DAY	3	4	2011-03-23	709	\N	911
+2128	GENERIC_DAY	3	4	2010-12-10	709	\N	911
+2129	GENERIC_DAY	3	4	2010-05-18	709	\N	911
+2130	GENERIC_DAY	3	4	2010-11-02	707	\N	911
+2131	GENERIC_DAY	3	4	2010-10-31	707	\N	911
+2132	GENERIC_DAY	3	4	2010-11-25	709	\N	911
+2133	GENERIC_DAY	3	4	2010-06-24	709	\N	911
+2134	GENERIC_DAY	3	4	2010-10-31	709	\N	911
+2135	GENERIC_DAY	3	4	2010-04-13	707	\N	911
+2136	GENERIC_DAY	3	4	2011-03-27	709	\N	911
+2137	GENERIC_DAY	3	4	2011-03-03	707	\N	911
+2138	GENERIC_DAY	3	4	2011-03-09	707	\N	911
+2139	GENERIC_DAY	3	4	2010-07-09	707	\N	911
+2140	GENERIC_DAY	3	4	2010-05-27	707	\N	911
+2141	GENERIC_DAY	3	4	2010-09-22	709	\N	911
+2142	GENERIC_DAY	3	4	2011-01-14	707	\N	911
+2143	GENERIC_DAY	3	4	2011-03-06	707	\N	911
+2144	GENERIC_DAY	3	4	2010-10-13	707	\N	911
+2145	GENERIC_DAY	3	4	2010-12-09	707	\N	911
+2146	GENERIC_DAY	3	4	2011-03-30	709	\N	911
+2147	GENERIC_DAY	3	4	2011-03-10	709	\N	911
+2148	GENERIC_DAY	3	4	2011-01-12	709	\N	911
+2149	GENERIC_DAY	3	4	2010-05-03	709	\N	911
+2150	GENERIC_DAY	3	4	2011-02-11	707	\N	911
+2151	GENERIC_DAY	3	4	2011-02-07	709	\N	911
+2152	GENERIC_DAY	3	4	2010-11-09	709	\N	911
+2153	GENERIC_DAY	3	4	2010-05-03	707	\N	911
+2154	GENERIC_DAY	3	4	2011-02-04	707	\N	911
+2155	GENERIC_DAY	3	4	2010-11-24	707	\N	911
+2156	GENERIC_DAY	3	4	2011-02-25	709	\N	911
+2157	GENERIC_DAY	3	4	2010-11-15	707	\N	911
+2158	GENERIC_DAY	3	4	2010-04-19	707	\N	911
+2159	GENERIC_DAY	3	4	2010-05-21	709	\N	911
+2160	GENERIC_DAY	3	4	2010-08-15	709	\N	911
+2161	GENERIC_DAY	3	4	2010-10-05	707	\N	911
+2162	GENERIC_DAY	3	4	2010-04-02	709	\N	911
+2163	GENERIC_DAY	3	4	2010-09-27	707	\N	911
+2164	GENERIC_DAY	3	4	2010-11-16	707	\N	911
+2165	GENERIC_DAY	3	4	2010-07-13	707	\N	911
+2166	GENERIC_DAY	3	4	2010-07-07	707	\N	911
+2167	GENERIC_DAY	3	4	2011-01-21	707	\N	911
+2168	GENERIC_DAY	3	4	2010-05-21	707	\N	911
+2169	GENERIC_DAY	3	4	2011-01-30	707	\N	911
+2170	GENERIC_DAY	3	4	2011-03-28	709	\N	911
+2171	GENERIC_DAY	3	4	2011-04-08	709	\N	911
+2172	GENERIC_DAY	3	4	2011-04-06	709	\N	911
+2173	GENERIC_DAY	3	4	2010-07-10	707	\N	911
+2174	GENERIC_DAY	3	4	2010-12-17	709	\N	911
+2175	GENERIC_DAY	3	4	2010-07-17	709	\N	911
+2176	GENERIC_DAY	3	4	2010-07-02	709	\N	911
+2177	GENERIC_DAY	3	4	2011-02-05	709	\N	911
+2178	GENERIC_DAY	3	4	2010-10-01	707	\N	911
+2179	GENERIC_DAY	3	4	2010-10-24	709	\N	911
+2180	GENERIC_DAY	3	4	2010-11-01	709	\N	911
+2181	GENERIC_DAY	3	4	2010-07-06	709	\N	911
+2182	GENERIC_DAY	3	4	2010-04-11	707	\N	911
+2183	GENERIC_DAY	3	4	2010-08-01	709	\N	911
+2184	GENERIC_DAY	3	4	2011-01-08	709	\N	911
+2185	GENERIC_DAY	3	4	2010-12-01	709	\N	911
+2186	GENERIC_DAY	3	4	2011-02-06	707	\N	911
+2187	GENERIC_DAY	3	4	2010-12-01	707	\N	911
+2188	GENERIC_DAY	3	4	2010-10-26	707	\N	911
+2189	GENERIC_DAY	3	4	2010-07-15	707	\N	911
+2190	GENERIC_DAY	3	4	2010-09-02	709	\N	911
+2191	GENERIC_DAY	3	4	2011-02-10	707	\N	911
+2192	GENERIC_DAY	3	4	2010-12-04	709	\N	911
+2193	GENERIC_DAY	3	4	2010-07-26	709	\N	911
+2194	GENERIC_DAY	3	4	2011-01-08	707	\N	911
+2195	GENERIC_DAY	3	4	2010-11-30	707	\N	911
+2196	GENERIC_DAY	3	4	2011-03-30	707	\N	911
+2197	GENERIC_DAY	3	4	2010-07-20	709	\N	911
+2198	GENERIC_DAY	3	4	2010-05-12	707	\N	911
+2199	GENERIC_DAY	3	4	2011-04-01	709	\N	911
+2200	GENERIC_DAY	3	4	2010-12-11	709	\N	911
+2201	GENERIC_DAY	3	4	2011-02-03	709	\N	911
+2202	GENERIC_DAY	3	4	2010-12-22	707	\N	911
+2203	GENERIC_DAY	3	4	2010-06-05	709	\N	911
+2204	GENERIC_DAY	3	4	2010-09-08	707	\N	911
+2205	GENERIC_DAY	3	4	2010-04-11	709	\N	911
+2206	GENERIC_DAY	3	4	2011-01-24	707	\N	911
+2207	GENERIC_DAY	3	4	2011-01-17	707	\N	911
+2208	GENERIC_DAY	3	4	2010-09-07	709	\N	911
+2209	GENERIC_DAY	3	4	2010-09-07	707	\N	911
+2210	GENERIC_DAY	3	4	2010-11-03	707	\N	911
+2211	GENERIC_DAY	3	4	2010-05-20	707	\N	911
+2212	GENERIC_DAY	3	4	2011-02-16	709	\N	911
+2213	GENERIC_DAY	3	4	2010-05-05	709	\N	911
+2214	GENERIC_DAY	3	4	2010-07-31	709	\N	911
+2215	GENERIC_DAY	3	4	2011-01-25	709	\N	911
+2216	GENERIC_DAY	3	4	2010-05-29	709	\N	911
+2217	GENERIC_DAY	3	4	2010-09-24	709	\N	911
+2218	GENERIC_DAY	3	4	2010-12-28	709	\N	911
+2219	GENERIC_DAY	3	4	2010-10-17	707	\N	911
+2220	GENERIC_DAY	3	4	2011-03-14	709	\N	911
+2221	GENERIC_DAY	3	4	2011-02-21	707	\N	911
+2222	GENERIC_DAY	3	4	2010-04-01	709	\N	911
+2223	GENERIC_DAY	3	4	2010-05-17	709	\N	911
+2224	GENERIC_DAY	3	4	2010-09-09	707	\N	911
+2225	GENERIC_DAY	3	4	2011-01-19	709	\N	911
+2226	GENERIC_DAY	3	4	2011-04-07	709	\N	911
+2227	GENERIC_DAY	3	4	2011-01-17	709	\N	911
+2228	GENERIC_DAY	3	4	2010-05-27	709	\N	911
+2229	GENERIC_DAY	3	4	2011-02-09	707	\N	911
+2230	GENERIC_DAY	3	4	2010-05-05	707	\N	911
+2231	GENERIC_DAY	3	4	2011-04-09	709	\N	911
+2232	GENERIC_DAY	3	4	2010-09-14	709	\N	911
+2233	GENERIC_DAY	3	4	2010-09-23	707	\N	911
+2234	GENERIC_DAY	3	4	2010-04-09	707	\N	911
+2235	GENERIC_DAY	3	4	2010-04-22	709	\N	911
+2236	GENERIC_DAY	3	4	2010-10-02	707	\N	911
+2237	GENERIC_DAY	3	4	2010-06-28	709	\N	911
+2238	GENERIC_DAY	3	4	2010-11-20	709	\N	911
+2239	GENERIC_DAY	3	4	2010-11-29	709	\N	911
+2240	GENERIC_DAY	3	4	2010-06-16	707	\N	911
+2241	GENERIC_DAY	3	4	2011-02-01	709	\N	911
+2242	GENERIC_DAY	3	4	2010-12-26	709	\N	911
+2243	GENERIC_DAY	3	4	2010-04-16	709	\N	911
+2244	GENERIC_DAY	3	4	2010-10-16	709	\N	911
+2245	GENERIC_DAY	3	4	2010-11-23	707	\N	911
+2246	GENERIC_DAY	3	4	2010-10-29	709	\N	911
+2247	GENERIC_DAY	3	4	2010-11-07	707	\N	911
+2248	GENERIC_DAY	3	4	2010-04-27	709	\N	911
+2249	GENERIC_DAY	3	4	2010-09-23	709	\N	911
+2250	GENERIC_DAY	3	4	2011-03-05	707	\N	911
+2251	GENERIC_DAY	3	4	2010-09-16	709	\N	911
+2252	GENERIC_DAY	3	4	2010-04-22	707	\N	911
+2253	GENERIC_DAY	3	4	2011-02-19	707	\N	911
+2254	GENERIC_DAY	3	4	2010-07-14	709	\N	911
+2255	GENERIC_DAY	3	4	2010-06-15	709	\N	911
+2256	GENERIC_DAY	3	4	2010-10-07	707	\N	911
+2257	GENERIC_DAY	3	4	2011-01-09	707	\N	911
+2258	GENERIC_DAY	3	4	2010-05-02	709	\N	911
+2259	GENERIC_DAY	3	4	2010-12-19	709	\N	911
+2260	GENERIC_DAY	3	4	2010-06-10	707	\N	911
+2261	GENERIC_DAY	3	4	2010-05-06	709	\N	911
+2262	GENERIC_DAY	3	4	2010-08-12	709	\N	911
+2263	GENERIC_DAY	3	4	2011-04-01	707	\N	911
+2264	GENERIC_DAY	3	4	2010-06-27	707	\N	911
+2265	GENERIC_DAY	3	4	2010-12-24	707	\N	911
+2266	GENERIC_DAY	3	4	2010-11-08	707	\N	911
+2267	GENERIC_DAY	3	4	2011-01-29	709	\N	911
+2268	GENERIC_DAY	3	4	2010-12-14	707	\N	911
+2269	GENERIC_DAY	3	4	2010-08-08	707	\N	911
+2270	GENERIC_DAY	3	4	2010-07-16	707	\N	911
+2271	GENERIC_DAY	3	4	2010-05-16	709	\N	911
+2272	GENERIC_DAY	3	4	2010-08-13	709	\N	911
+2273	GENERIC_DAY	3	4	2010-08-16	709	\N	911
+2274	GENERIC_DAY	3	4	2011-02-25	707	\N	911
+2275	GENERIC_DAY	3	4	2011-02-27	707	\N	911
+2276	GENERIC_DAY	3	4	2010-12-06	707	\N	911
+2277	GENERIC_DAY	3	4	2010-10-19	707	\N	911
+2278	GENERIC_DAY	3	4	2011-02-14	709	\N	911
+2279	GENERIC_DAY	3	4	2010-06-08	709	\N	911
+2280	GENERIC_DAY	3	4	2010-05-31	707	\N	911
+2281	GENERIC_DAY	3	4	2010-08-05	709	\N	911
+2282	GENERIC_DAY	3	4	2011-02-04	709	\N	911
+2283	GENERIC_DAY	3	4	2010-12-25	709	\N	911
+2284	GENERIC_DAY	3	4	2010-07-18	709	\N	911
+2285	GENERIC_DAY	3	4	2010-05-19	707	\N	911
+2286	GENERIC_DAY	3	4	2010-04-20	709	\N	911
+2287	GENERIC_DAY	3	4	2010-09-14	707	\N	911
+2288	GENERIC_DAY	3	4	2010-11-28	707	\N	911
+2289	GENERIC_DAY	3	4	2010-11-01	707	\N	911
+2290	GENERIC_DAY	3	4	2010-09-19	707	\N	911
+2291	GENERIC_DAY	3	4	2011-03-31	707	\N	911
+2292	GENERIC_DAY	3	4	2010-08-02	709	\N	911
+2293	GENERIC_DAY	3	4	2011-01-18	707	\N	911
+2294	GENERIC_DAY	3	4	2011-03-14	707	\N	911
+2295	GENERIC_DAY	3	4	2010-11-06	707	\N	911
+2296	GENERIC_DAY	3	4	2011-03-26	707	\N	911
+2297	GENERIC_DAY	3	4	2010-11-02	709	\N	911
+2298	GENERIC_DAY	3	4	2010-12-15	707	\N	911
+2299	GENERIC_DAY	3	4	2010-07-20	707	\N	911
+2300	GENERIC_DAY	3	4	2010-08-25	707	\N	911
+2301	GENERIC_DAY	3	4	2010-09-06	709	\N	911
+2302	GENERIC_DAY	3	4	2011-01-12	707	\N	911
+2303	GENERIC_DAY	3	4	2010-05-06	707	\N	911
+2304	GENERIC_DAY	3	4	2010-09-29	707	\N	911
+2305	GENERIC_DAY	3	4	2010-06-06	709	\N	911
+2306	GENERIC_DAY	3	4	2010-09-18	707	\N	911
+2307	GENERIC_DAY	3	4	2010-06-17	707	\N	911
+2308	GENERIC_DAY	3	4	2010-04-13	709	\N	911
+2309	GENERIC_DAY	3	4	2010-10-12	709	\N	911
+2310	GENERIC_DAY	3	4	2011-01-29	707	\N	911
+2311	GENERIC_DAY	3	4	2010-08-24	709	\N	911
+2312	GENERIC_DAY	3	4	2010-09-13	709	\N	911
+2313	GENERIC_DAY	3	4	2011-03-15	709	\N	911
+2314	GENERIC_DAY	3	4	2010-06-21	709	\N	911
+2315	GENERIC_DAY	3	4	2010-08-07	709	\N	911
+2316	GENERIC_DAY	3	4	2010-09-18	709	\N	911
+2317	GENERIC_DAY	3	4	2010-09-20	709	\N	911
+2318	GENERIC_DAY	3	4	2010-04-17	709	\N	911
+2319	GENERIC_DAY	3	4	2010-11-13	709	\N	911
+2320	GENERIC_DAY	3	4	2010-06-21	707	\N	911
+2321	GENERIC_DAY	3	4	2011-03-31	709	\N	911
+2322	GENERIC_DAY	3	4	2010-06-27	709	\N	911
+2323	GENERIC_DAY	3	4	2010-09-05	709	\N	911
+2324	GENERIC_DAY	3	4	2010-12-16	709	\N	911
+2325	GENERIC_DAY	3	4	2010-11-16	709	\N	911
+2326	GENERIC_DAY	3	4	2010-08-06	707	\N	911
+2327	GENERIC_DAY	3	4	2011-02-05	707	\N	911
+2328	GENERIC_DAY	3	4	2010-08-11	709	\N	911
+2329	GENERIC_DAY	3	4	2011-02-11	709	\N	911
+2330	GENERIC_DAY	3	4	2011-01-03	709	\N	911
+2331	GENERIC_DAY	3	4	2010-08-21	709	\N	911
+2332	GENERIC_DAY	3	4	2010-12-30	707	\N	911
+2333	GENERIC_DAY	3	4	2010-08-04	709	\N	911
+2334	GENERIC_DAY	3	4	2010-05-08	707	\N	911
+2335	GENERIC_DAY	3	4	2010-09-26	709	\N	911
+2336	GENERIC_DAY	3	4	2011-03-13	707	\N	911
+2337	GENERIC_DAY	3	4	2011-01-09	709	\N	911
+2338	GENERIC_DAY	3	4	2010-08-06	709	\N	911
+2339	GENERIC_DAY	3	4	2011-01-31	707	\N	911
+2340	GENERIC_DAY	3	4	2010-06-22	709	\N	911
+2341	GENERIC_DAY	3	4	2010-04-26	709	\N	911
+2342	GENERIC_DAY	3	4	2010-08-09	709	\N	911
+2343	GENERIC_DAY	3	4	2011-01-26	709	\N	911
+2344	GENERIC_DAY	3	4	2010-08-18	709	\N	911
+2345	GENERIC_DAY	3	4	2010-07-24	709	\N	911
+2346	GENERIC_DAY	3	4	2011-02-07	707	\N	911
+2347	GENERIC_DAY	3	4	2010-12-08	707	\N	911
+2348	GENERIC_DAY	3	4	2010-07-06	707	\N	911
+2349	GENERIC_DAY	3	4	2010-10-26	709	\N	911
+2350	GENERIC_DAY	3	4	2011-03-21	709	\N	911
+2351	GENERIC_DAY	3	4	2011-04-06	707	\N	911
+2352	GENERIC_DAY	3	4	2010-10-15	707	\N	911
+2353	GENERIC_DAY	3	4	2010-08-19	707	\N	911
+2354	GENERIC_DAY	3	4	2010-10-01	709	\N	911
+2355	GENERIC_DAY	3	4	2011-01-04	709	\N	911
+2356	GENERIC_DAY	3	4	2011-01-02	709	\N	911
+2357	GENERIC_DAY	3	4	2010-05-04	709	\N	911
+2358	GENERIC_DAY	3	4	2010-05-14	707	\N	911
+2359	GENERIC_DAY	3	4	2010-07-27	709	\N	911
+2360	GENERIC_DAY	3	4	2010-04-18	707	\N	911
+2361	GENERIC_DAY	3	4	2010-06-30	707	\N	911
+2362	GENERIC_DAY	3	4	2011-03-24	707	\N	911
+2363	GENERIC_DAY	3	4	2010-07-27	707	\N	911
+2364	GENERIC_DAY	3	4	2010-07-30	707	\N	911
+2365	GENERIC_DAY	3	4	2010-08-08	709	\N	911
+2366	GENERIC_DAY	3	4	2010-04-20	707	\N	911
+2367	GENERIC_DAY	3	4	2010-07-21	707	\N	911
+2368	GENERIC_DAY	3	4	2010-06-26	707	\N	911
+2369	GENERIC_DAY	3	4	2010-11-21	709	\N	911
+2370	GENERIC_DAY	3	4	2010-04-28	709	\N	911
+2371	GENERIC_DAY	3	4	2011-01-19	707	\N	911
+2372	GENERIC_DAY	3	4	2010-11-04	709	\N	911
+2373	GENERIC_DAY	3	4	2010-12-13	707	\N	911
+2374	GENERIC_DAY	3	4	2010-11-17	707	\N	911
+2375	GENERIC_DAY	3	4	2010-12-31	709	\N	911
+2376	GENERIC_DAY	3	4	2010-08-30	709	\N	911
+2377	GENERIC_DAY	3	4	2011-01-21	709	\N	911
+2378	GENERIC_DAY	3	4	2010-12-16	707	\N	911
+2379	GENERIC_DAY	3	4	2010-08-27	709	\N	911
+2380	GENERIC_DAY	3	4	2010-08-30	707	\N	911
+2381	GENERIC_DAY	3	4	2010-05-12	709	\N	911
+2382	GENERIC_DAY	3	4	2010-05-11	707	\N	911
+2383	GENERIC_DAY	3	4	2010-06-26	709	\N	911
+2384	GENERIC_DAY	3	4	2010-08-13	707	\N	911
+2385	GENERIC_DAY	3	4	2010-12-11	707	\N	911
+3325	GENERIC_DAY	3	8	2010-06-08	707	\N	915
+3326	GENERIC_DAY	3	8	2010-01-02	707	\N	915
+3327	GENERIC_DAY	3	8	2010-01-01	707	\N	915
+3328	GENERIC_DAY	3	8	2010-08-25	707	\N	915
+3329	GENERIC_DAY	3	8	2010-08-02	707	\N	915
+3330	GENERIC_DAY	3	8	2010-03-10	707	\N	915
+3331	GENERIC_DAY	3	8	2009-10-18	707	\N	915
+3332	GENERIC_DAY	3	8	2010-07-27	707	\N	915
+3333	GENERIC_DAY	3	8	2010-08-28	707	\N	915
+3334	GENERIC_DAY	3	8	2010-03-02	707	\N	915
+3335	GENERIC_DAY	3	8	2010-01-20	707	\N	915
+3336	GENERIC_DAY	3	8	2010-05-14	707	\N	915
+3337	GENERIC_DAY	3	8	2010-03-01	707	\N	915
+3338	GENERIC_DAY	3	8	2010-10-25	707	\N	915
+3339	GENERIC_DAY	3	8	2010-07-21	707	\N	915
+3340	GENERIC_DAY	3	8	2009-11-01	707	\N	915
+3341	GENERIC_DAY	3	8	2010-06-14	707	\N	915
+3342	GENERIC_DAY	3	8	2010-08-15	707	\N	915
+3343	GENERIC_DAY	3	8	2010-07-01	707	\N	915
+3344	GENERIC_DAY	3	8	2010-03-13	707	\N	915
+3345	GENERIC_DAY	3	8	2010-05-23	707	\N	915
+3346	GENERIC_DAY	3	8	2010-06-29	707	\N	915
+3347	GENERIC_DAY	3	8	2010-02-20	707	\N	915
+3348	GENERIC_DAY	3	8	2010-08-11	707	\N	915
+3349	GENERIC_DAY	3	8	2010-10-22	707	\N	915
+3350	GENERIC_DAY	3	8	2009-11-20	707	\N	915
+3351	GENERIC_DAY	3	8	2009-12-10	707	\N	915
+3352	GENERIC_DAY	3	8	2010-08-30	707	\N	915
+3353	GENERIC_DAY	3	8	2010-10-12	707	\N	915
+3354	GENERIC_DAY	3	8	2010-07-16	707	\N	915
+3355	GENERIC_DAY	3	8	2009-12-08	707	\N	915
+3356	GENERIC_DAY	3	8	2010-09-08	707	\N	915
+3357	GENERIC_DAY	3	8	2009-11-25	707	\N	915
+3358	GENERIC_DAY	3	8	2010-05-04	707	\N	915
+3359	GENERIC_DAY	3	8	2010-09-17	707	\N	915
+3360	GENERIC_DAY	3	8	2010-06-07	707	\N	915
+3361	GENERIC_DAY	3	8	2010-02-25	707	\N	915
+3362	GENERIC_DAY	3	8	2010-07-26	707	\N	915
+3363	GENERIC_DAY	3	8	2010-04-18	707	\N	915
+3364	GENERIC_DAY	3	8	2010-07-23	707	\N	915
+3365	GENERIC_DAY	3	8	2010-10-10	707	\N	915
+3366	GENERIC_DAY	3	8	2010-08-17	707	\N	915
+3367	GENERIC_DAY	3	8	2009-11-11	707	\N	915
+3368	GENERIC_DAY	3	8	2010-08-08	707	\N	915
+3369	GENERIC_DAY	3	8	2010-01-23	707	\N	915
+3370	GENERIC_DAY	3	8	2009-12-07	707	\N	915
+3371	GENERIC_DAY	3	8	2010-03-21	707	\N	915
+3372	GENERIC_DAY	3	8	2010-02-13	707	\N	915
+3373	GENERIC_DAY	3	8	2010-02-14	707	\N	915
+3374	GENERIC_DAY	3	8	2010-06-21	707	\N	915
+3375	GENERIC_DAY	3	8	2009-11-09	707	\N	915
+3376	GENERIC_DAY	3	8	2010-10-08	707	\N	915
+3377	GENERIC_DAY	3	8	2010-10-02	707	\N	915
+3378	GENERIC_DAY	3	8	2010-05-19	707	\N	915
+3379	GENERIC_DAY	3	8	2010-07-22	707	\N	915
+3380	GENERIC_DAY	3	8	2009-10-19	707	\N	915
+3381	GENERIC_DAY	3	8	2009-11-24	707	\N	915
+3382	GENERIC_DAY	3	8	2010-01-30	707	\N	915
+3383	GENERIC_DAY	3	8	2010-04-25	707	\N	915
+3384	GENERIC_DAY	3	8	2010-10-09	707	\N	915
+3385	GENERIC_DAY	3	8	2010-05-10	707	\N	915
+3386	GENERIC_DAY	3	8	2009-10-25	707	\N	915
+3387	GENERIC_DAY	3	8	2010-01-13	707	\N	915
+3388	GENERIC_DAY	3	8	2010-01-06	707	\N	915
+3389	GENERIC_DAY	3	8	2010-01-29	707	\N	915
+3390	GENERIC_DAY	3	8	2010-10-03	707	\N	915
+3391	GENERIC_DAY	3	8	2010-07-13	707	\N	915
+3392	GENERIC_DAY	3	8	2010-07-10	707	\N	915
+3393	GENERIC_DAY	3	8	2010-05-09	707	\N	915
+3394	GENERIC_DAY	3	8	2010-09-27	707	\N	915
+3395	GENERIC_DAY	3	8	2010-05-06	707	\N	915
+3396	GENERIC_DAY	3	8	2010-09-28	707	\N	915
+3397	GENERIC_DAY	3	8	2010-01-19	707	\N	915
+3398	GENERIC_DAY	3	8	2009-12-26	707	\N	915
+3399	GENERIC_DAY	3	8	2010-09-18	707	\N	915
+3400	GENERIC_DAY	3	8	2009-10-16	707	\N	915
+3401	GENERIC_DAY	3	8	2010-01-22	707	\N	915
+3402	GENERIC_DAY	3	8	2009-12-22	707	\N	915
+3403	GENERIC_DAY	3	8	2010-07-31	707	\N	915
+3404	GENERIC_DAY	3	8	2010-08-04	707	\N	915
+3405	GENERIC_DAY	3	8	2010-06-19	707	\N	915
+3406	GENERIC_DAY	3	8	2010-04-23	707	\N	915
+3407	GENERIC_DAY	3	8	2010-04-24	707	\N	915
+3408	GENERIC_DAY	3	8	2010-05-15	707	\N	915
+3409	GENERIC_DAY	3	8	2010-09-30	707	\N	915
+3410	GENERIC_DAY	3	8	2010-09-12	707	\N	915
+3411	GENERIC_DAY	3	8	2010-07-06	707	\N	915
+3412	GENERIC_DAY	3	8	2010-09-16	707	\N	915
+3413	GENERIC_DAY	3	8	2010-06-22	707	\N	915
+3414	GENERIC_DAY	3	8	2009-12-05	707	\N	915
+3415	GENERIC_DAY	3	8	2010-04-07	707	\N	915
+3416	GENERIC_DAY	3	8	2010-01-07	707	\N	915
+3417	GENERIC_DAY	3	8	2009-11-05	707	\N	915
+3418	GENERIC_DAY	3	8	2009-12-12	707	\N	915
+3419	GENERIC_DAY	3	8	2009-11-07	707	\N	915
+3420	GENERIC_DAY	3	8	2010-09-25	707	\N	915
+3421	GENERIC_DAY	3	8	2010-04-03	707	\N	915
+3422	GENERIC_DAY	3	8	2009-11-30	707	\N	915
+3423	GENERIC_DAY	3	8	2010-02-27	707	\N	915
+3424	GENERIC_DAY	3	8	2009-12-27	707	\N	915
+3425	GENERIC_DAY	3	8	2010-10-04	707	\N	915
+3426	GENERIC_DAY	3	8	2010-09-07	707	\N	915
+3427	GENERIC_DAY	3	8	2010-04-10	707	\N	915
+3428	GENERIC_DAY	3	8	2010-01-14	707	\N	915
+3429	GENERIC_DAY	3	8	2010-07-30	707	\N	915
+3430	GENERIC_DAY	3	8	2009-11-18	707	\N	915
+3431	GENERIC_DAY	3	8	2010-07-08	707	\N	915
+3432	GENERIC_DAY	3	8	2010-09-14	707	\N	915
+3433	GENERIC_DAY	3	8	2009-12-30	707	\N	915
+3434	GENERIC_DAY	3	8	2009-12-29	707	\N	915
+3435	GENERIC_DAY	3	8	2010-09-11	707	\N	915
+3436	GENERIC_DAY	3	8	2010-08-24	707	\N	915
+3437	GENERIC_DAY	3	8	2010-04-30	707	\N	915
+3438	GENERIC_DAY	3	8	2009-11-04	707	\N	915
+3439	GENERIC_DAY	3	8	2010-05-31	707	\N	915
+3440	GENERIC_DAY	3	8	2010-05-29	707	\N	915
+3441	GENERIC_DAY	3	8	2010-06-20	707	\N	915
+3442	GENERIC_DAY	3	8	2009-12-16	707	\N	915
+3443	GENERIC_DAY	3	8	2010-03-16	707	\N	915
+3444	GENERIC_DAY	3	8	2010-05-05	707	\N	915
+3445	GENERIC_DAY	3	8	2009-11-02	707	\N	915
+3446	GENERIC_DAY	3	8	2010-08-22	707	\N	915
+3447	GENERIC_DAY	3	8	2009-12-17	707	\N	915
+3448	GENERIC_DAY	3	8	2009-11-22	707	\N	915
+3449	GENERIC_DAY	3	8	2010-07-05	707	\N	915
+3450	GENERIC_DAY	3	8	2010-08-18	707	\N	915
+3451	GENERIC_DAY	3	8	2009-12-04	707	\N	915
+3452	GENERIC_DAY	3	8	2010-09-29	707	\N	915
+3453	GENERIC_DAY	3	8	2010-05-30	707	\N	915
+3454	GENERIC_DAY	3	8	2010-01-27	707	\N	915
+3455	GENERIC_DAY	3	8	2010-03-26	707	\N	915
+3456	GENERIC_DAY	3	8	2009-12-23	707	\N	915
+3457	GENERIC_DAY	3	8	2010-06-24	707	\N	915
+3458	GENERIC_DAY	3	8	2010-01-03	707	\N	915
+3459	GENERIC_DAY	3	8	2010-01-04	707	\N	915
+3460	GENERIC_DAY	3	8	2010-04-11	707	\N	915
+3461	GENERIC_DAY	3	8	2010-01-09	707	\N	915
+3462	GENERIC_DAY	3	8	2009-11-12	707	\N	915
+3463	GENERIC_DAY	3	8	2009-12-28	707	\N	915
+3464	GENERIC_DAY	3	8	2010-07-12	707	\N	915
+3465	GENERIC_DAY	3	8	2010-06-05	707	\N	915
+3466	GENERIC_DAY	3	8	2010-02-06	707	\N	915
+3467	GENERIC_DAY	3	8	2010-02-17	707	\N	915
+3468	GENERIC_DAY	3	8	2010-10-06	707	\N	915
+3469	GENERIC_DAY	3	8	2010-02-09	707	\N	915
+3470	GENERIC_DAY	3	8	2010-08-21	707	\N	915
+3471	GENERIC_DAY	3	8	2010-03-12	707	\N	915
+3472	GENERIC_DAY	3	8	2010-04-13	707	\N	915
+3473	GENERIC_DAY	3	8	2010-04-08	707	\N	915
+3474	GENERIC_DAY	3	8	2009-12-01	707	\N	915
+3475	GENERIC_DAY	3	8	2009-12-06	707	\N	915
+3476	GENERIC_DAY	3	8	2010-04-19	707	\N	915
+3477	GENERIC_DAY	3	8	2010-08-01	707	\N	915
+3478	GENERIC_DAY	3	8	2010-02-24	707	\N	915
+3479	GENERIC_DAY	3	8	2009-12-18	707	\N	915
+3480	GENERIC_DAY	3	8	2010-04-05	707	\N	915
+3481	GENERIC_DAY	3	8	2010-04-22	707	\N	915
+3482	GENERIC_DAY	3	8	2010-10-20	707	\N	915
+3483	GENERIC_DAY	3	8	2010-04-16	707	\N	915
+3484	GENERIC_DAY	3	8	2010-05-17	707	\N	915
+3485	GENERIC_DAY	3	8	2010-04-06	707	\N	915
+3486	GENERIC_DAY	3	8	2010-10-11	707	\N	915
+3487	GENERIC_DAY	3	8	2009-10-29	707	\N	915
+3488	GENERIC_DAY	3	8	2010-06-02	707	\N	915
+3489	GENERIC_DAY	3	8	2010-10-17	707	\N	915
+3490	GENERIC_DAY	3	8	2010-09-10	707	\N	915
+3491	GENERIC_DAY	3	8	2010-06-28	707	\N	915
+3492	GENERIC_DAY	3	8	2009-11-16	707	\N	915
+3493	GENERIC_DAY	3	8	2010-05-02	707	\N	915
+3494	GENERIC_DAY	3	8	2010-08-05	707	\N	915
+3495	GENERIC_DAY	3	8	2010-06-01	707	\N	915
+3496	GENERIC_DAY	3	8	2010-06-30	707	\N	915
+3497	GENERIC_DAY	3	8	2010-07-24	707	\N	915
+3498	GENERIC_DAY	3	8	2009-10-17	707	\N	915
+3499	GENERIC_DAY	3	8	2010-02-19	707	\N	915
+3500	GENERIC_DAY	3	8	2010-01-10	707	\N	915
+3501	GENERIC_DAY	3	8	2010-04-09	707	\N	915
+3502	GENERIC_DAY	3	8	2010-06-16	707	\N	915
+3503	GENERIC_DAY	3	8	2010-03-30	707	\N	915
+3504	GENERIC_DAY	3	8	2010-04-21	707	\N	915
+3505	GENERIC_DAY	3	8	2009-11-28	707	\N	915
+3506	GENERIC_DAY	3	8	2010-08-06	707	\N	915
+3507	GENERIC_DAY	3	8	2009-10-24	707	\N	915
+3508	GENERIC_DAY	3	8	2010-04-04	707	\N	915
+3509	GENERIC_DAY	3	8	2010-04-15	707	\N	915
+3510	GENERIC_DAY	3	8	2010-07-04	707	\N	915
+3511	GENERIC_DAY	3	8	2010-10-18	707	\N	915
+3512	GENERIC_DAY	3	8	2010-05-21	707	\N	915
+3513	GENERIC_DAY	3	8	2009-11-23	707	\N	915
+3514	GENERIC_DAY	3	8	2010-10-15	707	\N	915
+3515	GENERIC_DAY	3	8	2010-08-19	707	\N	915
+3516	GENERIC_DAY	3	8	2010-03-17	707	\N	915
+3517	GENERIC_DAY	3	8	2010-04-01	707	\N	915
+3518	GENERIC_DAY	3	8	2009-11-14	707	\N	915
+3519	GENERIC_DAY	3	8	2010-08-26	707	\N	915
+3520	GENERIC_DAY	3	8	2010-05-13	707	\N	915
+3521	GENERIC_DAY	3	8	2009-11-26	707	\N	915
+3522	GENERIC_DAY	3	8	2009-11-19	707	\N	915
+3523	GENERIC_DAY	3	8	2009-12-02	707	\N	915
+3524	GENERIC_DAY	3	8	2010-07-18	707	\N	915
+3525	GENERIC_DAY	3	8	2010-10-13	707	\N	915
+3526	GENERIC_DAY	3	8	2010-02-26	707	\N	915
+3527	GENERIC_DAY	3	8	2010-01-31	707	\N	915
+3528	GENERIC_DAY	3	8	2010-05-24	707	\N	915
+3529	GENERIC_DAY	3	8	2009-12-11	707	\N	915
+3530	GENERIC_DAY	3	8	2010-02-04	707	\N	915
+3531	GENERIC_DAY	3	8	2010-05-18	707	\N	915
+3532	GENERIC_DAY	3	8	2010-10-05	707	\N	915
+3533	GENERIC_DAY	3	8	2010-02-07	707	\N	915
+3534	GENERIC_DAY	3	8	2010-09-26	707	\N	915
+3535	GENERIC_DAY	3	8	2010-06-03	707	\N	915
+3536	GENERIC_DAY	3	8	2009-11-13	707	\N	915
+3537	GENERIC_DAY	3	8	2010-09-09	707	\N	915
+3538	GENERIC_DAY	3	8	2010-03-11	707	\N	915
+3539	GENERIC_DAY	3	8	2009-12-31	707	\N	915
+3540	GENERIC_DAY	3	8	2010-03-07	707	\N	915
+3541	GENERIC_DAY	3	8	2009-12-14	707	\N	915
+3542	GENERIC_DAY	3	8	2010-03-31	707	\N	915
+3543	GENERIC_DAY	3	8	2010-09-02	707	\N	915
+3544	GENERIC_DAY	3	8	2010-10-24	707	\N	915
+3545	GENERIC_DAY	3	8	2010-04-20	707	\N	915
+3546	GENERIC_DAY	3	8	2010-08-07	707	\N	915
+3547	GENERIC_DAY	3	8	2010-07-25	707	\N	915
+3548	GENERIC_DAY	3	8	2010-06-26	707	\N	915
+3549	GENERIC_DAY	3	8	2010-02-28	707	\N	915
+3550	GENERIC_DAY	3	8	2010-03-25	707	\N	915
+3551	GENERIC_DAY	3	8	2010-04-27	707	\N	915
+3552	GENERIC_DAY	3	8	2010-07-28	707	\N	915
+3553	GENERIC_DAY	3	8	2010-05-11	707	\N	915
+3554	GENERIC_DAY	3	8	2010-01-18	707	\N	915
+3555	GENERIC_DAY	3	8	2010-06-11	707	\N	915
+3556	GENERIC_DAY	3	8	2010-06-23	707	\N	915
+3557	GENERIC_DAY	3	8	2010-03-23	707	\N	915
+3558	GENERIC_DAY	3	8	2009-10-20	707	\N	915
+3559	GENERIC_DAY	3	8	2009-10-30	707	\N	915
+3560	GENERIC_DAY	3	8	2010-09-22	707	\N	915
+3561	GENERIC_DAY	3	8	2010-08-20	707	\N	915
+3562	GENERIC_DAY	3	8	2010-06-18	707	\N	915
+3563	GENERIC_DAY	3	8	2010-05-01	707	\N	915
+3564	GENERIC_DAY	3	8	2009-10-26	707	\N	915
+3565	GENERIC_DAY	3	8	2010-06-15	707	\N	915
+3566	GENERIC_DAY	3	8	2010-08-16	707	\N	915
+3567	GENERIC_DAY	3	8	2010-01-12	707	\N	915
+3568	GENERIC_DAY	3	8	2010-01-11	707	\N	915
+3569	GENERIC_DAY	3	8	2009-12-15	707	\N	915
+3570	GENERIC_DAY	3	8	2010-03-05	707	\N	915
+3571	GENERIC_DAY	3	8	2010-03-03	707	\N	915
+3572	GENERIC_DAY	3	8	2010-09-19	707	\N	915
+3573	GENERIC_DAY	3	8	2010-10-19	707	\N	915
+3574	GENERIC_DAY	3	8	2010-03-04	707	\N	915
+3575	GENERIC_DAY	3	8	2009-12-21	707	\N	915
+3576	GENERIC_DAY	3	8	2010-10-21	707	\N	915
+3577	GENERIC_DAY	3	8	2010-05-16	707	\N	915
+3578	GENERIC_DAY	3	8	2010-02-11	707	\N	915
+3579	GENERIC_DAY	3	8	2010-01-28	707	\N	915
+3580	GENERIC_DAY	3	8	2010-07-07	707	\N	915
+3581	GENERIC_DAY	3	8	2010-10-23	707	\N	915
+3582	GENERIC_DAY	3	8	2009-11-06	707	\N	915
+3583	GENERIC_DAY	3	8	2010-09-15	707	\N	915
+3584	GENERIC_DAY	3	8	2010-01-08	707	\N	915
+3585	GENERIC_DAY	3	8	2010-05-27	707	\N	915
+3586	GENERIC_DAY	3	8	2009-11-21	707	\N	915
+3587	GENERIC_DAY	3	8	2010-02-12	707	\N	915
+3588	GENERIC_DAY	3	8	2009-10-31	707	\N	915
+3589	GENERIC_DAY	3	8	2010-07-29	707	\N	915
+3590	GENERIC_DAY	3	8	2010-09-20	707	\N	915
+3591	GENERIC_DAY	3	8	2009-12-03	707	\N	915
+3592	GENERIC_DAY	3	8	2010-03-15	707	\N	915
+3593	GENERIC_DAY	3	8	2009-10-21	707	\N	915
+3594	GENERIC_DAY	3	8	2010-03-19	707	\N	915
+3595	GENERIC_DAY	3	8	2010-10-16	707	\N	915
+3596	GENERIC_DAY	3	8	2010-04-12	707	\N	915
+3597	GENERIC_DAY	3	8	2010-01-24	707	\N	915
+3598	GENERIC_DAY	3	8	2010-02-02	707	\N	915
+3599	GENERIC_DAY	3	8	2009-10-23	707	\N	915
+3600	GENERIC_DAY	3	8	2010-09-23	707	\N	915
+3601	GENERIC_DAY	3	8	2010-01-25	707	\N	915
+3602	GENERIC_DAY	3	8	2010-03-22	707	\N	915
+3603	GENERIC_DAY	3	8	2009-12-25	707	\N	915
+3604	GENERIC_DAY	3	8	2010-03-24	707	\N	915
+3605	GENERIC_DAY	3	8	2010-08-31	707	\N	915
+3606	GENERIC_DAY	3	8	2010-03-14	707	\N	915
+3607	GENERIC_DAY	3	8	2010-05-20	707	\N	915
+3608	GENERIC_DAY	3	8	2010-06-06	707	\N	915
+3609	GENERIC_DAY	3	8	2009-12-20	707	\N	915
+3610	GENERIC_DAY	3	8	2010-01-21	707	\N	915
+3611	GENERIC_DAY	3	8	2010-09-05	707	\N	915
+3612	GENERIC_DAY	3	8	2010-09-01	707	\N	915
+3613	GENERIC_DAY	3	8	2010-07-09	707	\N	915
+3614	GENERIC_DAY	3	8	2010-02-22	707	\N	915
+3615	GENERIC_DAY	3	8	2010-10-14	707	\N	915
+3616	GENERIC_DAY	3	8	2010-08-09	707	\N	915
+3617	GENERIC_DAY	3	8	2010-02-16	707	\N	915
+3618	GENERIC_DAY	3	8	2010-03-08	707	\N	915
+3619	GENERIC_DAY	3	8	2010-09-04	707	\N	915
+3620	GENERIC_DAY	3	8	2009-12-09	707	\N	915
+3621	GENERIC_DAY	3	8	2010-02-01	707	\N	915
+3622	GENERIC_DAY	3	8	2010-07-20	707	\N	915
+3623	GENERIC_DAY	3	8	2010-02-10	707	\N	915
+3624	GENERIC_DAY	3	8	2010-08-10	707	\N	915
+3625	GENERIC_DAY	3	8	2009-11-29	707	\N	915
+3626	GENERIC_DAY	3	8	2010-09-03	707	\N	915
+3627	GENERIC_DAY	3	8	2010-05-03	707	\N	915
+3628	GENERIC_DAY	3	8	2009-12-19	707	\N	915
+3629	GENERIC_DAY	3	8	2010-06-25	707	\N	915
+3630	GENERIC_DAY	3	8	2009-11-17	707	\N	915
+3631	GENERIC_DAY	3	8	2010-05-07	707	\N	915
+3632	GENERIC_DAY	3	8	2010-07-19	707	\N	915
+3633	GENERIC_DAY	3	8	2009-11-03	707	\N	915
+3634	GENERIC_DAY	3	8	2010-02-15	707	\N	915
+3635	GENERIC_DAY	3	8	2010-05-25	707	\N	915
+3636	GENERIC_DAY	3	8	2010-06-13	707	\N	915
+3637	GENERIC_DAY	3	8	2010-04-17	707	\N	915
+3638	GENERIC_DAY	3	8	2010-08-23	707	\N	915
+3639	GENERIC_DAY	3	8	2010-01-16	707	\N	915
+3640	GENERIC_DAY	3	8	2010-02-08	707	\N	915
+3641	GENERIC_DAY	3	8	2010-02-21	707	\N	915
+3642	GENERIC_DAY	3	8	2010-04-26	707	\N	915
+3643	GENERIC_DAY	3	8	2010-03-18	707	\N	915
+3644	GENERIC_DAY	3	8	2010-08-12	707	\N	915
+3645	GENERIC_DAY	3	8	2009-11-27	707	\N	915
+3646	GENERIC_DAY	3	8	2010-02-05	707	\N	915
+3647	GENERIC_DAY	3	8	2010-07-17	707	\N	915
+3648	GENERIC_DAY	3	8	2009-10-22	707	\N	915
+3649	GENERIC_DAY	3	8	2010-01-26	707	\N	915
+3650	GENERIC_DAY	3	8	2010-07-15	707	\N	915
+3651	GENERIC_DAY	3	8	2010-03-27	707	\N	915
+3652	GENERIC_DAY	3	8	2010-07-03	707	\N	915
+3653	GENERIC_DAY	3	8	2009-11-15	707	\N	915
+3654	GENERIC_DAY	3	8	2010-10-07	707	\N	915
+3655	GENERIC_DAY	3	8	2010-09-21	707	\N	915
+3656	GENERIC_DAY	3	8	2009-11-10	707	\N	915
+3657	GENERIC_DAY	3	8	2010-05-26	707	\N	915
+3658	GENERIC_DAY	3	8	2009-11-08	707	\N	915
+3659	GENERIC_DAY	3	8	2010-04-02	707	\N	915
+3660	GENERIC_DAY	3	8	2010-09-13	707	\N	915
+3661	GENERIC_DAY	3	8	2010-07-02	707	\N	915
+3662	GENERIC_DAY	3	8	2010-06-17	707	\N	915
+3663	GENERIC_DAY	3	8	2009-10-28	707	\N	915
+3664	GENERIC_DAY	3	8	2010-09-24	707	\N	915
+3665	GENERIC_DAY	3	8	2009-12-24	707	\N	915
+3666	GENERIC_DAY	3	8	2010-04-29	707	\N	915
+3667	GENERIC_DAY	3	8	2010-08-29	707	\N	915
+3668	GENERIC_DAY	3	8	2010-08-27	707	\N	915
+3669	GENERIC_DAY	3	8	2010-02-23	707	\N	915
+3670	GENERIC_DAY	3	8	2010-04-14	707	\N	915
+3671	GENERIC_DAY	3	8	2010-07-14	707	\N	915
+3672	GENERIC_DAY	3	8	2010-02-03	707	\N	915
+3673	GENERIC_DAY	3	8	2010-06-04	707	\N	915
+3674	GENERIC_DAY	3	8	2010-03-20	707	\N	915
+3675	GENERIC_DAY	3	8	2010-01-15	707	\N	915
+3676	GENERIC_DAY	3	8	2010-05-22	707	\N	915
+3677	GENERIC_DAY	3	8	2010-07-11	707	\N	915
+3678	GENERIC_DAY	3	8	2010-08-13	707	\N	915
+3679	GENERIC_DAY	3	8	2010-03-28	707	\N	915
+3680	GENERIC_DAY	3	8	2010-06-27	707	\N	915
+3681	GENERIC_DAY	3	8	2010-06-10	707	\N	915
+3682	GENERIC_DAY	3	8	2010-03-29	707	\N	915
+3683	GENERIC_DAY	3	8	2010-10-01	707	\N	915
+3684	GENERIC_DAY	3	8	2010-01-17	707	\N	915
+3685	GENERIC_DAY	3	8	2010-06-12	707	\N	915
+3686	GENERIC_DAY	3	8	2010-04-28	707	\N	915
+3687	GENERIC_DAY	3	8	2010-02-18	707	\N	915
+3688	GENERIC_DAY	3	8	2010-08-14	707	\N	915
+3689	GENERIC_DAY	3	8	2010-05-28	707	\N	915
+3690	GENERIC_DAY	3	8	2010-03-09	707	\N	915
+3691	GENERIC_DAY	3	8	2010-05-08	707	\N	915
+3692	GENERIC_DAY	3	8	2010-01-05	707	\N	915
+3693	GENERIC_DAY	3	8	2010-06-09	707	\N	915
+3694	GENERIC_DAY	3	8	2009-12-13	707	\N	915
+3695	GENERIC_DAY	3	8	2009-10-27	707	\N	915
+3696	GENERIC_DAY	3	8	2010-03-06	707	\N	915
+3697	GENERIC_DAY	3	8	2010-09-06	707	\N	915
+3698	GENERIC_DAY	3	8	2010-05-12	707	\N	915
+3699	GENERIC_DAY	3	8	2010-08-03	707	\N	915
+3700	GENERIC_DAY	3	4	2010-03-23	709	\N	916
+3701	GENERIC_DAY	3	4	2010-05-09	707	\N	916
+3702	GENERIC_DAY	3	4	2010-02-07	707	\N	916
+3703	GENERIC_DAY	3	4	2010-08-30	709	\N	916
+3704	GENERIC_DAY	3	4	2010-04-23	709	\N	916
+3705	GENERIC_DAY	3	4	2010-02-20	709	\N	916
+3706	GENERIC_DAY	3	4	2010-07-28	707	\N	916
+3707	GENERIC_DAY	3	4	2010-01-22	707	\N	916
+3708	GENERIC_DAY	3	4	2010-08-10	709	\N	916
+3709	GENERIC_DAY	3	4	2010-03-03	709	\N	916
+3710	GENERIC_DAY	3	4	2010-06-01	709	\N	916
+3711	GENERIC_DAY	3	4	2010-05-29	707	\N	916
+3712	GENERIC_DAY	3	4	2010-03-19	707	\N	916
+3713	GENERIC_DAY	3	4	2010-05-02	707	\N	916
+3714	GENERIC_DAY	3	4	2010-02-27	707	\N	916
+3715	GENERIC_DAY	3	4	2010-05-06	707	\N	916
+3716	GENERIC_DAY	3	4	2010-09-18	707	\N	916
+3717	GENERIC_DAY	3	4	2010-04-05	707	\N	916
+3718	GENERIC_DAY	3	4	2010-01-23	707	\N	916
+3719	GENERIC_DAY	3	4	2010-07-12	707	\N	916
+3720	GENERIC_DAY	3	4	2010-04-30	709	\N	916
+3721	GENERIC_DAY	3	4	2010-09-09	707	\N	916
+3722	GENERIC_DAY	3	4	2010-07-07	709	\N	916
+3723	GENERIC_DAY	3	4	2010-05-17	709	\N	916
+3724	GENERIC_DAY	3	4	2010-07-25	707	\N	916
+3725	GENERIC_DAY	3	4	2010-07-22	709	\N	916
+3726	GENERIC_DAY	3	4	2010-04-10	709	\N	916
+3727	GENERIC_DAY	3	4	2010-03-26	707	\N	916
+3728	GENERIC_DAY	3	4	2010-05-04	707	\N	916
+3729	GENERIC_DAY	3	4	2010-02-23	707	\N	916
+3730	GENERIC_DAY	3	4	2010-06-16	709	\N	916
+3731	GENERIC_DAY	3	4	2010-06-19	707	\N	916
+3732	GENERIC_DAY	3	4	2010-02-22	709	\N	916
+3733	GENERIC_DAY	3	4	2010-03-10	709	\N	916
+3734	GENERIC_DAY	3	4	2010-02-27	709	\N	916
+3735	GENERIC_DAY	3	4	2010-03-30	709	\N	916
+3736	GENERIC_DAY	3	4	2010-09-07	709	\N	916
+3737	GENERIC_DAY	3	4	2010-03-08	709	\N	916
+3738	GENERIC_DAY	3	4	2010-09-14	709	\N	916
+3739	GENERIC_DAY	3	4	2010-08-28	709	\N	916
+3740	GENERIC_DAY	3	4	2010-04-18	709	\N	916
+3741	GENERIC_DAY	3	4	2010-06-18	709	\N	916
+3742	GENERIC_DAY	3	4	2010-01-19	709	\N	916
+3743	GENERIC_DAY	3	4	2010-08-31	707	\N	916
+3744	GENERIC_DAY	3	4	2010-08-14	707	\N	916
+3745	GENERIC_DAY	3	4	2010-06-26	709	\N	916
+3746	GENERIC_DAY	3	4	2010-08-30	707	\N	916
+3747	GENERIC_DAY	3	4	2010-03-24	707	\N	916
+3748	GENERIC_DAY	3	4	2010-05-11	707	\N	916
+3749	GENERIC_DAY	3	4	2010-03-25	707	\N	916
+3750	GENERIC_DAY	3	4	2010-04-21	707	\N	916
+3751	GENERIC_DAY	3	4	2010-05-15	709	\N	916
+3752	GENERIC_DAY	3	4	2010-03-05	707	\N	916
+3753	GENERIC_DAY	3	4	2010-05-23	709	\N	916
+3754	GENERIC_DAY	3	4	2010-04-13	707	\N	916
+3755	GENERIC_DAY	3	4	2010-08-31	709	\N	916
+3756	GENERIC_DAY	3	4	2010-06-06	709	\N	916
+3757	GENERIC_DAY	3	4	2010-04-23	707	\N	916
+3758	GENERIC_DAY	3	4	2010-02-18	707	\N	916
+3759	GENERIC_DAY	3	4	2010-05-09	709	\N	916
+3760	GENERIC_DAY	3	4	2010-06-22	709	\N	916
+3761	GENERIC_DAY	3	4	2010-03-19	709	\N	916
+3762	GENERIC_DAY	3	4	2010-04-25	709	\N	916
+3763	GENERIC_DAY	3	4	2010-08-22	707	\N	916
+3764	GENERIC_DAY	3	4	2010-07-23	709	\N	916
+3765	GENERIC_DAY	3	4	2010-09-15	709	\N	916
+3766	GENERIC_DAY	3	4	2010-03-04	709	\N	916
+3767	GENERIC_DAY	3	4	2010-06-16	707	\N	916
+3768	GENERIC_DAY	3	4	2010-06-29	707	\N	916
+3769	GENERIC_DAY	3	4	2010-02-21	707	\N	916
+3770	GENERIC_DAY	3	4	2010-05-08	709	\N	916
+3771	GENERIC_DAY	3	4	2010-07-21	707	\N	916
+3772	GENERIC_DAY	3	4	2010-05-20	707	\N	916
+3773	GENERIC_DAY	3	4	2010-09-05	709	\N	916
+3774	GENERIC_DAY	3	4	2010-07-02	709	\N	916
+3775	GENERIC_DAY	3	4	2010-09-10	709	\N	916
+3776	GENERIC_DAY	3	4	2010-06-05	707	\N	916
+3777	GENERIC_DAY	3	4	2010-01-22	709	\N	916
+3778	GENERIC_DAY	3	4	2010-06-23	709	\N	916
+3779	GENERIC_DAY	3	4	2010-06-17	709	\N	916
+3780	GENERIC_DAY	3	4	2010-05-18	709	\N	916
+3781	GENERIC_DAY	3	4	2010-02-13	707	\N	916
+3782	GENERIC_DAY	3	4	2010-05-03	707	\N	916
+3783	GENERIC_DAY	3	4	2010-07-03	707	\N	916
+3784	GENERIC_DAY	3	4	2010-04-02	707	\N	916
+3785	GENERIC_DAY	3	4	2010-03-15	707	\N	916
+3786	GENERIC_DAY	3	4	2010-01-15	709	\N	916
+3787	GENERIC_DAY	3	4	2010-03-22	709	\N	916
+3788	GENERIC_DAY	3	4	2010-01-25	709	\N	916
+3789	GENERIC_DAY	3	4	2010-05-31	709	\N	916
+3790	GENERIC_DAY	3	4	2010-06-11	709	\N	916
+3791	GENERIC_DAY	3	4	2010-06-20	707	\N	916
+3792	GENERIC_DAY	3	4	2010-05-13	707	\N	916
+3793	GENERIC_DAY	3	4	2010-05-15	707	\N	916
+3794	GENERIC_DAY	3	4	2010-04-25	707	\N	916
+3795	GENERIC_DAY	3	4	2010-04-29	709	\N	916
+3796	GENERIC_DAY	3	4	2010-06-21	707	\N	916
+3797	GENERIC_DAY	3	4	2010-02-01	709	\N	916
+3798	GENERIC_DAY	3	4	2010-06-25	709	\N	916
+3799	GENERIC_DAY	3	4	2010-08-11	709	\N	916
+3800	GENERIC_DAY	3	4	2010-06-09	709	\N	916
+3801	GENERIC_DAY	3	4	2010-07-15	707	\N	916
+3802	GENERIC_DAY	3	4	2010-07-17	707	\N	916
+3803	GENERIC_DAY	3	4	2010-05-13	709	\N	916
+3804	GENERIC_DAY	3	4	2010-03-27	707	\N	916
+3805	GENERIC_DAY	3	4	2010-09-05	707	\N	916
+3806	GENERIC_DAY	3	4	2010-04-18	707	\N	916
+3807	GENERIC_DAY	3	4	2010-02-23	709	\N	916
+3808	GENERIC_DAY	3	4	2010-02-17	709	\N	916
+3809	GENERIC_DAY	3	4	2010-04-26	707	\N	916
+3810	GENERIC_DAY	3	4	2010-08-15	709	\N	916
+3811	GENERIC_DAY	3	4	2010-09-20	707	\N	916
+3812	GENERIC_DAY	3	4	2010-09-03	709	\N	916
+3813	GENERIC_DAY	3	4	2010-02-12	709	\N	916
+3814	GENERIC_DAY	3	4	2010-07-04	709	\N	916
+3815	GENERIC_DAY	3	4	2010-08-16	709	\N	916
+3816	GENERIC_DAY	3	4	2010-02-26	707	\N	916
+3817	GENERIC_DAY	3	4	2010-02-08	707	\N	916
+3818	GENERIC_DAY	3	4	2010-04-19	709	\N	916
+3819	GENERIC_DAY	3	4	2010-04-24	709	\N	916
+3820	GENERIC_DAY	3	4	2010-01-18	707	\N	916
+3821	GENERIC_DAY	3	4	2010-01-20	709	\N	916
+3822	GENERIC_DAY	3	4	2010-03-29	709	\N	916
+3823	GENERIC_DAY	3	4	2010-01-21	707	\N	916
+3824	GENERIC_DAY	3	4	2010-08-21	709	\N	916
+3825	GENERIC_DAY	3	4	2010-03-16	707	\N	916
+3826	GENERIC_DAY	3	4	2010-08-26	709	\N	916
+3827	GENERIC_DAY	3	4	2010-04-03	707	\N	916
+3828	GENERIC_DAY	3	4	2010-07-09	709	\N	916
+3829	GENERIC_DAY	3	4	2010-04-05	709	\N	916
+3830	GENERIC_DAY	3	4	2010-03-21	709	\N	916
+3831	GENERIC_DAY	3	4	2010-08-12	707	\N	916
+3832	GENERIC_DAY	3	4	2010-07-28	709	\N	916
+3833	GENERIC_DAY	3	4	2010-03-23	707	\N	916
+3834	GENERIC_DAY	3	4	2010-02-16	709	\N	916
+3835	GENERIC_DAY	3	4	2010-09-14	707	\N	916
+3836	GENERIC_DAY	3	4	2010-03-26	709	\N	916
+3837	GENERIC_DAY	3	4	2010-08-17	709	\N	916
+3838	GENERIC_DAY	3	4	2010-02-15	707	\N	916
+3839	GENERIC_DAY	3	4	2010-09-01	707	\N	916
+3840	GENERIC_DAY	3	4	2010-06-07	709	\N	916
+3841	GENERIC_DAY	3	4	2010-03-02	707	\N	916
+3842	GENERIC_DAY	3	4	2010-04-16	707	\N	916
+3843	GENERIC_DAY	3	4	2010-08-27	709	\N	916
+3844	GENERIC_DAY	3	4	2010-05-14	709	\N	916
+3845	GENERIC_DAY	3	4	2010-09-08	709	\N	916
+3846	GENERIC_DAY	3	4	2010-05-19	707	\N	916
+3847	GENERIC_DAY	3	4	2010-03-31	707	\N	916
+3848	GENERIC_DAY	3	4	2010-05-26	707	\N	916
+3849	GENERIC_DAY	3	4	2010-08-01	707	\N	916
+3850	GENERIC_DAY	3	4	2010-04-12	709	\N	916
+3851	GENERIC_DAY	3	4	2010-06-30	709	\N	916
+3852	GENERIC_DAY	3	4	2010-08-03	707	\N	916
+3853	GENERIC_DAY	3	4	2010-01-27	707	\N	916
+3854	GENERIC_DAY	3	4	2010-06-24	709	\N	916
+3855	GENERIC_DAY	3	4	2010-03-12	707	\N	916
+3856	GENERIC_DAY	3	4	2010-05-14	707	\N	916
+3857	GENERIC_DAY	3	4	2010-02-08	709	\N	916
+3858	GENERIC_DAY	3	4	2010-07-07	707	\N	916
+3859	GENERIC_DAY	3	4	2010-05-04	709	\N	916
+3860	GENERIC_DAY	3	4	2010-09-17	707	\N	916
+3861	GENERIC_DAY	3	4	2010-05-19	709	\N	916
+3862	GENERIC_DAY	3	4	2010-07-05	709	\N	916
+3863	GENERIC_DAY	3	4	2010-01-19	707	\N	916
+3864	GENERIC_DAY	3	4	2010-06-19	709	\N	916
+3865	GENERIC_DAY	3	4	2010-08-13	709	\N	916
+3866	GENERIC_DAY	3	4	2010-04-17	707	\N	916
+3867	GENERIC_DAY	3	4	2010-09-09	709	\N	916
+3868	GENERIC_DAY	3	4	2010-07-20	709	\N	916
+3869	GENERIC_DAY	3	4	2010-08-25	709	\N	916
+3870	GENERIC_DAY	3	4	2010-01-23	709	\N	916
+3871	GENERIC_DAY	3	4	2010-06-29	709	\N	916
+3872	GENERIC_DAY	3	4	2010-03-29	707	\N	916
+3873	GENERIC_DAY	3	4	2010-05-01	707	\N	916
+3874	GENERIC_DAY	3	4	2010-04-17	709	\N	916
+3875	GENERIC_DAY	3	4	2010-08-19	707	\N	916
+3876	GENERIC_DAY	3	4	2010-03-11	707	\N	916
+3877	GENERIC_DAY	3	4	2010-01-15	707	\N	916
+3878	GENERIC_DAY	3	4	2010-07-01	707	\N	916
+3879	GENERIC_DAY	3	4	2010-02-25	707	\N	916
+3880	GENERIC_DAY	3	4	2010-07-19	709	\N	916
+3881	GENERIC_DAY	3	4	2010-06-23	707	\N	916
+3882	GENERIC_DAY	3	4	2010-03-07	709	\N	916
+3883	GENERIC_DAY	3	4	2010-04-13	709	\N	916
+3884	GENERIC_DAY	3	4	2010-03-09	707	\N	916
+3885	GENERIC_DAY	3	4	2010-03-03	707	\N	916
+3886	GENERIC_DAY	3	4	2010-04-09	707	\N	916
+3887	GENERIC_DAY	3	4	2010-04-28	709	\N	916
+3888	GENERIC_DAY	3	4	2010-08-29	709	\N	916
+3889	GENERIC_DAY	3	4	2010-05-05	707	\N	916
+3890	GENERIC_DAY	3	4	2010-09-20	709	\N	916
+3891	GENERIC_DAY	3	4	2010-03-14	709	\N	916
+3892	GENERIC_DAY	3	4	2010-03-15	709	\N	916
+3893	GENERIC_DAY	3	4	2010-05-07	707	\N	916
+3894	GENERIC_DAY	3	4	2010-07-04	707	\N	916
+3895	GENERIC_DAY	3	4	2010-02-09	709	\N	916
+3896	GENERIC_DAY	3	4	2010-03-10	707	\N	916
+3897	GENERIC_DAY	3	4	2010-06-11	707	\N	916
+3898	GENERIC_DAY	3	4	2010-05-28	707	\N	916
+3899	GENERIC_DAY	3	4	2010-04-08	707	\N	916
+3900	GENERIC_DAY	3	4	2010-06-12	709	\N	916
+3901	GENERIC_DAY	3	4	2010-09-16	707	\N	916
+3902	GENERIC_DAY	3	4	2010-07-29	709	\N	916
+3903	GENERIC_DAY	3	4	2010-05-25	709	\N	916
+3904	GENERIC_DAY	3	4	2010-01-21	709	\N	916
+3905	GENERIC_DAY	3	4	2010-06-06	707	\N	916
+3906	GENERIC_DAY	3	4	2010-02-16	707	\N	916
+3907	GENERIC_DAY	3	4	2010-06-03	709	\N	916
+3908	GENERIC_DAY	3	4	2010-09-12	707	\N	916
+3909	GENERIC_DAY	3	4	2010-08-08	709	\N	916
+3910	GENERIC_DAY	3	4	2010-06-30	707	\N	916
+3911	GENERIC_DAY	3	4	2010-03-02	709	\N	916
+3912	GENERIC_DAY	3	4	2010-09-15	707	\N	916
+3913	GENERIC_DAY	3	4	2010-09-10	707	\N	916
+3914	GENERIC_DAY	3	4	2010-03-14	707	\N	916
+3915	GENERIC_DAY	3	4	2010-04-11	709	\N	916
+3916	GENERIC_DAY	3	4	2010-07-16	707	\N	916
+3917	GENERIC_DAY	3	4	2010-04-20	709	\N	916
+3918	GENERIC_DAY	3	4	2010-02-28	709	\N	916
+3919	GENERIC_DAY	3	4	2010-05-26	709	\N	916
+3920	GENERIC_DAY	3	4	2010-02-19	709	\N	916
+3921	GENERIC_DAY	3	4	2010-04-03	709	\N	916
+3922	GENERIC_DAY	3	4	2010-06-28	707	\N	916
+3923	GENERIC_DAY	3	4	2010-03-24	709	\N	916
+3924	GENERIC_DAY	3	4	2010-06-03	707	\N	916
+3925	GENERIC_DAY	3	4	2010-06-17	707	\N	916
+3926	GENERIC_DAY	3	4	2010-04-04	707	\N	916
+3927	GENERIC_DAY	3	4	2010-04-07	707	\N	916
+3928	GENERIC_DAY	3	4	2010-02-18	709	\N	916
+3929	GENERIC_DAY	3	4	2010-09-19	709	\N	916
+3930	GENERIC_DAY	3	4	2010-09-21	707	\N	916
+3931	GENERIC_DAY	3	4	2010-06-27	709	\N	916
+3932	GENERIC_DAY	3	4	2010-08-03	709	\N	916
+3933	GENERIC_DAY	3	4	2010-08-04	709	\N	916
+3934	GENERIC_DAY	3	4	2010-06-10	709	\N	916
+3935	GENERIC_DAY	3	4	2010-05-24	707	\N	916
+3936	GENERIC_DAY	3	4	2010-01-30	709	\N	916
+3937	GENERIC_DAY	3	4	2010-07-03	709	\N	916
+3938	GENERIC_DAY	3	4	2010-01-24	707	\N	916
+3939	GENERIC_DAY	3	4	2010-01-28	709	\N	916
+3940	GENERIC_DAY	3	4	2010-04-11	707	\N	916
+3941	GENERIC_DAY	3	4	2010-03-25	709	\N	916
+3942	GENERIC_DAY	3	4	2010-09-11	707	\N	916
+3943	GENERIC_DAY	3	4	2010-03-07	707	\N	916
+3944	GENERIC_DAY	3	4	2010-03-16	709	\N	916
+3945	GENERIC_DAY	3	4	2010-01-20	707	\N	916
+3946	GENERIC_DAY	3	4	2010-05-10	709	\N	916
+3947	GENERIC_DAY	3	4	2010-06-05	709	\N	916
+3948	GENERIC_DAY	3	4	2010-05-21	707	\N	916
+3949	GENERIC_DAY	3	4	2010-08-16	707	\N	916
+3950	GENERIC_DAY	3	4	2010-06-08	707	\N	916
+3951	GENERIC_DAY	3	4	2010-04-28	707	\N	916
+3952	GENERIC_DAY	3	4	2010-08-21	707	\N	916
+3953	GENERIC_DAY	3	4	2010-07-27	707	\N	916
+3954	GENERIC_DAY	3	4	2010-02-17	707	\N	916
+3955	GENERIC_DAY	3	4	2010-05-22	709	\N	916
+3956	GENERIC_DAY	3	4	2010-08-05	707	\N	916
+3957	GENERIC_DAY	3	4	2010-06-15	707	\N	916
+3958	GENERIC_DAY	3	4	2010-01-17	709	\N	916
+3959	GENERIC_DAY	3	4	2010-03-12	709	\N	916
+3960	GENERIC_DAY	3	4	2010-04-24	707	\N	916
+3961	GENERIC_DAY	3	4	2010-07-08	707	\N	916
+3962	GENERIC_DAY	3	4	2010-03-13	707	\N	916
+3963	GENERIC_DAY	3	4	2010-07-26	707	\N	916
+3964	GENERIC_DAY	3	4	2010-04-22	707	\N	916
+3965	GENERIC_DAY	3	4	2010-06-01	707	\N	916
+3966	GENERIC_DAY	3	4	2010-02-11	709	\N	916
+3967	GENERIC_DAY	3	4	2010-03-20	709	\N	916
+3968	GENERIC_DAY	3	4	2010-08-23	709	\N	916
+3969	GENERIC_DAY	3	4	2010-04-01	707	\N	916
+3970	GENERIC_DAY	3	4	2010-08-28	707	\N	916
+3971	GENERIC_DAY	3	4	2010-08-17	707	\N	916
+3972	GENERIC_DAY	3	4	2010-03-08	707	\N	916
+3973	GENERIC_DAY	3	4	2010-02-03	709	\N	916
+3974	GENERIC_DAY	3	4	2010-03-18	709	\N	916
+3975	GENERIC_DAY	3	4	2010-06-26	707	\N	916
+3976	GENERIC_DAY	3	4	2010-01-28	707	\N	916
+3977	GENERIC_DAY	3	4	2010-03-20	707	\N	916
+3978	GENERIC_DAY	3	4	2010-06-14	709	\N	916
+3979	GENERIC_DAY	3	4	2010-03-17	709	\N	916
+3980	GENERIC_DAY	3	4	2010-06-04	709	\N	916
+3981	GENERIC_DAY	3	4	2010-07-09	707	\N	916
+3982	GENERIC_DAY	3	4	2010-06-08	709	\N	916
+3983	GENERIC_DAY	3	4	2010-04-15	709	\N	916
+3984	GENERIC_DAY	3	4	2010-02-26	709	\N	916
+3985	GENERIC_DAY	3	4	2010-01-24	709	\N	916
+3986	GENERIC_DAY	3	4	2010-09-18	709	\N	916
+3987	GENERIC_DAY	3	4	2010-04-14	707	\N	916
+3988	GENERIC_DAY	3	4	2010-02-13	709	\N	916
+3989	GENERIC_DAY	3	4	2010-06-13	707	\N	916
+3990	GENERIC_DAY	3	4	2010-05-05	709	\N	916
+3991	GENERIC_DAY	3	4	2010-04-29	707	\N	916
+3992	GENERIC_DAY	3	4	2010-03-05	709	\N	916
+3993	GENERIC_DAY	3	4	2010-07-06	709	\N	916
+3994	GENERIC_DAY	3	4	2010-07-18	709	\N	916
+3995	GENERIC_DAY	3	4	2010-08-19	709	\N	916
+3996	GENERIC_DAY	3	4	2010-08-20	707	\N	916
+3997	GENERIC_DAY	3	4	2010-07-31	707	\N	916
+3998	GENERIC_DAY	3	4	2010-08-09	707	\N	916
+3999	GENERIC_DAY	3	4	2010-04-27	707	\N	916
+4000	GENERIC_DAY	3	4	2010-09-17	709	\N	916
+4001	GENERIC_DAY	3	4	2010-08-12	709	\N	916
+4002	GENERIC_DAY	3	4	2010-04-22	709	\N	916
+4003	GENERIC_DAY	3	4	2010-06-10	707	\N	916
+4004	GENERIC_DAY	3	4	2010-06-14	707	\N	916
+4005	GENERIC_DAY	3	4	2010-07-25	709	\N	916
+4006	GENERIC_DAY	3	4	2010-02-03	707	\N	916
+4007	GENERIC_DAY	3	4	2010-06-21	709	\N	916
+4008	GENERIC_DAY	3	4	2010-03-06	709	\N	916
+4009	GENERIC_DAY	3	4	2010-07-20	707	\N	916
+4010	GENERIC_DAY	3	4	2010-07-22	707	\N	916
+4011	GENERIC_DAY	3	4	2010-06-22	707	\N	916
+4012	GENERIC_DAY	3	4	2010-05-27	709	\N	916
+4013	GENERIC_DAY	3	4	2010-07-11	709	\N	916
+4014	GENERIC_DAY	3	4	2010-08-14	709	\N	916
+4015	GENERIC_DAY	3	4	2010-02-12	707	\N	916
+4016	GENERIC_DAY	3	4	2010-08-18	707	\N	916
+4017	GENERIC_DAY	3	4	2010-03-30	707	\N	916
+4018	GENERIC_DAY	3	4	2010-04-12	707	\N	916
+4019	GENERIC_DAY	3	4	2010-08-06	707	\N	916
+4020	GENERIC_DAY	3	4	2010-01-25	707	\N	916
+4021	GENERIC_DAY	3	4	2010-02-28	707	\N	916
+4022	GENERIC_DAY	3	4	2010-06-04	707	\N	916
+4023	GENERIC_DAY	3	4	2010-04-14	709	\N	916
+4024	GENERIC_DAY	3	4	2010-07-27	709	\N	916
+4025	GENERIC_DAY	3	4	2010-02-04	707	\N	916
+4026	GENERIC_DAY	3	4	2010-08-24	709	\N	916
+4027	GENERIC_DAY	3	4	2010-02-25	709	\N	916
+4028	GENERIC_DAY	3	4	2010-02-15	709	\N	916
+4029	GENERIC_DAY	3	4	2010-08-23	707	\N	916
+4030	GENERIC_DAY	3	4	2010-08-26	707	\N	916
+4031	GENERIC_DAY	3	4	2010-05-06	709	\N	916
+4032	GENERIC_DAY	3	4	2010-06-24	707	\N	916
+4033	GENERIC_DAY	3	4	2010-07-29	707	\N	916
+4034	GENERIC_DAY	3	4	2010-06-02	709	\N	916
+4035	GENERIC_DAY	3	4	2010-05-16	709	\N	916
+4036	GENERIC_DAY	3	4	2010-04-16	709	\N	916
+4037	GENERIC_DAY	3	4	2010-01-18	709	\N	916
+4038	GENERIC_DAY	3	4	2010-07-24	707	\N	916
+4039	GENERIC_DAY	3	4	2010-01-16	709	\N	916
+4040	GENERIC_DAY	3	4	2010-05-18	707	\N	916
+4041	GENERIC_DAY	3	4	2010-05-02	709	\N	916
+4042	GENERIC_DAY	3	4	2010-09-16	709	\N	916
+4043	GENERIC_DAY	3	4	2010-09-13	709	\N	916
+4044	GENERIC_DAY	3	4	2010-02-24	709	\N	916
+4045	GENERIC_DAY	3	4	2010-03-01	707	\N	916
+4046	GENERIC_DAY	3	4	2010-03-28	707	\N	916
+4047	GENERIC_DAY	3	4	2010-08-13	707	\N	916
+4048	GENERIC_DAY	3	4	2010-02-09	707	\N	916
+4049	GENERIC_DAY	3	4	2010-02-01	707	\N	916
+4050	GENERIC_DAY	3	4	2010-05-01	709	\N	916
+4051	GENERIC_DAY	3	4	2010-05-29	709	\N	916
+4052	GENERIC_DAY	3	4	2010-09-06	707	\N	916
+4053	GENERIC_DAY	3	4	2010-05-21	709	\N	916
+4054	GENERIC_DAY	3	4	2010-08-02	709	\N	916
+4055	GENERIC_DAY	3	4	2010-01-29	709	\N	916
+4056	GENERIC_DAY	3	4	2010-05-08	707	\N	916
+4057	GENERIC_DAY	3	4	2010-04-06	709	\N	916
+4058	GENERIC_DAY	3	4	2010-01-26	707	\N	916
+4059	GENERIC_DAY	3	4	2010-03-06	707	\N	916
+4060	GENERIC_DAY	3	4	2010-02-24	707	\N	916
+4061	GENERIC_DAY	3	4	2010-06-12	707	\N	916
+4062	GENERIC_DAY	3	4	2010-02-05	709	\N	916
+4063	GENERIC_DAY	3	4	2010-05-11	709	\N	916
+4064	GENERIC_DAY	3	4	2010-05-16	707	\N	916
+4065	GENERIC_DAY	3	4	2010-07-14	707	\N	916
+4066	GENERIC_DAY	3	4	2010-04-15	707	\N	916
+4067	GENERIC_DAY	3	4	2010-03-28	709	\N	916
+4068	GENERIC_DAY	3	4	2010-01-16	707	\N	916
+4069	GENERIC_DAY	3	4	2010-06-20	709	\N	916
+4070	GENERIC_DAY	3	4	2010-02-10	707	\N	916
+4071	GENERIC_DAY	3	4	2010-02-22	707	\N	916
+4072	GENERIC_DAY	3	4	2010-09-08	707	\N	916
+4073	GENERIC_DAY	3	4	2010-08-27	707	\N	916
+4074	GENERIC_DAY	3	4	2010-08-01	709	\N	916
+4075	GENERIC_DAY	3	4	2010-06-18	707	\N	916
+4076	GENERIC_DAY	3	4	2010-08-29	707	\N	916
+4077	GENERIC_DAY	3	4	2010-09-04	707	\N	916
+4078	GENERIC_DAY	3	4	2010-06-15	709	\N	916
+4079	GENERIC_DAY	3	4	2010-07-08	709	\N	916
+4080	GENERIC_DAY	3	4	2010-09-21	709	\N	916
+4081	GENERIC_DAY	3	4	2010-05-31	707	\N	916
+4082	GENERIC_DAY	3	4	2010-09-07	707	\N	916
+4083	GENERIC_DAY	3	4	2010-09-04	709	\N	916
+4084	GENERIC_DAY	3	4	2010-02-21	709	\N	916
+4085	GENERIC_DAY	3	4	2010-04-26	709	\N	916
+4086	GENERIC_DAY	3	4	2010-02-06	709	\N	916
+4087	GENERIC_DAY	3	4	2010-09-12	709	\N	916
+4088	GENERIC_DAY	3	4	2010-02-19	707	\N	916
+4089	GENERIC_DAY	3	4	2010-08-04	707	\N	916
+4090	GENERIC_DAY	3	4	2010-03-01	709	\N	916
+4091	GENERIC_DAY	3	4	2010-03-22	707	\N	916
+4092	GENERIC_DAY	3	4	2010-05-20	709	\N	916
+4093	GENERIC_DAY	3	4	2010-07-15	709	\N	916
+4094	GENERIC_DAY	3	4	2010-02-05	707	\N	916
+4095	GENERIC_DAY	3	4	2010-05-12	709	\N	916
+4096	GENERIC_DAY	3	4	2010-08-06	709	\N	916
+4097	GENERIC_DAY	3	4	2010-01-31	707	\N	916
+4098	GENERIC_DAY	3	4	2010-09-02	707	\N	916
+4099	GENERIC_DAY	3	4	2010-04-30	707	\N	916
+4100	GENERIC_DAY	3	4	2010-06-07	707	\N	916
+4101	GENERIC_DAY	3	4	2010-06-02	707	\N	916
+4102	GENERIC_DAY	3	4	2010-07-13	709	\N	916
+4103	GENERIC_DAY	3	4	2010-08-11	707	\N	916
+4104	GENERIC_DAY	3	4	2010-06-25	707	\N	916
+4105	GENERIC_DAY	3	4	2010-08-07	707	\N	916
+4106	GENERIC_DAY	3	4	2010-05-17	707	\N	916
+4107	GENERIC_DAY	3	4	2010-02-02	709	\N	916
+4108	GENERIC_DAY	3	4	2010-03-09	709	\N	916
+4109	GENERIC_DAY	3	4	2010-02-07	709	\N	916
+4110	GENERIC_DAY	3	4	2010-07-12	709	\N	916
+4111	GENERIC_DAY	3	4	2010-02-04	709	\N	916
+4112	GENERIC_DAY	3	4	2010-07-23	707	\N	916
+4113	GENERIC_DAY	3	4	2010-07-13	707	\N	916
+4114	GENERIC_DAY	3	4	2010-08-10	707	\N	916
+4115	GENERIC_DAY	3	4	2010-02-14	707	\N	916
+4116	GENERIC_DAY	3	4	2010-08-07	709	\N	916
+4117	GENERIC_DAY	3	4	2010-05-24	709	\N	916
+4118	GENERIC_DAY	3	4	2010-08-24	707	\N	916
+4119	GENERIC_DAY	3	4	2010-03-04	707	\N	916
+4120	GENERIC_DAY	3	4	2010-05-27	707	\N	916
+4121	GENERIC_DAY	3	4	2010-04-10	707	\N	916
+4122	GENERIC_DAY	3	4	2010-02-02	707	\N	916
+4123	GENERIC_DAY	3	4	2010-07-26	709	\N	916
+4124	GENERIC_DAY	3	4	2010-04-20	707	\N	916
+4125	GENERIC_DAY	3	4	2010-07-01	709	\N	916
+4126	GENERIC_DAY	3	4	2010-05-03	709	\N	916
+4127	GENERIC_DAY	3	4	2010-05-25	707	\N	916
+4128	GENERIC_DAY	3	4	2010-07-02	707	\N	916
+4129	GENERIC_DAY	3	4	2010-07-05	707	\N	916
+4130	GENERIC_DAY	3	4	2010-07-30	707	\N	916
+4131	GENERIC_DAY	3	4	2010-04-07	709	\N	916
+4132	GENERIC_DAY	3	4	2010-09-02	709	\N	916
+4133	GENERIC_DAY	3	4	2010-06-28	709	\N	916
+4134	GENERIC_DAY	3	4	2010-09-11	709	\N	916
+4135	GENERIC_DAY	3	4	2010-08-05	709	\N	916
+4136	GENERIC_DAY	3	4	2010-07-18	707	\N	916
+4137	GENERIC_DAY	3	4	2010-04-19	707	\N	916
+4138	GENERIC_DAY	3	4	2010-04-01	709	\N	916
+4139	GENERIC_DAY	3	4	2010-05-28	709	\N	916
+4140	GENERIC_DAY	3	4	2010-03-31	709	\N	916
+4141	GENERIC_DAY	3	4	2010-03-21	707	\N	916
+4142	GENERIC_DAY	3	4	2010-07-30	709	\N	916
+4143	GENERIC_DAY	3	4	2010-04-06	707	\N	916
+4144	GENERIC_DAY	3	4	2010-05-10	707	\N	916
+4145	GENERIC_DAY	3	4	2010-01-30	707	\N	916
+4146	GENERIC_DAY	3	4	2010-01-17	707	\N	916
+4147	GENERIC_DAY	3	4	2010-07-21	709	\N	916
+4148	GENERIC_DAY	3	4	2010-05-30	707	\N	916
+4149	GENERIC_DAY	3	4	2010-03-18	707	\N	916
+4150	GENERIC_DAY	3	4	2010-01-27	709	\N	916
+4151	GENERIC_DAY	3	4	2010-05-12	707	\N	916
+4152	GENERIC_DAY	3	4	2010-04-27	709	\N	916
+4153	GENERIC_DAY	3	4	2010-07-17	709	\N	916
+4154	GENERIC_DAY	3	4	2010-02-20	707	\N	916
+4155	GENERIC_DAY	3	4	2010-05-07	709	\N	916
+4156	GENERIC_DAY	3	4	2010-09-01	709	\N	916
+4157	GENERIC_DAY	3	4	2010-04-04	709	\N	916
+4158	GENERIC_DAY	3	4	2010-06-13	709	\N	916
+4159	GENERIC_DAY	3	4	2010-06-09	707	\N	916
+4160	GENERIC_DAY	3	4	2010-07-06	707	\N	916
+4161	GENERIC_DAY	3	4	2010-04-09	709	\N	916
+4162	GENERIC_DAY	3	4	2010-02-06	707	\N	916
+4163	GENERIC_DAY	3	4	2010-02-10	709	\N	916
+4164	GENERIC_DAY	3	4	2010-07-24	709	\N	916
+4165	GENERIC_DAY	3	4	2010-08-15	707	\N	916
+4166	GENERIC_DAY	3	4	2010-03-17	707	\N	916
+4167	GENERIC_DAY	3	4	2010-03-13	709	\N	916
+4168	GENERIC_DAY	3	4	2010-04-02	709	\N	916
+4169	GENERIC_DAY	3	4	2010-01-29	707	\N	916
+4170	GENERIC_DAY	3	4	2010-09-03	707	\N	916
+4171	GENERIC_DAY	3	4	2010-08-09	709	\N	916
+4172	GENERIC_DAY	3	4	2010-07-10	707	\N	916
+4173	GENERIC_DAY	3	4	2010-07-14	709	\N	916
+4174	GENERIC_DAY	3	4	2010-08-22	709	\N	916
+4175	GENERIC_DAY	3	4	2010-08-20	709	\N	916
+4176	GENERIC_DAY	3	4	2010-02-11	707	\N	916
+4177	GENERIC_DAY	3	4	2010-06-27	707	\N	916
+4178	GENERIC_DAY	3	4	2010-05-23	707	\N	916
+4179	GENERIC_DAY	3	4	2010-04-21	709	\N	916
+4180	GENERIC_DAY	3	4	2010-03-27	709	\N	916
+4181	GENERIC_DAY	3	4	2010-08-25	707	\N	916
+4182	GENERIC_DAY	3	4	2010-07-16	709	\N	916
+4183	GENERIC_DAY	3	4	2010-09-06	709	\N	916
+4184	GENERIC_DAY	3	4	2010-08-02	707	\N	916
+4185	GENERIC_DAY	3	4	2010-09-13	707	\N	916
+4186	GENERIC_DAY	3	4	2010-05-30	709	\N	916
+4187	GENERIC_DAY	3	4	2010-02-14	709	\N	916
+4188	GENERIC_DAY	3	4	2010-01-31	709	\N	916
+4189	GENERIC_DAY	3	4	2010-07-11	707	\N	916
+4190	GENERIC_DAY	3	4	2010-04-08	709	\N	916
+4191	GENERIC_DAY	3	4	2010-05-22	707	\N	916
+4192	GENERIC_DAY	3	4	2010-07-10	709	\N	916
+4193	GENERIC_DAY	3	4	2010-01-26	709	\N	916
+4194	GENERIC_DAY	3	4	2010-09-19	707	\N	916
+4195	GENERIC_DAY	3	4	2010-08-08	707	\N	916
+4196	GENERIC_DAY	3	4	2010-08-18	709	\N	916
+4197	GENERIC_DAY	3	4	2010-07-31	709	\N	916
+4198	GENERIC_DAY	3	4	2010-03-11	709	\N	916
+4199	GENERIC_DAY	3	4	2010-07-19	707	\N	916
+4200	GENERIC_DAY	3	2	2010-01-24	708	\N	917
+4201	GENERIC_DAY	3	2	2009-12-05	708	\N	917
+4202	GENERIC_DAY	3	2	2010-02-03	708	\N	917
+4203	GENERIC_DAY	3	2	2010-02-11	710	\N	917
+4204	GENERIC_DAY	3	2	2010-02-09	710	\N	917
+4205	GENERIC_DAY	3	2	2010-01-25	710	\N	917
+4206	GENERIC_DAY	3	2	2009-12-14	708	\N	917
+4207	GENERIC_DAY	3	2	2009-12-01	710	\N	917
+4208	GENERIC_DAY	3	2	2009-10-20	708	\N	917
+4209	GENERIC_DAY	3	2	2009-12-20	710	\N	917
+4210	GENERIC_DAY	3	2	2009-12-04	710	\N	917
+4211	GENERIC_DAY	3	2	2009-11-02	708	\N	917
+4212	GENERIC_DAY	3	2	2010-01-04	710	\N	917
+4213	GENERIC_DAY	3	2	2010-02-05	710	\N	917
+4214	GENERIC_DAY	3	2	2009-11-07	710	\N	917
+4215	GENERIC_DAY	3	2	2009-10-29	708	\N	917
+4216	GENERIC_DAY	3	2	2009-11-19	708	\N	917
+4217	GENERIC_DAY	3	2	2009-10-31	710	\N	917
+4218	GENERIC_DAY	3	2	2009-11-12	710	\N	917
+4219	GENERIC_DAY	3	2	2009-10-20	710	\N	917
+4220	GENERIC_DAY	3	2	2009-11-07	708	\N	917
+4221	GENERIC_DAY	3	2	2009-12-08	708	\N	917
+4222	GENERIC_DAY	3	2	2009-12-17	708	\N	917
+4223	GENERIC_DAY	3	2	2009-11-26	708	\N	917
+4224	GENERIC_DAY	3	2	2009-12-13	710	\N	917
+4225	GENERIC_DAY	3	2	2010-01-02	710	\N	917
+4226	GENERIC_DAY	3	2	2009-10-26	708	\N	917
+4227	GENERIC_DAY	3	2	2010-02-16	708	\N	917
+4228	GENERIC_DAY	3	2	2010-02-05	708	\N	917
+4229	GENERIC_DAY	3	2	2009-11-30	710	\N	917
+4230	GENERIC_DAY	3	2	2009-12-30	708	\N	917
+4231	GENERIC_DAY	3	2	2009-11-27	710	\N	917
+4232	GENERIC_DAY	3	2	2010-01-03	710	\N	917
+4233	GENERIC_DAY	3	2	2009-11-13	710	\N	917
+4234	GENERIC_DAY	3	2	2009-12-17	710	\N	917
+4235	GENERIC_DAY	3	2	2009-11-05	708	\N	917
+4236	GENERIC_DAY	3	2	2009-11-04	708	\N	917
+4237	GENERIC_DAY	3	2	2009-10-29	710	\N	917
+4238	GENERIC_DAY	3	2	2009-11-16	710	\N	917
+4239	GENERIC_DAY	3	2	2010-02-04	708	\N	917
+4240	GENERIC_DAY	3	2	2009-11-03	710	\N	917
+4241	GENERIC_DAY	3	2	2009-12-23	710	\N	917
+4242	GENERIC_DAY	3	2	2010-01-03	708	\N	917
+4243	GENERIC_DAY	3	2	2010-01-27	708	\N	917
+4244	GENERIC_DAY	3	2	2010-01-11	708	\N	917
+4245	GENERIC_DAY	3	2	2010-01-29	710	\N	917
+4246	GENERIC_DAY	3	2	2009-12-16	708	\N	917
+4247	GENERIC_DAY	3	2	2010-01-08	708	\N	917
+4248	GENERIC_DAY	3	2	2010-01-16	710	\N	917
+4249	GENERIC_DAY	3	2	2009-12-31	708	\N	917
+4250	GENERIC_DAY	3	2	2009-11-25	708	\N	917
+4251	GENERIC_DAY	3	2	2010-01-05	708	\N	917
+4252	GENERIC_DAY	3	2	2010-01-20	710	\N	917
+4253	GENERIC_DAY	3	2	2010-02-09	708	\N	917
+4254	GENERIC_DAY	3	2	2009-11-28	710	\N	917
+4255	GENERIC_DAY	3	2	2009-12-19	710	\N	917
+4256	GENERIC_DAY	3	2	2010-01-01	708	\N	917
+4257	GENERIC_DAY	3	2	2009-11-26	710	\N	917
+4258	GENERIC_DAY	3	2	2009-12-03	710	\N	917
+4259	GENERIC_DAY	3	2	2009-12-07	708	\N	917
+4260	GENERIC_DAY	3	2	2010-01-13	710	\N	917
+4261	GENERIC_DAY	3	2	2010-02-12	710	\N	917
+4262	GENERIC_DAY	3	2	2010-01-05	710	\N	917
+4263	GENERIC_DAY	3	2	2010-01-25	708	\N	917
+4264	GENERIC_DAY	3	2	2009-11-18	708	\N	917
+4265	GENERIC_DAY	3	2	2009-11-05	710	\N	917
+4266	GENERIC_DAY	3	2	2010-02-04	710	\N	917
+4267	GENERIC_DAY	3	2	2010-01-28	710	\N	917
+4268	GENERIC_DAY	3	2	2010-02-10	710	\N	917
+4269	GENERIC_DAY	3	2	2009-10-22	708	\N	917
+4270	GENERIC_DAY	3	2	2009-11-28	708	\N	917
+4271	GENERIC_DAY	3	2	2009-11-16	708	\N	917
+4272	GENERIC_DAY	3	2	2009-11-12	708	\N	917
+4273	GENERIC_DAY	3	2	2009-12-11	710	\N	917
+4274	GENERIC_DAY	3	2	2009-12-29	710	\N	917
+4275	GENERIC_DAY	3	2	2009-11-30	708	\N	917
+4276	GENERIC_DAY	3	2	2009-11-10	708	\N	917
+4277	GENERIC_DAY	3	2	2010-01-10	710	\N	917
+4278	GENERIC_DAY	3	2	2010-02-15	710	\N	917
+4279	GENERIC_DAY	3	2	2009-12-23	708	\N	917
+4280	GENERIC_DAY	3	2	2009-12-30	710	\N	917
+4281	GENERIC_DAY	3	2	2010-01-12	708	\N	917
+4282	GENERIC_DAY	3	2	2010-01-14	708	\N	917
+4283	GENERIC_DAY	3	2	2010-02-06	708	\N	917
+4284	GENERIC_DAY	3	2	2009-11-08	708	\N	917
+4285	GENERIC_DAY	3	2	2010-01-13	708	\N	917
+4286	GENERIC_DAY	3	2	2009-12-13	708	\N	917
+4287	GENERIC_DAY	3	2	2009-12-26	710	\N	917
+4288	GENERIC_DAY	3	2	2009-10-19	710	\N	917
+4289	GENERIC_DAY	3	2	2009-10-25	710	\N	917
+4290	GENERIC_DAY	3	2	2010-02-03	710	\N	917
+4291	GENERIC_DAY	3	2	2009-10-31	708	\N	917
+4292	GENERIC_DAY	3	2	2009-11-14	708	\N	917
+4293	GENERIC_DAY	3	2	2009-10-16	710	\N	917
+4294	GENERIC_DAY	3	2	2009-12-25	708	\N	917
+4295	GENERIC_DAY	3	2	2010-01-14	710	\N	917
+4296	GENERIC_DAY	3	2	2009-11-11	710	\N	917
+4297	GENERIC_DAY	3	2	2010-02-14	710	\N	917
+4298	GENERIC_DAY	3	2	2009-12-06	710	\N	917
+4299	GENERIC_DAY	3	2	2009-11-14	710	\N	917
+4300	GENERIC_DAY	3	2	2009-12-12	710	\N	917
+4301	GENERIC_DAY	3	2	2009-11-11	708	\N	917
+4302	GENERIC_DAY	3	2	2010-01-30	708	\N	917
+4303	GENERIC_DAY	3	2	2009-12-26	708	\N	917
+4304	GENERIC_DAY	3	2	2010-01-16	708	\N	917
+4305	GENERIC_DAY	3	2	2010-01-30	710	\N	917
+4306	GENERIC_DAY	3	2	2010-01-26	710	\N	917
+4307	GENERIC_DAY	3	2	2009-12-18	710	\N	917
+4308	GENERIC_DAY	3	2	2010-01-11	710	\N	917
+4309	GENERIC_DAY	3	2	2010-01-28	708	\N	917
+4310	GENERIC_DAY	3	2	2009-11-22	708	\N	917
+4311	GENERIC_DAY	3	2	2010-01-23	710	\N	917
+4312	GENERIC_DAY	3	2	2009-12-04	708	\N	917
+4313	GENERIC_DAY	3	2	2010-02-07	708	\N	917
+4314	GENERIC_DAY	3	2	2010-01-15	708	\N	917
+4315	GENERIC_DAY	3	2	2009-11-20	710	\N	917
+4316	GENERIC_DAY	3	2	2009-11-15	708	\N	917
+4317	GENERIC_DAY	3	2	2009-10-18	708	\N	917
+4318	GENERIC_DAY	3	2	2010-01-10	708	\N	917
+4319	GENERIC_DAY	3	2	2010-02-08	708	\N	917
+4320	GENERIC_DAY	3	2	2009-11-17	710	\N	917
+4321	GENERIC_DAY	3	2	2010-01-07	710	\N	917
+4322	GENERIC_DAY	3	2	2009-10-16	708	\N	917
+4323	GENERIC_DAY	3	2	2009-11-01	708	\N	917
+4324	GENERIC_DAY	3	2	2009-10-30	708	\N	917
+4325	GENERIC_DAY	3	2	2009-11-06	708	\N	917
+4326	GENERIC_DAY	3	2	2010-01-27	710	\N	917
+4327	GENERIC_DAY	3	2	2009-12-15	708	\N	917
+4328	GENERIC_DAY	3	2	2010-01-01	710	\N	917
+4329	GENERIC_DAY	3	2	2010-01-17	710	\N	917
+4330	GENERIC_DAY	3	2	2010-02-02	708	\N	917
+4331	GENERIC_DAY	3	2	2010-01-21	708	\N	917
+4332	GENERIC_DAY	3	2	2009-10-24	710	\N	917
+4333	GENERIC_DAY	3	2	2009-10-24	708	\N	917
+4334	GENERIC_DAY	3	2	2009-12-28	710	\N	917
+4335	GENERIC_DAY	3	2	2009-11-03	708	\N	917
+4336	GENERIC_DAY	3	2	2009-10-28	708	\N	917
+4337	GENERIC_DAY	3	2	2009-11-02	710	\N	917
+4338	GENERIC_DAY	3	2	2010-01-20	708	\N	917
+4339	GENERIC_DAY	3	2	2010-02-15	708	\N	917
+4340	GENERIC_DAY	3	2	2009-11-17	708	\N	917
+4341	GENERIC_DAY	3	2	2010-02-01	710	\N	917
+4342	GENERIC_DAY	3	2	2009-12-31	710	\N	917
+4343	GENERIC_DAY	3	2	2010-01-08	710	\N	917
+4344	GENERIC_DAY	3	2	2009-11-23	710	\N	917
+4345	GENERIC_DAY	3	2	2010-01-09	708	\N	917
+4346	GENERIC_DAY	3	2	2010-02-16	710	\N	917
+4347	GENERIC_DAY	3	2	2009-12-27	710	\N	917
+4348	GENERIC_DAY	3	2	2010-02-13	710	\N	917
+4349	GENERIC_DAY	3	2	2009-12-05	710	\N	917
+4350	GENERIC_DAY	3	2	2010-01-22	708	\N	917
+4351	GENERIC_DAY	3	2	2009-12-02	710	\N	917
+4352	GENERIC_DAY	3	2	2009-12-21	708	\N	917
+4353	GENERIC_DAY	3	2	2010-01-17	708	\N	917
+4354	GENERIC_DAY	3	2	2010-01-24	710	\N	917
+4355	GENERIC_DAY	3	2	2009-10-21	708	\N	917
+4356	GENERIC_DAY	3	2	2009-11-29	710	\N	917
+4357	GENERIC_DAY	3	2	2009-12-21	710	\N	917
+4358	GENERIC_DAY	3	2	2010-01-19	710	\N	917
+4359	GENERIC_DAY	3	2	2009-12-28	708	\N	917
+4360	GENERIC_DAY	3	2	2009-12-18	708	\N	917
+4361	GENERIC_DAY	3	2	2009-12-11	708	\N	917
+4362	GENERIC_DAY	3	2	2009-12-27	708	\N	917
+4363	GENERIC_DAY	3	2	2010-01-06	710	\N	917
+4364	GENERIC_DAY	3	2	2010-01-12	710	\N	917
+4365	GENERIC_DAY	3	2	2009-12-22	708	\N	917
+4366	GENERIC_DAY	3	2	2010-02-11	708	\N	917
+4367	GENERIC_DAY	3	2	2010-02-08	710	\N	917
+4368	GENERIC_DAY	3	2	2009-10-26	710	\N	917
+4369	GENERIC_DAY	3	2	2010-01-18	708	\N	917
+4370	GENERIC_DAY	3	2	2009-10-25	708	\N	917
+4371	GENERIC_DAY	3	2	2009-11-27	708	\N	917
+4372	GENERIC_DAY	3	2	2009-11-15	710	\N	917
+4373	GENERIC_DAY	3	2	2009-11-24	710	\N	917
+4374	GENERIC_DAY	3	2	2009-12-10	708	\N	917
+4375	GENERIC_DAY	3	2	2009-11-09	708	\N	917
+4376	GENERIC_DAY	3	2	2010-01-23	708	\N	917
+4377	GENERIC_DAY	3	2	2009-11-08	710	\N	917
+4378	GENERIC_DAY	3	2	2009-11-21	708	\N	917
+4379	GENERIC_DAY	3	2	2009-11-10	710	\N	917
+4380	GENERIC_DAY	3	2	2009-12-22	710	\N	917
+4381	GENERIC_DAY	3	2	2009-11-19	710	\N	917
+4382	GENERIC_DAY	3	2	2009-12-25	710	\N	917
+4383	GENERIC_DAY	3	2	2009-12-07	710	\N	917
+4384	GENERIC_DAY	3	2	2010-02-02	710	\N	917
+4385	GENERIC_DAY	3	2	2009-11-25	710	\N	917
+4386	GENERIC_DAY	3	2	2010-01-22	710	\N	917
+4387	GENERIC_DAY	3	2	2009-12-08	710	\N	917
+4388	GENERIC_DAY	3	2	2009-10-27	708	\N	917
+4389	GENERIC_DAY	3	2	2009-10-17	710	\N	917
+4390	GENERIC_DAY	3	2	2009-11-24	708	\N	917
+4391	GENERIC_DAY	3	2	2009-10-22	710	\N	917
+4392	GENERIC_DAY	3	2	2009-10-28	710	\N	917
+4393	GENERIC_DAY	3	2	2009-11-09	710	\N	917
+4394	GENERIC_DAY	3	2	2010-01-06	708	\N	917
+4395	GENERIC_DAY	3	2	2009-11-06	710	\N	917
+4396	GENERIC_DAY	3	2	2010-01-09	710	\N	917
+4397	GENERIC_DAY	3	2	2010-01-26	708	\N	917
+4398	GENERIC_DAY	3	2	2010-02-01	708	\N	917
+4399	GENERIC_DAY	3	2	2009-12-09	708	\N	917
+4400	GENERIC_DAY	3	2	2009-11-01	710	\N	917
+4401	GENERIC_DAY	3	2	2009-10-27	710	\N	917
+4402	GENERIC_DAY	3	2	2009-10-18	710	\N	917
+4403	GENERIC_DAY	3	2	2010-02-13	708	\N	917
+4404	GENERIC_DAY	3	2	2010-02-07	710	\N	917
+4405	GENERIC_DAY	3	2	2009-11-23	708	\N	917
+4406	GENERIC_DAY	3	2	2009-12-20	708	\N	917
+4407	GENERIC_DAY	3	2	2009-12-09	710	\N	917
+4408	GENERIC_DAY	3	2	2009-11-13	708	\N	917
+4409	GENERIC_DAY	3	2	2009-10-23	710	\N	917
+4410	GENERIC_DAY	3	2	2009-12-10	710	\N	917
+4411	GENERIC_DAY	3	2	2009-10-19	708	\N	917
+4412	GENERIC_DAY	3	2	2009-12-12	708	\N	917
+4413	GENERIC_DAY	3	2	2009-11-21	710	\N	917
+4414	GENERIC_DAY	3	2	2009-10-30	710	\N	917
+4415	GENERIC_DAY	3	2	2010-01-18	710	\N	917
+4416	GENERIC_DAY	3	2	2010-02-06	710	\N	917
+4417	GENERIC_DAY	3	2	2009-12-15	710	\N	917
+4418	GENERIC_DAY	3	2	2010-02-17	710	\N	917
+4419	GENERIC_DAY	3	2	2009-12-24	710	\N	917
+4420	GENERIC_DAY	3	2	2010-01-21	710	\N	917
+4421	GENERIC_DAY	3	2	2010-01-31	710	\N	917
+4422	GENERIC_DAY	3	2	2009-10-23	708	\N	917
+4423	GENERIC_DAY	3	2	2010-01-04	708	\N	917
+4424	GENERIC_DAY	3	2	2009-11-22	710	\N	917
+4425	GENERIC_DAY	3	2	2009-12-03	708	\N	917
+4426	GENERIC_DAY	3	2	2010-02-17	708	\N	917
+4427	GENERIC_DAY	3	2	2009-11-20	708	\N	917
+4428	GENERIC_DAY	3	2	2010-01-02	708	\N	917
+4429	GENERIC_DAY	3	2	2009-12-24	708	\N	917
+4430	GENERIC_DAY	3	2	2009-11-29	708	\N	917
+4431	GENERIC_DAY	3	2	2010-01-19	708	\N	917
+4432	GENERIC_DAY	3	2	2010-01-15	710	\N	917
+4433	GENERIC_DAY	3	2	2010-01-29	708	\N	917
+4434	GENERIC_DAY	3	2	2010-02-12	708	\N	917
+4435	GENERIC_DAY	3	2	2009-12-06	708	\N	917
+4436	GENERIC_DAY	3	2	2009-10-17	708	\N	917
+4437	GENERIC_DAY	3	2	2009-10-21	710	\N	917
+4438	GENERIC_DAY	3	2	2009-11-18	710	\N	917
+4439	GENERIC_DAY	3	2	2010-02-10	708	\N	917
+4440	GENERIC_DAY	3	2	2009-12-02	708	\N	917
+4441	GENERIC_DAY	3	2	2009-12-14	710	\N	917
+4442	GENERIC_DAY	3	2	2009-12-29	708	\N	917
+4443	GENERIC_DAY	3	2	2009-11-04	710	\N	917
+4444	GENERIC_DAY	3	2	2010-01-31	708	\N	917
+4445	GENERIC_DAY	3	2	2009-12-01	708	\N	917
+4446	GENERIC_DAY	3	2	2009-12-19	708	\N	917
+4447	GENERIC_DAY	3	2	2010-02-14	708	\N	917
+4448	GENERIC_DAY	3	2	2010-01-07	708	\N	917
+4449	GENERIC_DAY	3	2	2009-12-16	710	\N	917
+4450	GENERIC_DAY	3	2	2010-06-05	708	\N	918
+4451	GENERIC_DAY	3	2	2010-01-02	710	\N	918
+4452	GENERIC_DAY	3	2	2009-11-28	708	\N	918
+4453	GENERIC_DAY	3	2	2010-07-02	708	\N	918
+4454	GENERIC_DAY	3	2	2010-07-07	708	\N	918
+4455	GENERIC_DAY	3	2	2010-05-01	708	\N	918
+4456	GENERIC_DAY	3	2	2010-07-01	708	\N	918
+4457	GENERIC_DAY	3	2	2010-03-17	710	\N	918
+4458	GENERIC_DAY	3	2	2009-12-27	710	\N	918
+4459	GENERIC_DAY	3	2	2010-07-05	708	\N	918
+4460	GENERIC_DAY	3	2	2010-04-18	708	\N	918
+4461	GENERIC_DAY	3	2	2010-07-13	710	\N	918
+4462	GENERIC_DAY	3	2	2010-04-19	710	\N	918
+4463	GENERIC_DAY	3	2	2010-06-01	710	\N	918
+4464	GENERIC_DAY	3	2	2010-02-05	708	\N	918
+4465	GENERIC_DAY	3	2	2010-05-30	710	\N	918
+4466	GENERIC_DAY	3	2	2010-03-21	710	\N	918
+4467	GENERIC_DAY	3	2	2010-01-30	708	\N	918
+4468	GENERIC_DAY	3	2	2010-01-17	708	\N	918
+4469	GENERIC_DAY	3	2	2009-12-30	708	\N	918
+4470	GENERIC_DAY	3	2	2010-03-25	708	\N	918
+4471	GENERIC_DAY	3	2	2009-12-19	710	\N	918
+4472	GENERIC_DAY	3	2	2010-05-12	710	\N	918
+4473	GENERIC_DAY	3	2	2010-07-05	710	\N	918
+4474	GENERIC_DAY	3	2	2010-01-03	708	\N	918
+4475	GENERIC_DAY	3	2	2010-03-10	708	\N	918
+4476	GENERIC_DAY	3	2	2010-01-29	708	\N	918
+4477	GENERIC_DAY	3	2	2010-01-14	708	\N	918
+4478	GENERIC_DAY	3	2	2009-11-29	710	\N	918
+4479	GENERIC_DAY	3	2	2010-02-02	710	\N	918
+4480	GENERIC_DAY	3	2	2009-12-09	708	\N	918
+4481	GENERIC_DAY	3	2	2010-03-01	708	\N	918
+4482	GENERIC_DAY	3	2	2010-05-19	708	\N	918
+4483	GENERIC_DAY	3	2	2010-04-05	710	\N	918
+4484	GENERIC_DAY	3	2	2010-03-03	708	\N	918
+4485	GENERIC_DAY	3	2	2010-05-27	708	\N	918
+4486	GENERIC_DAY	3	2	2009-11-25	708	\N	918
+4487	GENERIC_DAY	3	2	2009-11-10	708	\N	918
+4488	GENERIC_DAY	3	2	2009-11-06	710	\N	918
+4489	GENERIC_DAY	3	2	2010-04-14	710	\N	918
+4490	GENERIC_DAY	3	2	2010-02-06	708	\N	918
+4491	GENERIC_DAY	3	2	2010-02-12	708	\N	918
+4492	GENERIC_DAY	3	2	2010-06-24	708	\N	918
+4493	GENERIC_DAY	3	2	2010-06-23	710	\N	918
+4494	GENERIC_DAY	3	2	2010-02-04	710	\N	918
+4495	GENERIC_DAY	3	2	2010-01-08	710	\N	918
+4496	GENERIC_DAY	3	2	2010-01-23	708	\N	918
+4497	GENERIC_DAY	3	2	2010-01-04	708	\N	918
+4498	GENERIC_DAY	3	2	2010-05-23	708	\N	918
+4499	GENERIC_DAY	3	2	2010-06-16	710	\N	918
+4500	GENERIC_DAY	3	2	2010-05-29	710	\N	918
+4501	GENERIC_DAY	3	2	2010-03-19	708	\N	918
+4502	GENERIC_DAY	3	2	2010-06-08	710	\N	918
+4503	GENERIC_DAY	3	2	2010-03-14	710	\N	918
+4504	GENERIC_DAY	3	2	2010-03-30	710	\N	918
+4505	GENERIC_DAY	3	2	2010-04-08	708	\N	918
+4506	GENERIC_DAY	3	2	2009-12-17	710	\N	918
+4507	GENERIC_DAY	3	2	2010-06-25	708	\N	918
+4508	GENERIC_DAY	3	2	2010-01-20	710	\N	918
+4509	GENERIC_DAY	3	2	2009-11-19	710	\N	918
+4510	GENERIC_DAY	3	2	2010-04-30	710	\N	918
+4511	GENERIC_DAY	3	2	2009-11-12	710	\N	918
+4512	GENERIC_DAY	3	2	2009-12-04	710	\N	918
+4513	GENERIC_DAY	3	2	2009-11-22	708	\N	918
+4514	GENERIC_DAY	3	2	2010-05-20	710	\N	918
+4515	GENERIC_DAY	3	2	2010-04-15	710	\N	918
+4516	GENERIC_DAY	3	2	2010-03-05	708	\N	918
+4517	GENERIC_DAY	3	2	2010-06-26	708	\N	918
+4518	GENERIC_DAY	3	2	2010-04-30	708	\N	918
+4519	GENERIC_DAY	3	2	2009-12-10	710	\N	918
+4520	GENERIC_DAY	3	2	2010-03-24	708	\N	918
+4521	GENERIC_DAY	3	2	2010-01-10	710	\N	918
+4522	GENERIC_DAY	3	2	2010-02-25	708	\N	918
+4523	GENERIC_DAY	3	2	2010-05-24	708	\N	918
+4524	GENERIC_DAY	3	2	2010-05-28	708	\N	918
+4525	GENERIC_DAY	3	2	2009-11-08	710	\N	918
+4526	GENERIC_DAY	3	2	2010-03-15	710	\N	918
+4527	GENERIC_DAY	3	2	2010-04-01	708	\N	918
+4528	GENERIC_DAY	3	2	2010-05-14	708	\N	918
+4529	GENERIC_DAY	3	2	2010-02-11	708	\N	918
+4530	GENERIC_DAY	3	2	2010-05-02	710	\N	918
+4531	GENERIC_DAY	3	2	2009-12-25	708	\N	918
+4532	GENERIC_DAY	3	2	2010-04-13	708	\N	918
+4533	GENERIC_DAY	3	2	2010-06-29	708	\N	918
+4534	GENERIC_DAY	3	2	2010-06-15	708	\N	918
+4535	GENERIC_DAY	3	2	2010-02-16	708	\N	918
+4536	GENERIC_DAY	3	2	2010-07-09	710	\N	918
+4537	GENERIC_DAY	3	2	2010-06-17	708	\N	918
+4538	GENERIC_DAY	3	2	2009-11-29	708	\N	918
+4539	GENERIC_DAY	3	2	2009-11-25	710	\N	918
+4540	GENERIC_DAY	3	2	2010-01-11	710	\N	918
+4541	GENERIC_DAY	3	2	2010-01-24	710	\N	918
+4542	GENERIC_DAY	3	2	2010-01-10	708	\N	918
+4543	GENERIC_DAY	3	2	2009-12-05	708	\N	918
+4544	GENERIC_DAY	3	2	2010-01-20	708	\N	918
+4545	GENERIC_DAY	3	2	2009-12-22	710	\N	918
+4546	GENERIC_DAY	3	2	2010-04-12	710	\N	918
+4547	GENERIC_DAY	3	2	2009-11-13	710	\N	918
+4548	GENERIC_DAY	3	2	2010-02-13	710	\N	918
+4549	GENERIC_DAY	3	2	2010-02-17	708	\N	918
+4550	GENERIC_DAY	3	2	2010-03-10	710	\N	918
+4551	GENERIC_DAY	3	2	2010-04-16	710	\N	918
+4552	GENERIC_DAY	3	2	2010-01-15	708	\N	918
+4553	GENERIC_DAY	3	2	2009-12-21	710	\N	918
+4554	GENERIC_DAY	3	2	2010-05-01	710	\N	918
+4555	GENERIC_DAY	3	2	2009-11-24	710	\N	918
+4556	GENERIC_DAY	3	2	2010-03-02	708	\N	918
+4557	GENERIC_DAY	3	2	2010-05-07	710	\N	918
+4558	GENERIC_DAY	3	2	2010-03-09	708	\N	918
+4559	GENERIC_DAY	3	2	2010-01-15	710	\N	918
+4560	GENERIC_DAY	3	2	2010-04-07	710	\N	918
+4561	GENERIC_DAY	3	2	2009-12-02	710	\N	918
+4562	GENERIC_DAY	3	2	2010-04-29	710	\N	918
+4563	GENERIC_DAY	3	2	2010-01-21	710	\N	918
+4564	GENERIC_DAY	3	2	2010-06-24	710	\N	918
+4565	GENERIC_DAY	3	2	2009-12-18	710	\N	918
+4566	GENERIC_DAY	3	2	2010-06-03	710	\N	918
+4567	GENERIC_DAY	3	2	2010-02-10	710	\N	918
+4568	GENERIC_DAY	3	2	2010-01-28	708	\N	918
+4569	GENERIC_DAY	3	2	2009-11-30	710	\N	918
+4570	GENERIC_DAY	3	2	2010-05-31	708	\N	918
+4571	GENERIC_DAY	3	2	2010-04-29	708	\N	918
+4572	GENERIC_DAY	3	2	2010-03-01	710	\N	918
+4573	GENERIC_DAY	3	2	2010-07-04	710	\N	918
+4574	GENERIC_DAY	3	2	2010-06-20	708	\N	918
+4575	GENERIC_DAY	3	2	2009-12-20	710	\N	918
+4576	GENERIC_DAY	3	2	2010-01-12	710	\N	918
+4577	GENERIC_DAY	3	2	2010-04-25	708	\N	918
+4578	GENERIC_DAY	3	2	2009-12-29	708	\N	918
+4579	GENERIC_DAY	3	2	2010-01-07	710	\N	918
+4580	GENERIC_DAY	3	2	2010-01-17	710	\N	918
+4581	GENERIC_DAY	3	2	2010-06-11	708	\N	918
+4582	GENERIC_DAY	3	2	2010-07-11	710	\N	918
+4583	GENERIC_DAY	3	2	2010-04-07	708	\N	918
+4584	GENERIC_DAY	3	2	2010-01-16	710	\N	918
+4585	GENERIC_DAY	3	2	2010-05-09	708	\N	918
+4586	GENERIC_DAY	3	2	2010-06-07	710	\N	918
+4587	GENERIC_DAY	3	2	2010-02-01	708	\N	918
+4588	GENERIC_DAY	3	2	2010-05-22	710	\N	918
+4589	GENERIC_DAY	3	2	2010-02-14	710	\N	918
+4590	GENERIC_DAY	3	2	2010-02-20	710	\N	918
+4591	GENERIC_DAY	3	2	2010-02-14	708	\N	918
+4592	GENERIC_DAY	3	2	2010-05-28	710	\N	918
+4593	GENERIC_DAY	3	2	2009-12-26	710	\N	918
+4594	GENERIC_DAY	3	2	2009-11-18	708	\N	918
+4595	GENERIC_DAY	3	2	2010-03-13	710	\N	918
+4596	GENERIC_DAY	3	2	2010-02-01	710	\N	918
+4597	GENERIC_DAY	3	2	2010-06-15	710	\N	918
+4598	GENERIC_DAY	3	2	2010-05-10	710	\N	918
+4599	GENERIC_DAY	3	2	2010-01-09	710	\N	918
+4600	GENERIC_DAY	3	2	2010-05-05	708	\N	918
+4601	GENERIC_DAY	3	2	2010-04-28	710	\N	918
+4602	GENERIC_DAY	3	2	2010-06-02	710	\N	918
+4603	GENERIC_DAY	3	2	2009-11-07	708	\N	918
+4604	GENERIC_DAY	3	2	2010-01-06	710	\N	918
+4605	GENERIC_DAY	3	2	2009-12-04	708	\N	918
+4606	GENERIC_DAY	3	2	2010-04-27	710	\N	918
+4607	GENERIC_DAY	3	2	2010-03-09	710	\N	918
+4608	GENERIC_DAY	3	2	2010-04-28	708	\N	918
+4609	GENERIC_DAY	3	2	2010-05-21	708	\N	918
+4610	GENERIC_DAY	3	2	2010-02-08	710	\N	918
+4611	GENERIC_DAY	3	2	2010-07-12	710	\N	918
+4612	GENERIC_DAY	3	2	2010-02-04	708	\N	918
+4613	GENERIC_DAY	3	2	2010-04-16	708	\N	918
+4614	GENERIC_DAY	3	2	2010-01-13	710	\N	918
+4615	GENERIC_DAY	3	2	2010-05-26	710	\N	918
+4616	GENERIC_DAY	3	2	2009-11-19	708	\N	918
+4617	GENERIC_DAY	3	2	2010-07-08	708	\N	918
+4618	GENERIC_DAY	3	2	2010-06-29	710	\N	918
+4619	GENERIC_DAY	3	2	2009-12-31	708	\N	918
+4620	GENERIC_DAY	3	2	2010-04-27	708	\N	918
+4621	GENERIC_DAY	3	2	2010-06-18	710	\N	918
+4622	GENERIC_DAY	3	2	2009-11-16	710	\N	918
+4623	GENERIC_DAY	3	2	2009-12-13	710	\N	918
+4624	GENERIC_DAY	3	2	2010-01-05	710	\N	918
+4625	GENERIC_DAY	3	2	2010-03-14	708	\N	918
+4626	GENERIC_DAY	3	2	2010-02-07	708	\N	918
+4627	GENERIC_DAY	3	2	2010-04-17	710	\N	918
+4628	GENERIC_DAY	3	2	2009-11-22	710	\N	918
+4629	GENERIC_DAY	3	2	2009-11-15	710	\N	918
+4630	GENERIC_DAY	3	2	2009-11-21	710	\N	918
+4631	GENERIC_DAY	3	2	2010-04-13	710	\N	918
+4632	GENERIC_DAY	3	2	2010-01-24	708	\N	918
+4633	GENERIC_DAY	3	2	2010-01-23	710	\N	918
+4634	GENERIC_DAY	3	2	2009-11-16	708	\N	918
+4635	GENERIC_DAY	3	2	2010-03-22	710	\N	918
+4636	GENERIC_DAY	3	2	2010-04-17	708	\N	918
+4637	GENERIC_DAY	3	2	2009-12-24	710	\N	918
+4638	GENERIC_DAY	3	2	2009-11-11	708	\N	918
+4639	GENERIC_DAY	3	2	2010-02-24	708	\N	918
+4640	GENERIC_DAY	3	2	2009-12-03	710	\N	918
+4641	GENERIC_DAY	3	2	2010-06-07	708	\N	918
+4642	GENERIC_DAY	3	2	2010-01-31	708	\N	918
+4643	GENERIC_DAY	3	2	2010-07-01	710	\N	918
+4644	GENERIC_DAY	3	2	2010-04-04	708	\N	918
+4645	GENERIC_DAY	3	2	2010-06-27	708	\N	918
+4646	GENERIC_DAY	3	2	2010-02-26	710	\N	918
+4647	GENERIC_DAY	3	2	2010-05-21	710	\N	918
+4648	GENERIC_DAY	3	2	2010-04-25	710	\N	918
+4649	GENERIC_DAY	3	2	2010-04-10	710	\N	918
+4650	GENERIC_DAY	3	2	2010-06-10	710	\N	918
+4651	GENERIC_DAY	3	2	2010-07-13	708	\N	918
+4652	GENERIC_DAY	3	2	2010-05-10	708	\N	918
+4653	GENERIC_DAY	3	2	2010-03-19	710	\N	918
+4654	GENERIC_DAY	3	2	2009-11-21	708	\N	918
+4655	GENERIC_DAY	3	2	2009-12-16	710	\N	918
+4656	GENERIC_DAY	3	2	2010-07-11	708	\N	918
+4657	GENERIC_DAY	3	2	2010-02-09	708	\N	918
+4658	GENERIC_DAY	3	2	2010-02-17	710	\N	918
+4659	GENERIC_DAY	3	2	2010-01-19	710	\N	918
+4660	GENERIC_DAY	3	2	2009-12-11	708	\N	918
+4661	GENERIC_DAY	3	2	2009-12-28	708	\N	918
+4662	GENERIC_DAY	3	2	2010-05-15	710	\N	918
+4663	GENERIC_DAY	3	2	2010-01-01	708	\N	918
+4664	GENERIC_DAY	3	2	2010-02-19	708	\N	918
+4665	GENERIC_DAY	3	2	2010-07-03	708	\N	918
+4666	GENERIC_DAY	3	2	2010-02-12	710	\N	918
+4667	GENERIC_DAY	3	2	2010-05-15	708	\N	918
+4668	GENERIC_DAY	3	2	2010-02-08	708	\N	918
+4669	GENERIC_DAY	3	2	2010-06-06	710	\N	918
+4670	GENERIC_DAY	3	2	2010-03-04	710	\N	918
+4671	GENERIC_DAY	3	2	2010-06-30	708	\N	918
+4672	GENERIC_DAY	3	2	2009-11-23	708	\N	918
+4673	GENERIC_DAY	3	2	2010-03-11	708	\N	918
+4674	GENERIC_DAY	3	2	2010-03-23	708	\N	918
+4675	GENERIC_DAY	3	2	2010-01-13	708	\N	918
+4676	GENERIC_DAY	3	2	2010-06-16	708	\N	918
+4677	GENERIC_DAY	3	2	2009-11-13	708	\N	918
+4678	GENERIC_DAY	3	2	2010-02-21	710	\N	918
+4679	GENERIC_DAY	3	2	2009-11-14	710	\N	918
+4680	GENERIC_DAY	3	2	2010-01-31	710	\N	918
+4681	GENERIC_DAY	3	2	2010-01-30	710	\N	918
+4682	GENERIC_DAY	3	2	2009-12-12	708	\N	918
+4683	GENERIC_DAY	3	2	2010-06-02	708	\N	918
+4684	GENERIC_DAY	3	2	2010-01-02	708	\N	918
+4685	GENERIC_DAY	3	2	2010-06-10	708	\N	918
+4686	GENERIC_DAY	3	2	2010-05-16	710	\N	918
+4687	GENERIC_DAY	3	2	2010-05-25	708	\N	918
+4688	GENERIC_DAY	3	2	2010-03-20	710	\N	918
+4689	GENERIC_DAY	3	2	2010-03-15	708	\N	918
+4690	GENERIC_DAY	3	2	2010-04-20	708	\N	918
+4691	GENERIC_DAY	3	2	2010-06-04	710	\N	918
+4692	GENERIC_DAY	3	2	2009-11-27	708	\N	918
+4693	GENERIC_DAY	3	2	2010-07-03	710	\N	918
+4694	GENERIC_DAY	3	2	2010-04-12	708	\N	918
+4695	GENERIC_DAY	3	2	2010-02-06	710	\N	918
+4696	GENERIC_DAY	3	2	2010-04-02	708	\N	918
+4697	GENERIC_DAY	3	2	2010-02-05	710	\N	918
+4698	GENERIC_DAY	3	2	2010-03-21	708	\N	918
+4699	GENERIC_DAY	3	2	2010-05-03	708	\N	918
+4700	GENERIC_DAY	3	2	2010-03-06	710	\N	918
+4701	GENERIC_DAY	3	2	2010-03-29	710	\N	918
+4702	GENERIC_DAY	3	2	2010-06-12	708	\N	918
+4703	GENERIC_DAY	3	2	2009-12-23	708	\N	918
+4704	GENERIC_DAY	3	2	2010-07-10	710	\N	918
+4705	GENERIC_DAY	3	2	2010-06-22	710	\N	918
+4706	GENERIC_DAY	3	2	2010-02-28	708	\N	918
+4707	GENERIC_DAY	3	2	2010-02-10	708	\N	918
+4708	GENERIC_DAY	3	2	2010-05-06	708	\N	918
+4709	GENERIC_DAY	3	2	2010-03-02	710	\N	918
+4710	GENERIC_DAY	3	2	2009-12-23	710	\N	918
+4711	GENERIC_DAY	3	2	2010-04-18	710	\N	918
+4712	GENERIC_DAY	3	2	2009-11-18	710	\N	918
+4713	GENERIC_DAY	3	2	2009-12-20	708	\N	918
+4714	GENERIC_DAY	3	2	2010-05-11	710	\N	918
+4715	GENERIC_DAY	3	2	2010-03-31	710	\N	918
+4716	GENERIC_DAY	3	2	2010-06-19	710	\N	918
+4717	GENERIC_DAY	3	2	2010-02-21	708	\N	918
+4718	GENERIC_DAY	3	2	2010-04-11	708	\N	918
+4719	GENERIC_DAY	3	2	2010-01-22	710	\N	918
+4720	GENERIC_DAY	3	2	2010-06-26	710	\N	918
+4721	GENERIC_DAY	3	2	2010-04-08	710	\N	918
+4722	GENERIC_DAY	3	2	2010-01-28	710	\N	918
+4723	GENERIC_DAY	3	2	2010-02-27	708	\N	918
+4724	GENERIC_DAY	3	2	2010-02-22	710	\N	918
+4725	GENERIC_DAY	3	2	2010-05-03	710	\N	918
+4726	GENERIC_DAY	3	2	2010-03-27	710	\N	918
+4727	GENERIC_DAY	3	2	2010-05-13	710	\N	918
+4728	GENERIC_DAY	3	2	2010-06-19	708	\N	918
+4729	GENERIC_DAY	3	2	2010-04-05	708	\N	918
+4730	GENERIC_DAY	3	2	2009-12-29	710	\N	918
+4731	GENERIC_DAY	3	2	2010-06-23	708	\N	918
+4732	GENERIC_DAY	3	2	2010-03-31	708	\N	918
+4733	GENERIC_DAY	3	2	2010-03-06	708	\N	918
+4734	GENERIC_DAY	3	2	2009-11-30	708	\N	918
+4735	GENERIC_DAY	3	2	2009-12-03	708	\N	918
+4736	GENERIC_DAY	3	2	2010-04-24	710	\N	918
+4737	GENERIC_DAY	3	2	2010-02-03	708	\N	918
+4738	GENERIC_DAY	3	2	2010-04-21	710	\N	918
+4739	GENERIC_DAY	3	2	2010-02-28	710	\N	918
+4740	GENERIC_DAY	3	2	2009-11-09	708	\N	918
+4741	GENERIC_DAY	3	2	2010-03-27	708	\N	918
+4742	GENERIC_DAY	3	2	2010-03-08	708	\N	918
+4743	GENERIC_DAY	3	2	2009-12-07	710	\N	918
+4744	GENERIC_DAY	3	2	2010-06-18	708	\N	918
+4745	GENERIC_DAY	3	2	2009-11-26	708	\N	918
+4746	GENERIC_DAY	3	2	2010-07-07	710	\N	918
+4747	GENERIC_DAY	3	2	2010-03-12	708	\N	918
+4748	GENERIC_DAY	3	2	2010-01-09	708	\N	918
+4749	GENERIC_DAY	3	2	2010-01-16	708	\N	918
+4750	GENERIC_DAY	3	2	2009-11-20	708	\N	918
+4751	GENERIC_DAY	3	2	2010-03-03	710	\N	918
+4752	GENERIC_DAY	3	2	2010-06-03	708	\N	918
+4753	GENERIC_DAY	3	2	2010-01-22	708	\N	918
+4754	GENERIC_DAY	3	2	2009-11-24	708	\N	918
+4755	GENERIC_DAY	3	2	2010-07-12	708	\N	918
+4756	GENERIC_DAY	3	2	2010-04-26	710	\N	918
+4757	GENERIC_DAY	3	2	2010-01-18	710	\N	918
+4758	GENERIC_DAY	3	2	2010-06-01	708	\N	918
+4759	GENERIC_DAY	3	2	2010-03-26	708	\N	918
+4760	GENERIC_DAY	3	2	2010-04-26	708	\N	918
+4761	GENERIC_DAY	3	2	2010-06-12	710	\N	918
+4762	GENERIC_DAY	3	2	2009-11-07	710	\N	918
+4763	GENERIC_DAY	3	2	2010-05-29	708	\N	918
+4764	GENERIC_DAY	3	2	2009-12-25	710	\N	918
+4765	GENERIC_DAY	3	2	2010-05-12	708	\N	918
+4766	GENERIC_DAY	3	2	2009-12-21	708	\N	918
+4767	GENERIC_DAY	3	2	2010-05-17	710	\N	918
+4768	GENERIC_DAY	3	2	2009-12-17	708	\N	918
+4769	GENERIC_DAY	3	2	2010-05-20	708	\N	918
+4770	GENERIC_DAY	3	2	2010-04-02	710	\N	918
+4771	GENERIC_DAY	3	2	2010-05-08	708	\N	918
+4772	GENERIC_DAY	3	2	2010-05-25	710	\N	918
+4773	GENERIC_DAY	3	2	2010-05-23	710	\N	918
+4774	GENERIC_DAY	3	2	2010-02-09	710	\N	918
+4775	GENERIC_DAY	3	2	2009-12-08	710	\N	918
+4776	GENERIC_DAY	3	2	2009-11-20	710	\N	918
+4777	GENERIC_DAY	3	2	2010-04-14	708	\N	918
+4778	GENERIC_DAY	3	2	2010-04-22	710	\N	918
+4779	GENERIC_DAY	3	2	2010-01-04	710	\N	918
+4780	GENERIC_DAY	3	2	2010-05-24	710	\N	918
+4781	GENERIC_DAY	3	2	2010-03-18	710	\N	918
+4782	GENERIC_DAY	3	2	2010-01-08	708	\N	918
+4783	GENERIC_DAY	3	2	2010-05-22	708	\N	918
+4784	GENERIC_DAY	3	2	2010-01-25	710	\N	918
+4785	GENERIC_DAY	3	2	2010-01-21	708	\N	918
+4786	GENERIC_DAY	3	2	2010-05-16	708	\N	918
+4787	GENERIC_DAY	3	2	2010-04-06	710	\N	918
+4788	GENERIC_DAY	3	2	2010-04-20	710	\N	918
+4789	GENERIC_DAY	3	2	2010-05-04	708	\N	918
+4790	GENERIC_DAY	3	2	2010-06-22	708	\N	918
+4791	GENERIC_DAY	3	2	2010-03-16	708	\N	918
+4792	GENERIC_DAY	3	2	2010-05-07	708	\N	918
+4793	GENERIC_DAY	3	2	2010-01-19	708	\N	918
+4794	GENERIC_DAY	3	2	2010-05-02	708	\N	918
+4795	GENERIC_DAY	3	2	2009-11-11	710	\N	918
+4796	GENERIC_DAY	3	2	2010-06-21	708	\N	918
+4797	GENERIC_DAY	3	2	2010-04-01	710	\N	918
+4798	GENERIC_DAY	3	2	2010-05-08	710	\N	918
+4799	GENERIC_DAY	3	2	2009-11-08	708	\N	918
+4800	GENERIC_DAY	3	2	2010-01-26	708	\N	918
+4801	GENERIC_DAY	3	2	2010-02-19	710	\N	918
+4802	GENERIC_DAY	3	2	2009-12-15	708	\N	918
+4803	GENERIC_DAY	3	2	2010-02-27	710	\N	918
+4804	GENERIC_DAY	3	2	2010-03-07	708	\N	918
+4805	GENERIC_DAY	3	2	2010-03-08	710	\N	918
+4806	GENERIC_DAY	3	2	2009-11-23	710	\N	918
+4807	GENERIC_DAY	3	2	2010-06-09	710	\N	918
+4808	GENERIC_DAY	3	2	2010-04-15	708	\N	918
+4809	GENERIC_DAY	3	2	2009-12-30	710	\N	918
+4810	GENERIC_DAY	3	2	2010-01-11	708	\N	918
+4811	GENERIC_DAY	3	2	2010-03-13	708	\N	918
+4812	GENERIC_DAY	3	2	2010-03-16	710	\N	918
+4813	GENERIC_DAY	3	2	2010-03-23	710	\N	918
+4814	GENERIC_DAY	3	2	2010-01-27	710	\N	918
+4815	GENERIC_DAY	3	2	2009-11-09	710	\N	918
+4816	GENERIC_DAY	3	2	2010-05-26	708	\N	918
+4817	GENERIC_DAY	3	2	2010-05-31	710	\N	918
+4818	GENERIC_DAY	3	2	2010-03-20	708	\N	918
+4819	GENERIC_DAY	3	2	2009-12-07	708	\N	918
+4820	GENERIC_DAY	3	2	2010-02-24	710	\N	918
+4821	GENERIC_DAY	3	2	2009-12-08	708	\N	918
+4822	GENERIC_DAY	3	2	2010-06-08	708	\N	918
+4823	GENERIC_DAY	3	2	2010-01-07	708	\N	918
+4824	GENERIC_DAY	3	2	2009-12-19	708	\N	918
+4825	GENERIC_DAY	3	2	2010-04-09	708	\N	918
+4826	GENERIC_DAY	3	2	2010-02-02	708	\N	918
+4827	GENERIC_DAY	3	2	2010-02-07	710	\N	918
+4828	GENERIC_DAY	3	2	2010-03-17	708	\N	918
+4829	GENERIC_DAY	3	2	2010-01-14	710	\N	918
+4830	GENERIC_DAY	3	2	2010-03-18	708	\N	918
+4831	GENERIC_DAY	3	2	2010-04-23	710	\N	918
+4832	GENERIC_DAY	3	2	2010-04-03	710	\N	918
+4833	GENERIC_DAY	3	2	2010-06-25	710	\N	918
+4834	GENERIC_DAY	3	2	2010-01-06	708	\N	918
+4835	GENERIC_DAY	3	2	2010-06-06	708	\N	918
+4836	GENERIC_DAY	3	2	2010-02-11	710	\N	918
+4837	GENERIC_DAY	3	2	2010-04-06	708	\N	918
+4838	GENERIC_DAY	3	2	2010-05-04	710	\N	918
+4839	GENERIC_DAY	3	2	2010-05-30	708	\N	918
+4840	GENERIC_DAY	3	2	2010-07-08	710	\N	918
+4841	GENERIC_DAY	3	2	2010-07-06	710	\N	918
+4842	GENERIC_DAY	3	2	2010-05-17	708	\N	918
+4843	GENERIC_DAY	3	2	2010-03-05	710	\N	918
+4844	GENERIC_DAY	3	2	2010-04-03	708	\N	918
+4845	GENERIC_DAY	3	2	2009-12-10	708	\N	918
+4846	GENERIC_DAY	3	2	2009-12-14	710	\N	918
+4847	GENERIC_DAY	3	2	2010-03-07	710	\N	918
+4848	GENERIC_DAY	3	2	2009-12-06	708	\N	918
+4849	GENERIC_DAY	3	2	2010-03-26	710	\N	918
+4850	GENERIC_DAY	3	2	2009-11-12	708	\N	918
+4851	GENERIC_DAY	3	2	2009-12-09	710	\N	918
+4852	GENERIC_DAY	3	2	2009-12-15	710	\N	918
+4853	GENERIC_DAY	3	2	2010-06-09	708	\N	918
+4854	GENERIC_DAY	3	2	2010-02-23	708	\N	918
+4855	GENERIC_DAY	3	2	2010-03-24	710	\N	918
+4856	GENERIC_DAY	3	2	2010-02-22	708	\N	918
+4857	GENERIC_DAY	3	2	2009-12-18	708	\N	918
+4858	GENERIC_DAY	3	2	2010-03-25	710	\N	918
+4859	GENERIC_DAY	3	2	2010-06-11	710	\N	918
+4860	GENERIC_DAY	3	2	2010-05-18	710	\N	918
+4861	GENERIC_DAY	3	2	2009-11-27	710	\N	918
+4862	GENERIC_DAY	3	2	2010-02-03	710	\N	918
+4863	GENERIC_DAY	3	2	2009-12-26	708	\N	918
+4864	GENERIC_DAY	3	2	2010-04-09	710	\N	918
+4865	GENERIC_DAY	3	2	2010-06-04	708	\N	918
+4866	GENERIC_DAY	3	2	2010-05-13	708	\N	918
+4867	GENERIC_DAY	3	2	2010-01-01	710	\N	918
+4868	GENERIC_DAY	3	2	2010-05-05	710	\N	918
+4869	GENERIC_DAY	3	2	2009-12-02	708	\N	918
+4870	GENERIC_DAY	3	2	2010-04-19	708	\N	918
+4871	GENERIC_DAY	3	2	2010-06-28	710	\N	918
+4872	GENERIC_DAY	3	2	2009-12-12	710	\N	918
+4873	GENERIC_DAY	3	2	2010-02-20	708	\N	918
+4874	GENERIC_DAY	3	2	2009-12-27	708	\N	918
+4875	GENERIC_DAY	3	2	2010-02-15	708	\N	918
+4876	GENERIC_DAY	3	2	2009-11-06	708	\N	918
+4877	GENERIC_DAY	3	2	2010-03-28	710	\N	918
+4878	GENERIC_DAY	3	2	2010-05-06	710	\N	918
+4879	GENERIC_DAY	3	2	2010-06-20	710	\N	918
+4880	GENERIC_DAY	3	2	2010-06-30	710	\N	918
+4881	GENERIC_DAY	3	2	2009-12-16	708	\N	918
+4882	GENERIC_DAY	3	2	2010-01-29	710	\N	918
+4883	GENERIC_DAY	3	2	2010-04-10	708	\N	918
+4884	GENERIC_DAY	3	2	2010-07-02	710	\N	918
+4885	GENERIC_DAY	3	2	2010-06-13	708	\N	918
+4886	GENERIC_DAY	3	2	2010-06-13	710	\N	918
+4887	GENERIC_DAY	3	2	2010-04-24	708	\N	918
+4888	GENERIC_DAY	3	2	2010-01-26	710	\N	918
+4889	GENERIC_DAY	3	2	2009-12-22	708	\N	918
+4890	GENERIC_DAY	3	2	2010-02-23	710	\N	918
+4891	GENERIC_DAY	3	2	2010-04-23	708	\N	918
+4892	GENERIC_DAY	3	2	2009-12-13	708	\N	918
+4893	GENERIC_DAY	3	2	2010-05-11	708	\N	918
+4894	GENERIC_DAY	3	2	2010-04-04	710	\N	918
+4895	GENERIC_DAY	3	2	2010-07-10	708	\N	918
+4896	GENERIC_DAY	3	2	2010-06-05	710	\N	918
+4897	GENERIC_DAY	3	2	2010-05-14	710	\N	918
+4898	GENERIC_DAY	3	2	2010-06-14	708	\N	918
+4899	GENERIC_DAY	3	2	2009-12-28	710	\N	918
+4900	GENERIC_DAY	3	2	2010-01-03	710	\N	918
+4901	GENERIC_DAY	3	2	2010-02-26	708	\N	918
+4902	GENERIC_DAY	3	2	2010-04-21	708	\N	918
+4903	GENERIC_DAY	3	2	2010-01-12	708	\N	918
+4904	GENERIC_DAY	3	2	2010-03-28	708	\N	918
+4905	GENERIC_DAY	3	2	2010-04-22	708	\N	918
+4906	GENERIC_DAY	3	2	2010-02-13	708	\N	918
+4907	GENERIC_DAY	3	2	2010-03-12	710	\N	918
+4908	GENERIC_DAY	3	2	2010-07-06	708	\N	918
+4909	GENERIC_DAY	3	2	2010-02-15	710	\N	918
+4910	GENERIC_DAY	3	2	2010-05-27	710	\N	918
+4911	GENERIC_DAY	3	2	2010-03-22	708	\N	918
+4912	GENERIC_DAY	3	2	2010-03-30	708	\N	918
+4913	GENERIC_DAY	3	2	2010-05-09	710	\N	918
+4914	GENERIC_DAY	3	2	2010-03-04	708	\N	918
+4915	GENERIC_DAY	3	2	2010-06-14	710	\N	918
+4916	GENERIC_DAY	3	2	2009-11-15	708	\N	918
+4917	GENERIC_DAY	3	2	2009-12-01	708	\N	918
+4918	GENERIC_DAY	3	2	2009-12-05	710	\N	918
+4919	GENERIC_DAY	3	2	2010-01-27	708	\N	918
+4920	GENERIC_DAY	3	2	2009-11-17	710	\N	918
+4921	GENERIC_DAY	3	2	2010-01-18	708	\N	918
+4922	GENERIC_DAY	3	2	2009-12-31	710	\N	918
+4923	GENERIC_DAY	3	2	2010-06-21	710	\N	918
+4924	GENERIC_DAY	3	2	2010-01-05	708	\N	918
+4925	GENERIC_DAY	3	2	2010-07-04	708	\N	918
+4926	GENERIC_DAY	3	2	2009-11-10	710	\N	918
+4927	GENERIC_DAY	3	2	2010-05-18	708	\N	918
+4928	GENERIC_DAY	3	2	2010-02-18	710	\N	918
+4929	GENERIC_DAY	3	2	2010-04-11	710	\N	918
+4930	GENERIC_DAY	3	2	2009-12-11	710	\N	918
+4931	GENERIC_DAY	3	2	2009-12-01	710	\N	918
+4932	GENERIC_DAY	3	2	2010-03-11	710	\N	918
+4933	GENERIC_DAY	3	2	2010-06-28	708	\N	918
+4934	GENERIC_DAY	3	2	2010-02-16	710	\N	918
+4935	GENERIC_DAY	3	2	2010-05-19	710	\N	918
+4936	GENERIC_DAY	3	2	2010-01-25	708	\N	918
+4937	GENERIC_DAY	3	2	2009-12-14	708	\N	918
+4938	GENERIC_DAY	3	2	2010-03-29	708	\N	918
+4939	GENERIC_DAY	3	2	2009-11-26	710	\N	918
+4940	GENERIC_DAY	3	2	2009-12-06	710	\N	918
+4941	GENERIC_DAY	3	2	2009-11-28	710	\N	918
+4942	GENERIC_DAY	3	2	2010-07-09	708	\N	918
+4943	GENERIC_DAY	3	2	2009-11-14	708	\N	918
+4944	GENERIC_DAY	3	2	2010-02-25	710	\N	918
+4945	GENERIC_DAY	3	2	2010-02-18	708	\N	918
+4946	GENERIC_DAY	3	2	2010-06-27	710	\N	918
+4947	GENERIC_DAY	3	2	2009-11-17	708	\N	918
+4948	GENERIC_DAY	3	2	2009-12-24	708	\N	918
+4949	GENERIC_DAY	3	2	2010-06-17	710	\N	918
+4950	GENERIC_DAY	3	2	2010-11-16	708	\N	919
+4951	GENERIC_DAY	3	2	2010-07-10	708	\N	919
+4952	GENERIC_DAY	3	2	2009-12-01	708	\N	919
+4953	GENERIC_DAY	3	2	2010-09-21	708	\N	919
+4954	GENERIC_DAY	3	2	2010-05-03	708	\N	919
+4955	GENERIC_DAY	3	2	2010-02-06	708	\N	919
+4956	GENERIC_DAY	3	2	2010-05-28	710	\N	919
+4957	GENERIC_DAY	3	2	2010-12-06	710	\N	919
+4958	GENERIC_DAY	3	2	2010-05-09	708	\N	919
+4959	GENERIC_DAY	3	2	2010-10-17	708	\N	919
+4960	GENERIC_DAY	3	2	2010-01-30	710	\N	919
+4961	GENERIC_DAY	3	2	2010-04-17	708	\N	919
+4962	GENERIC_DAY	3	2	2009-12-26	710	\N	919
+4963	GENERIC_DAY	3	2	2010-01-21	708	\N	919
+4964	GENERIC_DAY	3	2	2009-12-20	708	\N	919
+4965	GENERIC_DAY	3	2	2010-11-10	708	\N	919
+4966	GENERIC_DAY	3	2	2010-07-28	708	\N	919
+4967	GENERIC_DAY	3	2	2010-01-04	710	\N	919
+4968	GENERIC_DAY	3	2	2010-01-23	710	\N	919
+4969	GENERIC_DAY	3	2	2010-07-25	710	\N	919
+4970	GENERIC_DAY	3	2	2010-05-06	710	\N	919
+4971	GENERIC_DAY	3	2	2010-07-02	710	\N	919
+4972	GENERIC_DAY	3	2	2010-09-03	710	\N	919
+4973	GENERIC_DAY	3	2	2010-10-29	708	\N	919
+4974	GENERIC_DAY	3	2	2010-11-15	710	\N	919
+4975	GENERIC_DAY	3	2	2010-02-02	708	\N	919
+4976	GENERIC_DAY	3	2	2010-01-21	710	\N	919
+4977	GENERIC_DAY	3	2	2010-03-08	710	\N	919
+4978	GENERIC_DAY	3	2	2010-06-01	708	\N	919
+4979	GENERIC_DAY	3	2	2009-12-07	708	\N	919
+4980	GENERIC_DAY	3	2	2010-03-11	710	\N	919
+4981	GENERIC_DAY	3	2	2010-03-19	708	\N	919
+4982	GENERIC_DAY	3	2	2010-04-09	708	\N	919
+4983	GENERIC_DAY	3	2	2010-09-07	710	\N	919
+4984	GENERIC_DAY	3	2	2010-08-05	710	\N	919
+4985	GENERIC_DAY	3	2	2010-07-06	710	\N	919
+4986	GENERIC_DAY	3	2	2010-10-31	708	\N	919
+4987	GENERIC_DAY	3	2	2010-02-17	708	\N	919
+4988	GENERIC_DAY	3	2	2010-11-27	708	\N	919
+4989	GENERIC_DAY	3	2	2010-07-25	708	\N	919
+4990	GENERIC_DAY	3	2	2010-02-11	708	\N	919
+4991	GENERIC_DAY	3	2	2010-04-23	708	\N	919
+4992	GENERIC_DAY	3	2	2010-06-27	708	\N	919
+4993	GENERIC_DAY	3	2	2010-05-13	710	\N	919
+4994	GENERIC_DAY	3	2	2010-05-24	708	\N	919
+4995	GENERIC_DAY	3	2	2010-09-06	710	\N	919
+4996	GENERIC_DAY	3	2	2010-07-15	708	\N	919
+4997	GENERIC_DAY	3	2	2010-12-05	710	\N	919
+4998	GENERIC_DAY	3	2	2010-05-21	708	\N	919
+4999	GENERIC_DAY	3	2	2010-09-08	708	\N	919
+5000	GENERIC_DAY	3	2	2010-07-12	708	\N	919
+5001	GENERIC_DAY	3	2	2010-01-11	708	\N	919
+5002	GENERIC_DAY	3	2	2010-09-06	708	\N	919
+5003	GENERIC_DAY	3	2	2010-02-06	710	\N	919
+5004	GENERIC_DAY	3	2	2010-03-14	710	\N	919
+5005	GENERIC_DAY	3	2	2010-04-04	708	\N	919
+5006	GENERIC_DAY	3	2	2010-01-12	710	\N	919
+5007	GENERIC_DAY	3	2	2010-07-30	710	\N	919
+5008	GENERIC_DAY	3	2	2010-03-15	708	\N	919
+5009	GENERIC_DAY	3	2	2010-08-16	708	\N	919
+5010	GENERIC_DAY	3	2	2009-12-27	710	\N	919
+5011	GENERIC_DAY	3	2	2010-09-26	708	\N	919
+5012	GENERIC_DAY	3	2	2010-10-11	710	\N	919
+5013	GENERIC_DAY	3	2	2010-09-20	710	\N	919
+5014	GENERIC_DAY	3	2	2010-04-15	710	\N	919
+5015	GENERIC_DAY	3	2	2010-09-25	710	\N	919
+5016	GENERIC_DAY	3	2	2010-05-31	708	\N	919
+5017	GENERIC_DAY	3	2	2010-09-17	708	\N	919
+5018	GENERIC_DAY	3	2	2010-02-04	710	\N	919
+5019	GENERIC_DAY	3	2	2009-12-29	710	\N	919
+5020	GENERIC_DAY	3	2	2010-11-25	708	\N	919
+5021	GENERIC_DAY	3	2	2010-08-31	710	\N	919
+5022	GENERIC_DAY	3	2	2010-06-09	710	\N	919
+5023	GENERIC_DAY	3	2	2010-08-26	708	\N	919
+5024	GENERIC_DAY	3	2	2010-07-05	710	\N	919
+5025	GENERIC_DAY	3	2	2010-07-26	708	\N	919
+5026	GENERIC_DAY	3	2	2010-05-15	710	\N	919
+5027	GENERIC_DAY	3	2	2010-08-11	710	\N	919
+5028	GENERIC_DAY	3	2	2010-04-15	708	\N	919
+5029	GENERIC_DAY	3	2	2010-07-09	710	\N	919
+5030	GENERIC_DAY	3	2	2009-12-24	710	\N	919
+5031	GENERIC_DAY	3	2	2010-03-17	710	\N	919
+5032	GENERIC_DAY	3	2	2010-12-02	710	\N	919
+5033	GENERIC_DAY	3	2	2010-06-15	708	\N	919
+5034	GENERIC_DAY	3	2	2010-07-31	710	\N	919
+5035	GENERIC_DAY	3	2	2010-06-18	710	\N	919
+5036	GENERIC_DAY	3	2	2009-12-22	710	\N	919
+5037	GENERIC_DAY	3	2	2010-11-09	708	\N	919
+5038	GENERIC_DAY	3	2	2010-07-16	708	\N	919
+5039	GENERIC_DAY	3	2	2010-09-22	710	\N	919
+5040	GENERIC_DAY	3	2	2010-11-03	708	\N	919
+5041	GENERIC_DAY	3	2	2009-12-23	710	\N	919
+5042	GENERIC_DAY	3	2	2009-12-03	710	\N	919
+5043	GENERIC_DAY	3	2	2010-05-20	708	\N	919
+5044	GENERIC_DAY	3	2	2010-05-26	708	\N	919
+5045	GENERIC_DAY	3	2	2010-03-31	708	\N	919
+5046	GENERIC_DAY	3	2	2010-06-09	708	\N	919
+5047	GENERIC_DAY	3	2	2010-07-04	710	\N	919
+5048	GENERIC_DAY	3	2	2010-05-27	708	\N	919
+5049	GENERIC_DAY	3	2	2010-07-19	708	\N	919
+5050	GENERIC_DAY	3	2	2010-02-15	708	\N	919
+5051	GENERIC_DAY	3	2	2010-10-14	708	\N	919
+5052	GENERIC_DAY	3	2	2010-08-25	710	\N	919
+5053	GENERIC_DAY	3	2	2010-01-31	710	\N	919
+5054	GENERIC_DAY	3	2	2009-12-14	708	\N	919
+5055	GENERIC_DAY	3	2	2009-12-30	710	\N	919
+5056	GENERIC_DAY	3	2	2010-04-22	708	\N	919
+5057	GENERIC_DAY	3	2	2009-12-06	708	\N	919
+5058	GENERIC_DAY	3	2	2010-08-06	710	\N	919
+5059	GENERIC_DAY	3	2	2010-07-22	708	\N	919
+5060	GENERIC_DAY	3	2	2010-06-26	708	\N	919
+5061	GENERIC_DAY	3	2	2010-01-31	708	\N	919
+5062	GENERIC_DAY	3	2	2010-09-08	710	\N	919
+5063	GENERIC_DAY	3	2	2010-10-16	708	\N	919
+5064	GENERIC_DAY	3	2	2010-04-11	710	\N	919
+5065	GENERIC_DAY	3	2	2010-11-05	708	\N	919
+5066	GENERIC_DAY	3	2	2010-02-20	708	\N	919
+5067	GENERIC_DAY	3	2	2010-01-02	710	\N	919
+5068	GENERIC_DAY	3	2	2010-07-18	710	\N	919
+5069	GENERIC_DAY	3	2	2010-04-28	710	\N	919
+5070	GENERIC_DAY	3	2	2010-02-28	708	\N	919
+5071	GENERIC_DAY	3	2	2010-05-25	710	\N	919
+5072	GENERIC_DAY	3	2	2010-05-19	708	\N	919
+5073	GENERIC_DAY	3	2	2010-04-07	708	\N	919
+5074	GENERIC_DAY	3	2	2010-08-04	710	\N	919
+5075	GENERIC_DAY	3	2	2010-11-11	708	\N	919
+5076	GENERIC_DAY	3	2	2010-01-18	708	\N	919
+5077	GENERIC_DAY	3	2	2010-08-02	708	\N	919
+5078	GENERIC_DAY	3	2	2010-09-04	710	\N	919
+5079	GENERIC_DAY	3	2	2010-04-08	708	\N	919
+5080	GENERIC_DAY	3	2	2010-06-20	708	\N	919
+5081	GENERIC_DAY	3	2	2010-02-10	710	\N	919
+5082	GENERIC_DAY	3	2	2010-05-25	708	\N	919
+5083	GENERIC_DAY	3	2	2010-05-08	710	\N	919
+5084	GENERIC_DAY	3	2	2010-02-01	710	\N	919
+5085	GENERIC_DAY	3	2	2010-10-15	708	\N	919
+5086	GENERIC_DAY	3	2	2010-04-16	710	\N	919
+5087	GENERIC_DAY	3	2	2010-04-28	708	\N	919
+5088	GENERIC_DAY	3	2	2010-11-08	708	\N	919
+5089	GENERIC_DAY	3	2	2010-02-19	710	\N	919
+5090	GENERIC_DAY	3	2	2010-11-24	710	\N	919
+5091	GENERIC_DAY	3	2	2010-10-28	710	\N	919
+5092	GENERIC_DAY	3	2	2010-10-22	708	\N	919
+5093	GENERIC_DAY	3	2	2010-03-13	708	\N	919
+5094	GENERIC_DAY	3	2	2009-12-11	710	\N	919
+5095	GENERIC_DAY	3	2	2009-12-18	710	\N	919
+5096	GENERIC_DAY	3	2	2010-03-24	708	\N	919
+5097	GENERIC_DAY	3	2	2010-04-10	708	\N	919
+5098	GENERIC_DAY	3	2	2010-01-23	708	\N	919
+5099	GENERIC_DAY	3	2	2010-04-29	708	\N	919
+5100	GENERIC_DAY	3	2	2010-03-18	710	\N	919
+5101	GENERIC_DAY	3	2	2010-10-20	710	\N	919
+5102	GENERIC_DAY	3	2	2010-01-15	710	\N	919
+5103	GENERIC_DAY	3	2	2010-11-12	708	\N	919
+5104	GENERIC_DAY	3	2	2010-09-15	710	\N	919
+5105	GENERIC_DAY	3	2	2010-02-13	708	\N	919
+5106	GENERIC_DAY	3	2	2010-07-17	708	\N	919
+5107	GENERIC_DAY	3	2	2010-07-03	710	\N	919
+5108	GENERIC_DAY	3	2	2010-11-10	710	\N	919
+5109	GENERIC_DAY	3	2	2010-02-26	710	\N	919
+5110	GENERIC_DAY	3	2	2010-01-19	710	\N	919
+5111	GENERIC_DAY	3	2	2009-12-03	708	\N	919
+5112	GENERIC_DAY	3	2	2010-10-06	710	\N	919
+5113	GENERIC_DAY	3	2	2010-03-30	710	\N	919
+5114	GENERIC_DAY	3	2	2010-08-09	710	\N	919
+5115	GENERIC_DAY	3	2	2010-06-17	708	\N	919
+5116	GENERIC_DAY	3	2	2010-02-10	708	\N	919
+5117	GENERIC_DAY	3	2	2010-07-22	710	\N	919
+5118	GENERIC_DAY	3	2	2010-03-29	710	\N	919
+5119	GENERIC_DAY	3	2	2010-12-07	710	\N	919
+5120	GENERIC_DAY	3	2	2010-10-08	710	\N	919
+5121	GENERIC_DAY	3	2	2010-08-04	708	\N	919
+5122	GENERIC_DAY	3	2	2010-07-06	708	\N	919
+5123	GENERIC_DAY	3	2	2010-06-16	710	\N	919
+5124	GENERIC_DAY	3	2	2010-04-13	710	\N	919
+5125	GENERIC_DAY	3	2	2010-05-02	708	\N	919
+5126	GENERIC_DAY	3	2	2009-12-04	710	\N	919
+5127	GENERIC_DAY	3	2	2010-04-18	708	\N	919
+5128	GENERIC_DAY	3	2	2010-06-02	710	\N	919
+5129	GENERIC_DAY	3	2	2010-04-02	708	\N	919
+5130	GENERIC_DAY	3	2	2010-10-03	708	\N	919
+5131	GENERIC_DAY	3	2	2010-08-05	708	\N	919
+5132	GENERIC_DAY	3	2	2009-12-27	708	\N	919
+5133	GENERIC_DAY	3	2	2010-03-14	708	\N	919
+5134	GENERIC_DAY	3	2	2010-02-22	710	\N	919
+5135	GENERIC_DAY	3	2	2010-10-05	710	\N	919
+5136	GENERIC_DAY	3	2	2010-07-14	708	\N	919
+5137	GENERIC_DAY	3	2	2010-04-02	710	\N	919
+5138	GENERIC_DAY	3	2	2010-10-10	710	\N	919
+5139	GENERIC_DAY	3	2	2010-09-16	710	\N	919
+5140	GENERIC_DAY	3	2	2010-01-26	710	\N	919
+5141	GENERIC_DAY	3	2	2010-04-04	710	\N	919
+5142	GENERIC_DAY	3	2	2010-03-12	710	\N	919
+5143	GENERIC_DAY	3	2	2010-10-20	708	\N	919
+5144	GENERIC_DAY	3	2	2010-03-16	708	\N	919
+5145	GENERIC_DAY	3	2	2010-03-24	710	\N	919
+5146	GENERIC_DAY	3	2	2010-09-26	710	\N	919
+5147	GENERIC_DAY	3	2	2010-10-30	708	\N	919
+5148	GENERIC_DAY	3	2	2010-08-12	708	\N	919
+5149	GENERIC_DAY	3	2	2010-02-09	708	\N	919
+5150	GENERIC_DAY	3	2	2010-07-18	708	\N	919
+5151	GENERIC_DAY	3	2	2010-05-23	710	\N	919
+5152	GENERIC_DAY	3	2	2010-09-05	710	\N	919
+5153	GENERIC_DAY	3	2	2010-04-27	708	\N	919
+5154	GENERIC_DAY	3	2	2010-07-29	710	\N	919
+5155	GENERIC_DAY	3	2	2010-12-04	710	\N	919
+5156	GENERIC_DAY	3	2	2010-02-14	710	\N	919
+5157	GENERIC_DAY	3	2	2010-09-29	708	\N	919
+5158	GENERIC_DAY	3	2	2010-10-27	708	\N	919
+5159	GENERIC_DAY	3	2	2010-05-18	710	\N	919
+5160	GENERIC_DAY	3	2	2010-11-08	710	\N	919
+5161	GENERIC_DAY	3	2	2010-11-20	708	\N	919
+5162	GENERIC_DAY	3	2	2010-07-07	708	\N	919
+5163	GENERIC_DAY	3	2	2010-02-12	708	\N	919
+5164	GENERIC_DAY	3	2	2010-06-30	708	\N	919
+5165	GENERIC_DAY	3	2	2010-02-03	708	\N	919
+5166	GENERIC_DAY	3	2	2010-05-06	708	\N	919
+5167	GENERIC_DAY	3	2	2010-02-23	708	\N	919
+5168	GENERIC_DAY	3	2	2010-02-23	710	\N	919
+5169	GENERIC_DAY	3	2	2010-01-19	708	\N	919
+5170	GENERIC_DAY	3	2	2010-01-04	708	\N	919
+5171	GENERIC_DAY	3	2	2010-02-07	708	\N	919
+5172	GENERIC_DAY	3	2	2010-09-15	708	\N	919
+5173	GENERIC_DAY	3	2	2010-05-10	708	\N	919
+5174	GENERIC_DAY	3	2	2010-10-19	708	\N	919
+5175	GENERIC_DAY	3	2	2010-12-06	708	\N	919
+5176	GENERIC_DAY	3	2	2010-02-28	710	\N	919
+5177	GENERIC_DAY	3	2	2010-01-14	710	\N	919
+5178	GENERIC_DAY	3	2	2010-05-12	708	\N	919
+5179	GENERIC_DAY	3	2	2010-05-01	708	\N	919
+5180	GENERIC_DAY	3	2	2010-06-30	710	\N	919
+5181	GENERIC_DAY	3	2	2010-09-24	708	\N	919
+5182	GENERIC_DAY	3	2	2010-03-27	708	\N	919
+5183	GENERIC_DAY	3	2	2010-11-21	710	\N	919
+5184	GENERIC_DAY	3	2	2010-11-17	710	\N	919
+5185	GENERIC_DAY	3	2	2010-09-14	710	\N	919
+5186	GENERIC_DAY	3	2	2010-07-09	708	\N	919
+5187	GENERIC_DAY	3	2	2009-12-28	710	\N	919
+5188	GENERIC_DAY	3	2	2009-11-28	708	\N	919
+5189	GENERIC_DAY	3	2	2010-07-11	708	\N	919
+5190	GENERIC_DAY	3	2	2010-09-03	708	\N	919
+5191	GENERIC_DAY	3	2	2010-09-02	710	\N	919
+5192	GENERIC_DAY	3	2	2010-05-28	708	\N	919
+5193	GENERIC_DAY	3	2	2010-03-09	710	\N	919
+5194	GENERIC_DAY	3	2	2010-04-11	708	\N	919
+5195	GENERIC_DAY	3	2	2010-11-07	710	\N	919
+5196	GENERIC_DAY	3	2	2010-05-16	708	\N	919
+5197	GENERIC_DAY	3	2	2010-09-19	708	\N	919
+5198	GENERIC_DAY	3	2	2010-09-01	708	\N	919
+5199	GENERIC_DAY	3	2	2010-05-31	710	\N	919
+5200	GENERIC_DAY	3	2	2010-05-07	710	\N	919
+5201	GENERIC_DAY	3	2	2010-08-21	710	\N	919
+5202	GENERIC_DAY	3	2	2010-06-01	710	\N	919
+5203	GENERIC_DAY	3	2	2010-06-18	708	\N	919
+5204	GENERIC_DAY	3	2	2010-03-19	710	\N	919
+5205	GENERIC_DAY	3	2	2010-02-03	710	\N	919
+5206	GENERIC_DAY	3	2	2010-03-04	710	\N	919
+5207	GENERIC_DAY	3	2	2010-04-27	710	\N	919
+5208	GENERIC_DAY	3	2	2010-08-24	708	\N	919
+5209	GENERIC_DAY	3	2	2010-03-03	710	\N	919
+5210	GENERIC_DAY	3	2	2009-12-20	710	\N	919
+5211	GENERIC_DAY	3	2	2010-01-25	710	\N	919
+5212	GENERIC_DAY	3	2	2010-11-19	708	\N	919
+5213	GENERIC_DAY	3	2	2010-08-17	708	\N	919
+5214	GENERIC_DAY	3	2	2010-01-20	710	\N	919
+5215	GENERIC_DAY	3	2	2010-01-13	708	\N	919
+5216	GENERIC_DAY	3	2	2010-06-22	708	\N	919
+5217	GENERIC_DAY	3	2	2010-09-21	710	\N	919
+5218	GENERIC_DAY	3	2	2010-02-05	708	\N	919
+5219	GENERIC_DAY	3	2	2010-12-07	708	\N	919
+5220	GENERIC_DAY	3	2	2010-11-07	708	\N	919
+5221	GENERIC_DAY	3	2	2010-03-06	708	\N	919
+5222	GENERIC_DAY	3	2	2010-05-19	710	\N	919
+5223	GENERIC_DAY	3	2	2010-10-09	710	\N	919
+5224	GENERIC_DAY	3	2	2010-08-21	708	\N	919
+5225	GENERIC_DAY	3	2	2010-06-12	710	\N	919
+5226	GENERIC_DAY	3	2	2010-08-10	710	\N	919
+5227	GENERIC_DAY	3	2	2010-12-01	708	\N	919
+5228	GENERIC_DAY	3	2	2010-03-12	708	\N	919
+5229	GENERIC_DAY	3	2	2010-02-08	710	\N	919
+5230	GENERIC_DAY	3	2	2010-04-01	710	\N	919
+5231	GENERIC_DAY	3	2	2010-09-04	708	\N	919
+5232	GENERIC_DAY	3	2	2010-07-24	710	\N	919
+5233	GENERIC_DAY	3	2	2010-06-11	708	\N	919
+5234	GENERIC_DAY	3	2	2009-12-09	710	\N	919
+5235	GENERIC_DAY	3	2	2010-04-10	710	\N	919
+5236	GENERIC_DAY	3	2	2010-04-21	708	\N	919
+5237	GENERIC_DAY	3	2	2010-10-23	710	\N	919
+5238	GENERIC_DAY	3	2	2010-02-15	710	\N	919
+5239	GENERIC_DAY	3	2	2010-12-03	708	\N	919
+5240	GENERIC_DAY	3	2	2010-08-06	708	\N	919
+5241	GENERIC_DAY	3	2	2010-08-19	708	\N	919
+5242	GENERIC_DAY	3	2	2010-10-25	708	\N	919
+5243	GENERIC_DAY	3	2	2010-02-22	708	\N	919
+5244	GENERIC_DAY	3	2	2010-10-10	708	\N	919
+5245	GENERIC_DAY	3	2	2010-03-10	708	\N	919
+5246	GENERIC_DAY	3	2	2010-08-09	708	\N	919
+5247	GENERIC_DAY	3	2	2010-01-03	710	\N	919
+5248	GENERIC_DAY	3	2	2010-03-17	708	\N	919
+5249	GENERIC_DAY	3	2	2010-06-17	710	\N	919
+5250	GENERIC_DAY	3	2	2010-09-24	710	\N	919
+5251	GENERIC_DAY	3	2	2010-04-22	710	\N	919
+5252	GENERIC_DAY	3	2	2010-04-01	708	\N	919
+5253	GENERIC_DAY	3	2	2010-06-08	710	\N	919
+5254	GENERIC_DAY	3	2	2010-02-27	710	\N	919
+5255	GENERIC_DAY	3	2	2010-04-03	708	\N	919
+5256	GENERIC_DAY	3	2	2010-03-09	708	\N	919
+5257	GENERIC_DAY	3	2	2010-11-01	708	\N	919
+5258	GENERIC_DAY	3	2	2010-10-02	708	\N	919
+5259	GENERIC_DAY	3	2	2010-11-22	708	\N	919
+5260	GENERIC_DAY	3	2	2010-11-05	710	\N	919
+5261	GENERIC_DAY	3	2	2009-12-10	708	\N	919
+5262	GENERIC_DAY	3	2	2010-01-28	710	\N	919
+5263	GENERIC_DAY	3	2	2010-08-14	708	\N	919
+5264	GENERIC_DAY	3	2	2010-09-09	710	\N	919
+5265	GENERIC_DAY	3	2	2010-08-18	710	\N	919
+5266	GENERIC_DAY	3	2	2010-02-16	708	\N	919
+5267	GENERIC_DAY	3	2	2010-02-11	710	\N	919
+5268	GENERIC_DAY	3	2	2010-05-07	708	\N	919
+5269	GENERIC_DAY	3	2	2010-06-13	710	\N	919
+5270	GENERIC_DAY	3	2	2010-03-20	710	\N	919
+5271	GENERIC_DAY	3	2	2010-03-08	708	\N	919
+5272	GENERIC_DAY	3	2	2010-10-09	708	\N	919
+5273	GENERIC_DAY	3	2	2010-10-12	708	\N	919
+5274	GENERIC_DAY	3	2	2010-06-04	710	\N	919
+5275	GENERIC_DAY	3	2	2010-01-12	708	\N	919
+5276	GENERIC_DAY	3	2	2010-10-16	710	\N	919
+5277	GENERIC_DAY	3	2	2010-06-21	710	\N	919
+5278	GENERIC_DAY	3	2	2010-03-10	710	\N	919
+5279	GENERIC_DAY	3	2	2010-04-06	708	\N	919
+5280	GENERIC_DAY	3	2	2010-04-17	710	\N	919
+5281	GENERIC_DAY	3	2	2009-12-29	708	\N	919
+5282	GENERIC_DAY	3	2	2010-05-17	708	\N	919
+5283	GENERIC_DAY	3	2	2010-02-17	710	\N	919
+5284	GENERIC_DAY	3	2	2009-12-16	710	\N	919
+5285	GENERIC_DAY	3	2	2010-03-18	708	\N	919
+5286	GENERIC_DAY	3	2	2010-05-05	708	\N	919
+5287	GENERIC_DAY	3	2	2010-08-08	708	\N	919
+5288	GENERIC_DAY	3	2	2010-07-01	708	\N	919
+5289	GENERIC_DAY	3	2	2009-11-29	710	\N	919
+5290	GENERIC_DAY	3	2	2010-03-29	708	\N	919
+5291	GENERIC_DAY	3	2	2010-05-11	710	\N	919
+5292	GENERIC_DAY	3	2	2010-08-01	710	\N	919
+5293	GENERIC_DAY	3	2	2010-10-07	710	\N	919
+5294	GENERIC_DAY	3	2	2010-06-27	710	\N	919
+5295	GENERIC_DAY	3	2	2010-04-25	708	\N	919
+5296	GENERIC_DAY	3	2	2010-11-23	708	\N	919
+5297	GENERIC_DAY	3	2	2010-08-20	710	\N	919
+5298	GENERIC_DAY	3	2	2010-03-03	708	\N	919
+5299	GENERIC_DAY	3	2	2010-10-14	710	\N	919
+5300	GENERIC_DAY	3	2	2010-10-04	710	\N	919
+5301	GENERIC_DAY	3	2	2010-10-11	708	\N	919
+5302	GENERIC_DAY	3	2	2010-05-22	708	\N	919
+5303	GENERIC_DAY	3	2	2010-08-13	710	\N	919
+5304	GENERIC_DAY	3	2	2010-04-29	710	\N	919
+5305	GENERIC_DAY	3	2	2010-03-02	710	\N	919
+5306	GENERIC_DAY	3	2	2009-12-21	708	\N	919
+5307	GENERIC_DAY	3	2	2010-08-23	710	\N	919
+5308	GENERIC_DAY	3	2	2010-07-11	710	\N	919
+5309	GENERIC_DAY	3	2	2010-04-26	710	\N	919
+5310	GENERIC_DAY	3	2	2010-11-21	708	\N	919
+5311	GENERIC_DAY	3	2	2010-11-28	708	\N	919
+5312	GENERIC_DAY	3	2	2010-10-01	708	\N	919
+5313	GENERIC_DAY	3	2	2010-10-19	710	\N	919
+5314	GENERIC_DAY	3	2	2010-09-28	710	\N	919
+5315	GENERIC_DAY	3	2	2010-01-10	708	\N	919
+5316	GENERIC_DAY	3	2	2010-11-23	710	\N	919
+5317	GENERIC_DAY	3	2	2010-10-03	710	\N	919
+5318	GENERIC_DAY	3	2	2010-01-02	708	\N	919
+5319	GENERIC_DAY	3	2	2009-12-05	708	\N	919
+5320	GENERIC_DAY	3	2	2010-07-31	708	\N	919
+5321	GENERIC_DAY	3	2	2010-12-04	708	\N	919
+5322	GENERIC_DAY	3	2	2010-01-17	710	\N	919
+5323	GENERIC_DAY	3	2	2010-03-23	710	\N	919
+5324	GENERIC_DAY	3	2	2010-01-16	710	\N	919
+5325	GENERIC_DAY	3	2	2010-08-03	708	\N	919
+5326	GENERIC_DAY	3	2	2010-02-26	708	\N	919
+5327	GENERIC_DAY	3	2	2010-11-18	710	\N	919
+5328	GENERIC_DAY	3	2	2010-09-10	708	\N	919
+5329	GENERIC_DAY	3	2	2010-09-18	710	\N	919
+5330	GENERIC_DAY	3	2	2010-03-25	710	\N	919
+5331	GENERIC_DAY	3	2	2010-01-07	710	\N	919
+5332	GENERIC_DAY	3	2	2010-05-27	710	\N	919
+5333	GENERIC_DAY	3	2	2010-06-02	708	\N	919
+5334	GENERIC_DAY	3	2	2010-06-06	708	\N	919
+5335	GENERIC_DAY	3	2	2010-02-21	710	\N	919
+5336	GENERIC_DAY	3	2	2010-05-03	710	\N	919
+5337	GENERIC_DAY	3	2	2010-08-22	710	\N	919
+5338	GENERIC_DAY	3	2	2010-06-07	710	\N	919
+5339	GENERIC_DAY	3	2	2010-11-24	708	\N	919
+5340	GENERIC_DAY	3	2	2010-01-18	710	\N	919
+5341	GENERIC_DAY	3	2	2010-07-21	710	\N	919
+5342	GENERIC_DAY	3	2	2010-04-12	708	\N	919
+5343	GENERIC_DAY	3	2	2010-10-08	708	\N	919
+5344	GENERIC_DAY	3	2	2010-08-19	710	\N	919
+5345	GENERIC_DAY	3	2	2010-06-07	708	\N	919
+5346	GENERIC_DAY	3	2	2010-02-01	708	\N	919
+5347	GENERIC_DAY	3	2	2010-05-22	710	\N	919
+5348	GENERIC_DAY	3	2	2009-12-17	710	\N	919
+5349	GENERIC_DAY	3	2	2010-09-29	710	\N	919
+5350	GENERIC_DAY	3	2	2009-12-09	708	\N	919
+5351	GENERIC_DAY	3	2	2010-03-06	710	\N	919
+5352	GENERIC_DAY	3	2	2010-06-10	710	\N	919
+5353	GENERIC_DAY	3	2	2010-08-10	708	\N	919
+5354	GENERIC_DAY	3	2	2010-07-27	710	\N	919
+5355	GENERIC_DAY	3	2	2010-07-16	710	\N	919
+5356	GENERIC_DAY	3	2	2010-06-04	708	\N	919
+5357	GENERIC_DAY	3	2	2010-04-19	708	\N	919
+5358	GENERIC_DAY	3	2	2010-09-07	708	\N	919
+5359	GENERIC_DAY	3	2	2010-11-04	710	\N	919
+5360	GENERIC_DAY	3	2	2010-03-04	708	\N	919
+5361	GENERIC_DAY	3	2	2010-09-09	708	\N	919
+5362	GENERIC_DAY	3	2	2010-04-19	710	\N	919
+5363	GENERIC_DAY	3	2	2010-07-01	710	\N	919
+5364	GENERIC_DAY	3	2	2009-12-10	710	\N	919
+5365	GENERIC_DAY	3	2	2010-02-08	708	\N	919
+5366	GENERIC_DAY	3	2	2010-05-30	710	\N	919
+5367	GENERIC_DAY	3	2	2010-08-11	708	\N	919
+5368	GENERIC_DAY	3	2	2010-10-13	710	\N	919
+5369	GENERIC_DAY	3	2	2010-02-13	710	\N	919
+5370	GENERIC_DAY	3	2	2010-10-05	708	\N	919
+5371	GENERIC_DAY	3	2	2010-05-09	710	\N	919
+5372	GENERIC_DAY	3	2	2010-08-31	708	\N	919
+5373	GENERIC_DAY	3	2	2010-08-28	708	\N	919
+5374	GENERIC_DAY	3	2	2010-03-21	710	\N	919
+5375	GENERIC_DAY	3	2	2010-08-29	710	\N	919
+5376	GENERIC_DAY	3	2	2010-06-13	708	\N	919
+5377	GENERIC_DAY	3	2	2010-08-15	708	\N	919
+5378	GENERIC_DAY	3	2	2010-06-24	708	\N	919
+5379	GENERIC_DAY	3	2	2009-12-08	710	\N	919
+5380	GENERIC_DAY	3	2	2010-10-06	708	\N	919
+5381	GENERIC_DAY	3	2	2010-04-25	710	\N	919
+5382	GENERIC_DAY	3	2	2010-10-21	710	\N	919
+5383	GENERIC_DAY	3	2	2010-08-26	710	\N	919
+5384	GENERIC_DAY	3	2	2010-02-09	710	\N	919
+5385	GENERIC_DAY	3	2	2010-01-14	708	\N	919
+5386	GENERIC_DAY	3	2	2010-03-07	708	\N	919
+5387	GENERIC_DAY	3	2	2009-12-24	708	\N	919
+5388	GENERIC_DAY	3	2	2010-04-20	708	\N	919
+5389	GENERIC_DAY	3	2	2010-03-05	708	\N	919
+5390	GENERIC_DAY	3	2	2010-02-18	708	\N	919
+5391	GENERIC_DAY	3	2	2010-10-30	710	\N	919
+5392	GENERIC_DAY	3	2	2010-08-27	708	\N	919
+5393	GENERIC_DAY	3	2	2010-09-22	708	\N	919
+5394	GENERIC_DAY	3	2	2010-03-01	708	\N	919
+5395	GENERIC_DAY	3	2	2010-07-23	710	\N	919
+5396	GENERIC_DAY	3	2	2010-09-05	708	\N	919
+5397	GENERIC_DAY	3	2	2010-02-16	710	\N	919
+5398	GENERIC_DAY	3	2	2010-06-19	710	\N	919
+5399	GENERIC_DAY	3	2	2010-05-29	710	\N	919
+5400	GENERIC_DAY	3	2	2010-02-05	710	\N	919
+5401	GENERIC_DAY	3	2	2010-01-25	708	\N	919
+5402	GENERIC_DAY	3	2	2010-03-05	710	\N	919
+5403	GENERIC_DAY	3	2	2010-03-22	708	\N	919
+5404	GENERIC_DAY	3	2	2010-09-25	708	\N	919
+5405	GENERIC_DAY	3	2	2010-09-10	710	\N	919
+5406	GENERIC_DAY	3	2	2009-11-30	710	\N	919
+5407	GENERIC_DAY	3	2	2010-01-13	710	\N	919
+5408	GENERIC_DAY	3	2	2010-08-17	710	\N	919
+5409	GENERIC_DAY	3	2	2010-01-09	708	\N	919
+5410	GENERIC_DAY	3	2	2010-07-10	710	\N	919
+5411	GENERIC_DAY	3	2	2010-01-29	708	\N	919
+5412	GENERIC_DAY	3	2	2010-12-01	710	\N	919
+5413	GENERIC_DAY	3	2	2010-07-07	710	\N	919
+5414	GENERIC_DAY	3	2	2010-11-30	710	\N	919
+5415	GENERIC_DAY	3	2	2009-12-16	708	\N	919
+5416	GENERIC_DAY	3	2	2010-09-16	708	\N	919
+5417	GENERIC_DAY	3	2	2010-03-27	710	\N	919
+5418	GENERIC_DAY	3	2	2010-02-07	710	\N	919
+5419	GENERIC_DAY	3	2	2010-10-13	708	\N	919
+5420	GENERIC_DAY	3	2	2010-09-20	708	\N	919
+5421	GENERIC_DAY	3	2	2010-10-17	710	\N	919
+5422	GENERIC_DAY	3	2	2010-01-15	708	\N	919
+5423	GENERIC_DAY	3	2	2010-01-08	708	\N	919
+5424	GENERIC_DAY	3	2	2010-08-01	708	\N	919
+5425	GENERIC_DAY	3	2	2010-04-05	708	\N	919
+5426	GENERIC_DAY	3	2	2009-12-19	710	\N	919
+5427	GENERIC_DAY	3	2	2010-11-13	710	\N	919
+5428	GENERIC_DAY	3	2	2010-03-22	710	\N	919
+5429	GENERIC_DAY	3	2	2010-02-20	710	\N	919
+5430	GENERIC_DAY	3	2	2009-12-14	710	\N	919
+5431	GENERIC_DAY	3	2	2010-09-11	710	\N	919
+5432	GENERIC_DAY	3	2	2010-01-29	710	\N	919
+5433	GENERIC_DAY	3	2	2010-11-29	708	\N	919
+5434	GENERIC_DAY	3	2	2010-08-07	710	\N	919
+5435	GENERIC_DAY	3	2	2010-06-12	708	\N	919
+5436	GENERIC_DAY	3	2	2010-01-24	710	\N	919
+5437	GENERIC_DAY	3	2	2009-12-15	710	\N	919
+5438	GENERIC_DAY	3	2	2010-08-28	710	\N	919
+5439	GENERIC_DAY	3	2	2010-06-28	708	\N	919
+5440	GENERIC_DAY	3	2	2010-06-26	710	\N	919
+5441	GENERIC_DAY	3	2	2010-10-29	710	\N	919
+5442	GENERIC_DAY	3	2	2010-04-03	710	\N	919
+5443	GENERIC_DAY	3	2	2010-05-15	708	\N	919
+5444	GENERIC_DAY	3	2	2010-01-01	708	\N	919
+5445	GENERIC_DAY	3	2	2010-08-24	710	\N	919
+5446	GENERIC_DAY	3	2	2010-06-28	710	\N	919
+5447	GENERIC_DAY	3	2	2010-07-03	708	\N	919
+5448	GENERIC_DAY	3	2	2010-06-03	710	\N	919
+5449	GENERIC_DAY	3	2	2010-11-14	710	\N	919
+5450	GENERIC_DAY	3	2	2010-06-21	708	\N	919
+5451	GENERIC_DAY	3	2	2009-12-18	708	\N	919
+5452	GENERIC_DAY	3	2	2010-09-02	708	\N	919
+5453	GENERIC_DAY	3	2	2010-07-17	710	\N	919
+5454	GENERIC_DAY	3	2	2010-12-05	708	\N	919
+5455	GENERIC_DAY	3	2	2010-11-02	710	\N	919
+5456	GENERIC_DAY	3	2	2010-10-18	708	\N	919
+5457	GENERIC_DAY	3	2	2010-04-09	710	\N	919
+5458	GENERIC_DAY	3	2	2010-11-09	710	\N	919
+5459	GENERIC_DAY	3	2	2010-05-14	710	\N	919
+5460	GENERIC_DAY	3	2	2010-09-23	710	\N	919
+5461	GENERIC_DAY	3	2	2010-02-02	710	\N	919
+5462	GENERIC_DAY	3	2	2010-11-30	708	\N	919
+5463	GENERIC_DAY	3	2	2010-03-13	710	\N	919
+5464	GENERIC_DAY	3	2	2010-03-01	710	\N	919
+5465	GENERIC_DAY	3	2	2010-11-06	708	\N	919
+5466	GENERIC_DAY	3	2	2010-05-04	710	\N	919
+5467	GENERIC_DAY	3	2	2010-02-24	710	\N	919
+5468	GENERIC_DAY	3	2	2010-06-05	708	\N	919
+5469	GENERIC_DAY	3	2	2009-12-11	708	\N	919
+5470	GENERIC_DAY	3	2	2010-08-29	708	\N	919
+5471	GENERIC_DAY	3	2	2010-06-22	710	\N	919
+5472	GENERIC_DAY	3	2	2010-06-03	708	\N	919
+5473	GENERIC_DAY	3	2	2010-02-25	708	\N	919
+5474	GENERIC_DAY	3	2	2010-08-27	710	\N	919
+5475	GENERIC_DAY	3	2	2010-10-21	708	\N	919
+5476	GENERIC_DAY	3	2	2010-01-24	708	\N	919
+5477	GENERIC_DAY	3	2	2010-11-26	710	\N	919
+5478	GENERIC_DAY	3	2	2010-04-23	710	\N	919
+5479	GENERIC_DAY	3	2	2010-06-24	710	\N	919
+5480	GENERIC_DAY	3	2	2010-02-18	710	\N	919
+5481	GENERIC_DAY	3	2	2010-05-16	710	\N	919
+5482	GENERIC_DAY	3	2	2010-03-11	708	\N	919
+5483	GENERIC_DAY	3	2	2010-04-12	710	\N	919
+5484	GENERIC_DAY	3	2	2010-02-14	708	\N	919
+5485	GENERIC_DAY	3	2	2010-10-07	708	\N	919
+5486	GENERIC_DAY	3	2	2010-06-25	708	\N	919
+5487	GENERIC_DAY	3	2	2010-03-28	710	\N	919
+5488	GENERIC_DAY	3	2	2010-03-31	710	\N	919
+5489	GENERIC_DAY	3	2	2009-12-04	708	\N	919
+5490	GENERIC_DAY	3	2	2010-11-06	710	\N	919
+5491	GENERIC_DAY	3	2	2010-08-08	710	\N	919
+5492	GENERIC_DAY	3	2	2010-10-01	710	\N	919
+5493	GENERIC_DAY	3	2	2010-07-23	708	\N	919
+5494	GENERIC_DAY	3	2	2010-07-13	710	\N	919
+5495	GENERIC_DAY	3	2	2010-04-16	708	\N	919
+5496	GENERIC_DAY	3	2	2010-01-26	708	\N	919
+5497	GENERIC_DAY	3	2	2010-09-13	708	\N	919
+5498	GENERIC_DAY	3	2	2010-07-08	710	\N	919
+5499	GENERIC_DAY	3	2	2010-10-25	710	\N	919
+5500	GENERIC_DAY	3	2	2010-07-13	708	\N	919
+5501	GENERIC_DAY	3	2	2010-03-23	708	\N	919
+5502	GENERIC_DAY	3	2	2010-11-25	710	\N	919
+5503	GENERIC_DAY	3	2	2010-06-06	710	\N	919
+5504	GENERIC_DAY	3	2	2010-08-07	708	\N	919
+5505	GENERIC_DAY	3	2	2010-06-10	708	\N	919
+5506	GENERIC_DAY	3	2	2010-07-04	708	\N	919
+5507	GENERIC_DAY	3	2	2010-05-08	708	\N	919
+5508	GENERIC_DAY	3	2	2010-05-14	708	\N	919
+5509	GENERIC_DAY	3	2	2010-02-24	708	\N	919
+5510	GENERIC_DAY	3	2	2010-11-11	710	\N	919
+5511	GENERIC_DAY	3	2	2010-07-27	708	\N	919
+5512	GENERIC_DAY	3	2	2010-08-02	710	\N	919
+5513	GENERIC_DAY	3	2	2010-01-08	710	\N	919
+5514	GENERIC_DAY	3	2	2010-11-13	708	\N	919
+5515	GENERIC_DAY	3	2	2010-03-07	710	\N	919
+5516	GENERIC_DAY	3	2	2010-10-31	710	\N	919
+5517	GENERIC_DAY	3	2	2010-10-24	710	\N	919
+5518	GENERIC_DAY	3	2	2010-10-04	708	\N	919
+5519	GENERIC_DAY	3	2	2010-06-19	708	\N	919
+5520	GENERIC_DAY	3	2	2010-03-20	708	\N	919
+5521	GENERIC_DAY	3	2	2010-05-10	710	\N	919
+5522	GENERIC_DAY	3	2	2010-06-05	710	\N	919
+5523	GENERIC_DAY	3	2	2010-10-12	710	\N	919
+5524	GENERIC_DAY	3	2	2010-08-23	708	\N	919
+5525	GENERIC_DAY	3	2	2010-09-12	710	\N	919
+5526	GENERIC_DAY	3	2	2010-05-29	708	\N	919
+5527	GENERIC_DAY	3	2	2010-05-17	710	\N	919
+5528	GENERIC_DAY	3	2	2009-12-02	710	\N	919
+5529	GENERIC_DAY	3	2	2009-11-30	708	\N	919
+5530	GENERIC_DAY	3	2	2009-12-25	708	\N	919
+5531	GENERIC_DAY	3	2	2010-08-14	710	\N	919
+5532	GENERIC_DAY	3	2	2009-12-15	708	\N	919
+5533	GENERIC_DAY	3	2	2010-01-07	708	\N	919
+5534	GENERIC_DAY	3	2	2010-04-24	708	\N	919
+5535	GENERIC_DAY	3	2	2010-10-24	708	\N	919
+5536	GENERIC_DAY	3	2	2009-12-01	710	\N	919
+5537	GENERIC_DAY	3	2	2010-04-30	710	\N	919
+5538	GENERIC_DAY	3	2	2010-08-30	710	\N	919
+5539	GENERIC_DAY	3	2	2010-01-28	708	\N	919
+5540	GENERIC_DAY	3	2	2009-12-13	710	\N	919
+5541	GENERIC_DAY	3	2	2010-06-15	710	\N	919
+5542	GENERIC_DAY	3	2	2010-08-12	710	\N	919
+5543	GENERIC_DAY	3	2	2010-04-21	710	\N	919
+5544	GENERIC_DAY	3	2	2010-05-13	708	\N	919
+5545	GENERIC_DAY	3	2	2010-08-18	708	\N	919
+5546	GENERIC_DAY	3	2	2010-11-26	708	\N	919
+5547	GENERIC_DAY	3	2	2010-04-14	708	\N	919
+5548	GENERIC_DAY	3	2	2010-07-29	708	\N	919
+5549	GENERIC_DAY	3	2	2010-07-14	710	\N	919
+5550	GENERIC_DAY	3	2	2009-12-23	708	\N	919
+5551	GENERIC_DAY	3	2	2009-12-17	708	\N	919
+5552	GENERIC_DAY	3	2	2010-01-06	708	\N	919
+5553	GENERIC_DAY	3	2	2010-04-08	710	\N	919
+5554	GENERIC_DAY	3	2	2010-11-28	710	\N	919
+5555	GENERIC_DAY	3	2	2010-06-11	710	\N	919
+5556	GENERIC_DAY	3	2	2010-09-27	708	\N	919
+5557	GENERIC_DAY	3	2	2010-07-20	710	\N	919
+5558	GENERIC_DAY	3	2	2010-06-16	708	\N	919
+5559	GENERIC_DAY	3	2	2010-01-17	708	\N	919
+5560	GENERIC_DAY	3	2	2010-10-26	708	\N	919
+5561	GENERIC_DAY	3	2	2010-07-26	710	\N	919
+5562	GENERIC_DAY	3	2	2010-11-19	710	\N	919
+5563	GENERIC_DAY	3	2	2009-12-02	708	\N	919
+5564	GENERIC_DAY	3	2	2010-10-15	710	\N	919
+5565	GENERIC_DAY	3	2	2010-06-29	710	\N	919
+5566	GENERIC_DAY	3	2	2010-06-23	708	\N	919
+5567	GENERIC_DAY	3	2	2010-03-28	708	\N	919
+5568	GENERIC_DAY	3	2	2010-05-02	710	\N	919
+5569	GENERIC_DAY	3	2	2010-02-27	708	\N	919
+5570	GENERIC_DAY	3	2	2010-08-03	710	\N	919
+5571	GENERIC_DAY	3	2	2010-05-23	708	\N	919
+5572	GENERIC_DAY	3	2	2010-10-27	710	\N	919
+5573	GENERIC_DAY	3	2	2010-05-26	710	\N	919
+5574	GENERIC_DAY	3	2	2010-03-16	710	\N	919
+5575	GENERIC_DAY	3	2	2010-02-19	708	\N	919
+5576	GENERIC_DAY	3	2	2009-12-13	708	\N	919
+5577	GENERIC_DAY	3	2	2010-11-18	708	\N	919
+5578	GENERIC_DAY	3	2	2010-01-06	710	\N	919
+5579	GENERIC_DAY	3	2	2010-07-12	710	\N	919
+5580	GENERIC_DAY	3	2	2010-08-22	708	\N	919
+5581	GENERIC_DAY	3	2	2010-01-05	708	\N	919
+5582	GENERIC_DAY	3	2	2009-12-19	708	\N	919
+5583	GENERIC_DAY	3	2	2010-11-04	708	\N	919
+5584	GENERIC_DAY	3	2	2010-04-18	710	\N	919
+5585	GENERIC_DAY	3	2	2010-05-21	710	\N	919
+5586	GENERIC_DAY	3	2	2010-01-20	708	\N	919
+5587	GENERIC_DAY	3	2	2010-04-24	710	\N	919
+5588	GENERIC_DAY	3	2	2010-10-23	708	\N	919
+5589	GENERIC_DAY	3	2	2010-06-20	710	\N	919
+5590	GENERIC_DAY	3	2	2009-11-28	710	\N	919
+5591	GENERIC_DAY	3	2	2010-01-22	708	\N	919
+5592	GENERIC_DAY	3	2	2010-01-03	708	\N	919
+5593	GENERIC_DAY	3	2	2010-04-07	710	\N	919
+5594	GENERIC_DAY	3	2	2009-12-06	710	\N	919
+5595	GENERIC_DAY	3	2	2010-08-13	708	\N	919
+5596	GENERIC_DAY	3	2	2009-12-30	708	\N	919
+5597	GENERIC_DAY	3	2	2010-03-21	708	\N	919
+5598	GENERIC_DAY	3	2	2010-09-18	708	\N	919
+5599	GENERIC_DAY	3	2	2010-09-14	708	\N	919
+5600	GENERIC_DAY	3	2	2009-12-25	710	\N	919
+5601	GENERIC_DAY	3	2	2010-01-27	710	\N	919
+5602	GENERIC_DAY	3	2	2010-07-21	708	\N	919
+5603	GENERIC_DAY	3	2	2009-12-31	710	\N	919
+5604	GENERIC_DAY	3	2	2010-11-12	710	\N	919
+5605	GENERIC_DAY	3	2	2010-11-15	708	\N	919
+5606	GENERIC_DAY	3	2	2010-09-28	708	\N	919
+5607	GENERIC_DAY	3	2	2009-11-29	708	\N	919
+5608	GENERIC_DAY	3	2	2010-03-15	710	\N	919
+5609	GENERIC_DAY	3	2	2010-11-03	710	\N	919
+5610	GENERIC_DAY	3	2	2010-06-23	710	\N	919
+5611	GENERIC_DAY	3	2	2010-07-08	708	\N	919
+5612	GENERIC_DAY	3	2	2010-09-19	710	\N	919
+5613	GENERIC_DAY	3	2	2010-08-15	710	\N	919
+5614	GENERIC_DAY	3	2	2010-09-11	708	\N	919
+5615	GENERIC_DAY	3	2	2009-12-26	708	\N	919
+5616	GENERIC_DAY	3	2	2010-01-01	710	\N	919
+5617	GENERIC_DAY	3	2	2010-10-26	710	\N	919
+5618	GENERIC_DAY	3	2	2009-12-12	708	\N	919
+5619	GENERIC_DAY	3	2	2010-05-18	708	\N	919
+5620	GENERIC_DAY	3	2	2010-11-14	708	\N	919
+5621	GENERIC_DAY	3	2	2010-07-24	708	\N	919
+5622	GENERIC_DAY	3	2	2010-10-18	710	\N	919
+5623	GENERIC_DAY	3	2	2010-06-08	708	\N	919
+5624	GENERIC_DAY	3	2	2010-09-30	708	\N	919
+5625	GENERIC_DAY	3	2	2010-08-20	708	\N	919
+5626	GENERIC_DAY	3	2	2010-01-09	710	\N	919
+5627	GENERIC_DAY	3	2	2010-08-30	708	\N	919
+5628	GENERIC_DAY	3	2	2009-12-21	710	\N	919
+5629	GENERIC_DAY	3	2	2010-05-30	708	\N	919
+5630	GENERIC_DAY	3	2	2010-12-02	708	\N	919
+5631	GENERIC_DAY	3	2	2010-01-30	708	\N	919
+5632	GENERIC_DAY	3	2	2010-08-16	710	\N	919
+5633	GENERIC_DAY	3	2	2010-09-30	710	\N	919
+5634	GENERIC_DAY	3	2	2010-07-15	710	\N	919
+5635	GENERIC_DAY	3	2	2010-11-27	710	\N	919
+5636	GENERIC_DAY	3	2	2010-03-26	708	\N	919
+5637	GENERIC_DAY	3	2	2010-07-28	710	\N	919
+5638	GENERIC_DAY	3	2	2010-01-10	710	\N	919
+5639	GENERIC_DAY	3	2	2010-05-20	710	\N	919
+5640	GENERIC_DAY	3	2	2009-12-07	710	\N	919
+5641	GENERIC_DAY	3	2	2009-12-22	708	\N	919
+5642	GENERIC_DAY	3	2	2010-02-25	710	\N	919
+5643	GENERIC_DAY	3	2	2010-05-11	708	\N	919
+5644	GENERIC_DAY	3	2	2010-12-03	710	\N	919
+5645	GENERIC_DAY	3	2	2010-09-01	710	\N	919
+5646	GENERIC_DAY	3	2	2010-01-05	710	\N	919
+5647	GENERIC_DAY	3	2	2010-07-02	708	\N	919
+5648	GENERIC_DAY	3	2	2010-08-25	708	\N	919
+5649	GENERIC_DAY	3	2	2010-07-20	708	\N	919
+5650	GENERIC_DAY	3	2	2009-12-05	710	\N	919
+5651	GENERIC_DAY	3	2	2010-02-12	710	\N	919
+5652	GENERIC_DAY	3	2	2010-10-02	710	\N	919
+5653	GENERIC_DAY	3	2	2010-03-25	708	\N	919
+5654	GENERIC_DAY	3	2	2010-01-27	708	\N	919
+5655	GENERIC_DAY	3	2	2010-03-02	708	\N	919
+5656	GENERIC_DAY	3	2	2010-01-22	710	\N	919
+5657	GENERIC_DAY	3	2	2010-04-14	710	\N	919
+5658	GENERIC_DAY	3	2	2010-11-01	710	\N	919
+5659	GENERIC_DAY	3	2	2010-07-19	710	\N	919
+5660	GENERIC_DAY	3	2	2010-01-11	710	\N	919
+5661	GENERIC_DAY	3	2	2010-09-23	708	\N	919
+5662	GENERIC_DAY	3	2	2010-06-14	708	\N	919
+5663	GENERIC_DAY	3	2	2010-11-20	710	\N	919
+5664	GENERIC_DAY	3	2	2010-09-12	708	\N	919
+5665	GENERIC_DAY	3	2	2010-09-17	710	\N	919
+5666	GENERIC_DAY	3	2	2009-12-28	708	\N	919
+5667	GENERIC_DAY	3	2	2010-11-02	708	\N	919
+5668	GENERIC_DAY	3	2	2010-10-22	710	\N	919
+5669	GENERIC_DAY	3	2	2010-05-12	710	\N	919
+5670	GENERIC_DAY	3	2	2010-06-25	710	\N	919
+5671	GENERIC_DAY	3	2	2010-04-06	710	\N	919
+5672	GENERIC_DAY	3	2	2010-07-05	708	\N	919
+5673	GENERIC_DAY	3	2	2009-12-12	710	\N	919
+5674	GENERIC_DAY	3	2	2010-09-13	710	\N	919
+5675	GENERIC_DAY	3	2	2010-05-24	710	\N	919
+5676	GENERIC_DAY	3	2	2010-11-17	708	\N	919
+5677	GENERIC_DAY	3	2	2010-11-29	710	\N	919
+5678	GENERIC_DAY	3	2	2010-09-27	710	\N	919
+5679	GENERIC_DAY	3	2	2010-07-30	708	\N	919
+5680	GENERIC_DAY	3	2	2010-05-05	710	\N	919
+5681	GENERIC_DAY	3	2	2010-04-26	708	\N	919
+5682	GENERIC_DAY	3	2	2010-04-13	708	\N	919
+5683	GENERIC_DAY	3	2	2010-06-14	710	\N	919
+5684	GENERIC_DAY	3	2	2009-12-31	708	\N	919
+5685	GENERIC_DAY	3	2	2010-03-30	708	\N	919
+5686	GENERIC_DAY	3	2	2010-02-21	708	\N	919
+5687	GENERIC_DAY	3	2	2010-01-16	708	\N	919
+5688	GENERIC_DAY	3	2	2009-12-08	708	\N	919
+5689	GENERIC_DAY	3	2	2010-05-01	710	\N	919
+5690	GENERIC_DAY	3	2	2010-04-20	710	\N	919
+5691	GENERIC_DAY	3	2	2010-05-04	708	\N	919
+5692	GENERIC_DAY	3	2	2010-06-29	708	\N	919
+5693	GENERIC_DAY	3	2	2010-02-04	708	\N	919
+5694	GENERIC_DAY	3	2	2010-11-16	710	\N	919
+5695	GENERIC_DAY	3	2	2010-11-22	710	\N	919
+5696	GENERIC_DAY	3	2	2010-10-28	708	\N	919
+5697	GENERIC_DAY	3	2	2010-03-26	710	\N	919
+5698	GENERIC_DAY	3	2	2010-04-30	708	\N	919
+5699	GENERIC_DAY	3	2	2010-04-05	710	\N	919
+\.
+
+
+--
+-- Data for Name: dependency; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY dependency (id, version, origin, destination, type) FROM stdin;
+\.
+
+
+--
+-- Data for Name: directadvanceassignment; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY directadvanceassignment (advance_assignment_id, direct_order_element_id, maxvalue) FROM stdin;
+411	364	100.00
+417	365	100.00
+\.
+
+
+--
+-- Data for Name: exceptionday; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY exceptionday (id, version, date, hours, base_calendar_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: generic_resource_allocation; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY generic_resource_allocation (resource_allocation_id) FROM stdin;
+910
+911
+912
+913
+914
+915
+916
+917
+918
+919
+\.
+
+
+--
+-- Data for Name: hibernate_unique_key; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY hibernate_unique_key (next_hi) FROM stdin;
+61
+\.
+
+
+--
+-- Data for Name: hoursgroup; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY hoursgroup (id, version, workinghours, percentage, fixedpercentage, parent_order_line) FROM stdin;
+570	2	3000	1.00	f	372
+571	2	2000	1.00	f	373
+572	2	500	1.00	f	375
+573	2	1000	1.00	f	376
+574	2	1500	1.00	f	377
+565	5	500	1.00	f	364
+566	5	1000	1.00	f	365
+567	5	3000	1.00	f	366
+568	5	2000	1.00	f	368
+569	5	3000	1.00	f	369
+\.
+
+
+--
+-- Data for Name: hoursperday; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY hoursperday (base_calendar_id, hours, day_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: indirectadvanceassignment; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY indirectadvanceassignment (advance_assignment_id, indirect_order_element_id) FROM stdin;
+407	371
+408	374
+406	370
+405	367
+412	303
+404	303
+\.
+
+
+--
+-- Data for Name: label; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY label (id, version, name, label_type_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: label_type; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY label_type (id, version, name) FROM stdin;
+\.
+
+
+--
+-- Data for Name: order_element_label; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY order_element_label (order_element_id, label_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: order_table; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY order_table (orderelementid, responsible, customer) FROM stdin;
+370	Xavier Castaño	Barreras
+303	Pedro Castro	Navantia
+\.
+
+
+--
+-- Data for Name: orderelement; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY orderelement (id, version, name, initdate, enddate, mandatoryinit, mandatoryend, description, code, parent, positionincontainer) FROM stdin;
+303	6	Pedido1	2009-10-16 09:48:51.55	2010-10-16 00:00:00	f	f	\N	A1111	\N	\N
+364	5	Montaje Cabina	\N	\N	f	f		111A	303	0
+365	5	Camarote 1	\N	\N	f	f		112A	303	1
+366	5	Camarote 2	\N	\N	f	f		113A	303	2
+367	5	Soldado Tuberia	\N	\N	f	f	\N	114A	303	3
+368	5	Tuberia Matriz	\N	\N	f	f		115A	367	0
+369	5	Tuberia Secundaria	\N	\N	f	f		116A	367	1
+370	3	Pedido2	2009-10-16 10:10:44.831	2010-03-16 00:00:00	f	f	\N	B200	\N	\N
+371	2	Montaje Casco	\N	\N	f	f	\N	P100	370	0
+372	2	Trabajo en Casco	\N	\N	f	f		P200	371	0
+373	2	Montaje Casco Proa	\N	\N	f	f		P250	371	1
+374	2	Montaje Popa	\N	\N	f	f	\N	P300	370	1
+375	2	Amarras	\N	\N	f	f		P400	374	0
+376	2	Montaje Popa	\N	\N	f	f		P450	374	1
+377	2	Puente	\N	\N	f	f		P500	374	2
+\.
+
+
+--
+-- Data for Name: orderline; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY orderline (orderelementid) FROM stdin;
+364
+365
+366
+368
+369
+372
+373
+375
+376
+377
+\.
+
+
+--
+-- Data for Name: orderlinegroup; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY orderlinegroup (orderelementid) FROM stdin;
+303
+367
+370
+371
+374
+\.
+
+
+--
+-- Data for Name: resource; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY resource (id, version, calendar) FROM stdin;
+710	2	\N
+709	2	\N
+707	3	\N
+708	2	\N
+\.
+
+
+--
+-- Data for Name: resourceallocation; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY resourceallocation (id, version, resourcesperday, task, assignment_function) FROM stdin;
+912	0	1.00	609	\N
+913	0	2.00	608	\N
+914	0	1.00	607	\N
+910	3	1.00	611	\N
+911	3	1.00	612	\N
+915	3	1.00	615	\N
+916	3	1.00	616	\N
+917	3	0.50	618	\N
+918	3	0.50	619	\N
+919	3	0.50	620	\N
+\.
+
+
+--
+-- Data for Name: resourcecalendar; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY resourcecalendar (base_calendar_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: specific_resource_allocation; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY specific_resource_allocation (resource_allocation_id, resource) FROM stdin;
+\.
+
+
+--
+-- Data for Name: task; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY task (task_element_id, hoursgroup, calculatedvalue) FROM stdin;
+611	568	1
+612	569	1
+609	567	1
+608	566	1
+607	565	1
+615	570	1
+616	571	1
+618	572	1
+619	573	1
+620	574	1
+\.
+
+
+--
+-- Data for Name: taskelement; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY taskelement (id, version, shareofhours, name, notes, startdate, enddate, order_element_id, parent, base_calendar_id, positioninparent) FROM stdin;
+610	2	\N	Soldado Tuberia	\N	2009-12-22 00:00:00	2011-04-11 00:00:00	367	606	\N	3
+611	2	\N	Tuberia Matriz	\N	2009-12-22 00:00:00	2010-08-29 00:00:00	368	610	\N	0
+612	2	\N	Tuberia Secundaria	\N	2010-04-01 00:00:00	2011-04-11 00:00:00	369	610	\N	1
+609	2	\N	Camarote 2	\N	2009-12-24 00:00:00	2011-01-03 00:00:00	366	606	\N	2
+608	2	\N	Camarote 1	\N	2009-11-15 00:00:00	2010-01-17 00:00:00	365	606	\N	1
+607	2	\N	Montaje Cabina	\N	2009-10-21 00:00:00	2009-12-23 00:00:00	364	606	\N	0
+606	2	\N	\N	\N	2009-10-21 00:00:00	2011-04-11 00:00:00	303	\N	\N	\N
+614	2	\N	Montaje Casco	\N	2009-10-16 00:00:00	2010-10-26 00:00:00	371	613	\N	0
+615	2	\N	Trabajo en Casco	\N	2009-10-16 00:00:00	2010-10-26 00:00:00	372	614	\N	0
+616	2	\N	Montaje Casco Proa	\N	2010-01-15 00:00:00	2010-09-22 00:00:00	373	614	\N	1
+617	2	\N	Montaje Popa	\N	2009-10-16 00:00:00	2010-12-08 00:00:00	374	613	\N	1
+618	2	\N	Amarras	\N	2009-10-16 00:00:00	2010-02-18 00:00:00	375	617	\N	0
+619	2	\N	Montaje Popa	\N	2009-11-06 00:00:00	2010-07-14 00:00:00	376	617	\N	1
+620	2	\N	Puente	\N	2009-11-28 00:00:00	2010-12-08 00:00:00	377	617	\N	2
+613	2	\N	\N	\N	2009-10-16 00:00:00	2010-12-08 00:00:00	370	\N	\N	\N
+\.
+
+
+--
+-- Data for Name: taskgroup; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY taskgroup (task_element_id) FROM stdin;
+606
+610
+613
+614
+617
+\.
+
+
+--
+-- Data for Name: taskmilestone; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY taskmilestone (task_element_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: work_report; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY work_report (id, version, date, place, responsible, work_report_type_id) FROM stdin;
+5858	3	2009-10-19 00:00:00	Lugo	Prueba	5757
+\.
+
+
+--
+-- Data for Name: work_report_line; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY work_report_line (id, version, numhours, work_report_id, resource_id, order_element_id) FROM stdin;
+5962	3	300	5858	707	364
+5961	3	200	5858	710	365
+5959	3	10	5858	709	365
+5960	3	32	5858	708	365
+\.
+
+
+--
+-- Data for Name: work_report_type; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY work_report_type (id, version, name) FROM stdin;
+5757	1	Parte Trabajo
+\.
+
+
+--
+-- Data for Name: worker; Type: TABLE DATA; Schema: public; Owner: naval
+--
+
+COPY worker (worker_id, firstname, surname, nif) FROM stdin;
+710	Lorenzo	Tilve	44444444D
+709	Juan	Gonzalez	33333333C
+707	Xoan 	Lopez	11111111A
+708	Pedro	Gómez	22222222B
+\.
+
+
+--
+-- Name: advanceassignment_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY advanceassignment
+    ADD CONSTRAINT advanceassignment_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: advancemeasurement_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY advancemeasurement
+    ADD CONSTRAINT advancemeasurement_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: advancetype_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY advancetype
+    ADD CONSTRAINT advancetype_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: advancetype_unitname_key; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY advancetype
+    ADD CONSTRAINT advancetype_unitname_key UNIQUE (unitname);
+
+
+--
+-- Name: all_criterions_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY all_criterions
+    ADD CONSTRAINT all_criterions_pkey PRIMARY KEY (generic_resource_allocation_id, criterion_id);
+
+
+--
+-- Name: assignment_function_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY assignment_function
+    ADD CONSTRAINT assignment_function_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: basecalendar_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY basecalendar
+    ADD CONSTRAINT basecalendar_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: calendardata_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY calendardata
+    ADD CONSTRAINT calendardata_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: criterion_name_key; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY criterion
+    ADD CONSTRAINT criterion_name_key UNIQUE (name, id_criterion_type);
+
+
+--
+-- Name: criterion_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY criterion
+    ADD CONSTRAINT criterion_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: criterion_type_work_report_type_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY criterion_type_work_report_type
+    ADD CONSTRAINT criterion_type_work_report_type_pkey PRIMARY KEY (work_report_type_id, criterion_type_id);
+
+
+--
+-- Name: criterion_work_report_line_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY criterion_work_report_line
+    ADD CONSTRAINT criterion_work_report_line_pkey PRIMARY KEY (work_report_line_id, criterion_id);
+
+
+--
+-- Name: criterionhoursgroup_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY criterionhoursgroup
+    ADD CONSTRAINT criterionhoursgroup_pkey PRIMARY KEY (hoursgroupid, criterionid);
+
+
+--
+-- Name: criterionsatisfaction_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY criterionsatisfaction
+    ADD CONSTRAINT criterionsatisfaction_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: criteriontype_name_key; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY criteriontype
+    ADD CONSTRAINT criteriontype_name_key UNIQUE (name);
+
+
+--
+-- Name: criteriontype_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY criteriontype
+    ADD CONSTRAINT criteriontype_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: day_assignment_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY day_assignment
+    ADD CONSTRAINT day_assignment_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: dependency_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY dependency
+    ADD CONSTRAINT dependency_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: directadvanceassignment_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY directadvanceassignment
+    ADD CONSTRAINT directadvanceassignment_pkey PRIMARY KEY (advance_assignment_id);
+
+
+--
+-- Name: exceptionday_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY exceptionday
+    ADD CONSTRAINT exceptionday_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: generic_resource_allocation_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY generic_resource_allocation
+    ADD CONSTRAINT generic_resource_allocation_pkey PRIMARY KEY (resource_allocation_id);
+
+
+--
+-- Name: hoursgroup_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY hoursgroup
+    ADD CONSTRAINT hoursgroup_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: hoursperday_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY hoursperday
+    ADD CONSTRAINT hoursperday_pkey PRIMARY KEY (base_calendar_id, day_id);
+
+
+--
+-- Name: indirectadvanceassignment_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY indirectadvanceassignment
+    ADD CONSTRAINT indirectadvanceassignment_pkey PRIMARY KEY (advance_assignment_id);
+
+
+--
+-- Name: label_name_key; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY label
+    ADD CONSTRAINT label_name_key UNIQUE (name, label_type_id);
+
+
+--
+-- Name: label_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY label
+    ADD CONSTRAINT label_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: label_type_name_key; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY label_type
+    ADD CONSTRAINT label_type_name_key UNIQUE (name);
+
+
+--
+-- Name: label_type_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY label_type
+    ADD CONSTRAINT label_type_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: order_element_label_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY order_element_label
+    ADD CONSTRAINT order_element_label_pkey PRIMARY KEY (order_element_id, label_id);
+
+
+--
+-- Name: order_table_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY order_table
+    ADD CONSTRAINT order_table_pkey PRIMARY KEY (orderelementid);
+
+
+--
+-- Name: orderelement_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY orderelement
+    ADD CONSTRAINT orderelement_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: orderline_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY orderline
+    ADD CONSTRAINT orderline_pkey PRIMARY KEY (orderelementid);
+
+
+--
+-- Name: orderlinegroup_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY orderlinegroup
+    ADD CONSTRAINT orderlinegroup_pkey PRIMARY KEY (orderelementid);
+
+
+--
+-- Name: resource_calendar_key; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY resource
+    ADD CONSTRAINT resource_calendar_key UNIQUE (calendar);
+
+
+--
+-- Name: resource_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY resource
+    ADD CONSTRAINT resource_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: resourceallocation_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY resourceallocation
+    ADD CONSTRAINT resourceallocation_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: resourcecalendar_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY resourcecalendar
+    ADD CONSTRAINT resourcecalendar_pkey PRIMARY KEY (base_calendar_id);
+
+
+--
+-- Name: specific_resource_allocation_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY specific_resource_allocation
+    ADD CONSTRAINT specific_resource_allocation_pkey PRIMARY KEY (resource_allocation_id);
+
+
+--
+-- Name: task_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY task
+    ADD CONSTRAINT task_pkey PRIMARY KEY (task_element_id);
+
+
+--
+-- Name: taskelement_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY taskelement
+    ADD CONSTRAINT taskelement_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: taskgroup_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY taskgroup
+    ADD CONSTRAINT taskgroup_pkey PRIMARY KEY (task_element_id);
+
+
+--
+-- Name: taskmilestone_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY taskmilestone
+    ADD CONSTRAINT taskmilestone_pkey PRIMARY KEY (task_element_id);
+
+
+--
+-- Name: work_report_line_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY work_report_line
+    ADD CONSTRAINT work_report_line_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: work_report_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY work_report
+    ADD CONSTRAINT work_report_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: work_report_type_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY work_report_type
+    ADD CONSTRAINT work_report_type_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: worker_pkey; Type: CONSTRAINT; Schema: public; Owner: naval; Tablespace: 
+--
+
+ALTER TABLE ONLY worker
+    ADD CONSTRAINT worker_pkey PRIMARY KEY (worker_id);
+
+
+--
+-- Name: fk1a95a222131853a1; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY work_report
+    ADD CONSTRAINT fk1a95a222131853a1 FOREIGN KEY (work_report_type_id) REFERENCES work_report_type(id);
+
+
+--
+-- Name: fk27a9a54936bb8c; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY task
+    ADD CONSTRAINT fk27a9a54936bb8c FOREIGN KEY (task_element_id) REFERENCES taskelement(id);
+
+
+--
+-- Name: fk27a9a55ac3aeb2; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY task
+    ADD CONSTRAINT fk27a9a55ac3aeb2 FOREIGN KEY (hoursgroup) REFERENCES hoursgroup(id);
+
+
+--
+-- Name: fk3d1ffd21218d7620; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY indirectadvanceassignment
+    ADD CONSTRAINT fk3d1ffd21218d7620 FOREIGN KEY (indirect_order_element_id) REFERENCES orderelement(id);
+
+
+--
+-- Name: fk3d1ffd212f2d3aec; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY indirectadvanceassignment
+    ADD CONSTRAINT fk3d1ffd212f2d3aec FOREIGN KEY (advance_assignment_id) REFERENCES advanceassignment(id);
+
+
+--
+-- Name: fk3d1ffd218202350f; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY indirectadvanceassignment
+    ADD CONSTRAINT fk3d1ffd218202350f FOREIGN KEY (indirect_order_element_id) REFERENCES orderlinegroup(orderelementid);
+
+
+--
+-- Name: fk3f30d9ad8c4c676c; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY criterionsatisfaction
+    ADD CONSTRAINT fk3f30d9ad8c4c676c FOREIGN KEY (criterion) REFERENCES criterion(id);
+
+
+--
+-- Name: fk3f30d9adeae850b2; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY criterionsatisfaction
+    ADD CONSTRAINT fk3f30d9adeae850b2 FOREIGN KEY (resource) REFERENCES resource(id);
+
+
+--
+-- Name: fk41e073ae15671e92; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY resourceallocation
+    ADD CONSTRAINT fk41e073ae15671e92 FOREIGN KEY (assignment_function) REFERENCES assignment_function(id);
+
+
+--
+-- Name: fk41e073aeff61540d; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY resourceallocation
+    ADD CONSTRAINT fk41e073aeff61540d FOREIGN KEY (task) REFERENCES task(task_element_id);
+
+
+--
+-- Name: fk44d86d4707cd777; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY label
+    ADD CONSTRAINT fk44d86d4707cd777 FOREIGN KEY (label_type_id) REFERENCES label_type(id);
+
+
+--
+-- Name: fk4822b25e131853a1; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY criterion_type_work_report_type
+    ADD CONSTRAINT fk4822b25e131853a1 FOREIGN KEY (work_report_type_id) REFERENCES work_report_type(id);
+
+
+--
+-- Name: fk4822b25eff876347; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY criterion_type_work_report_type
+    ADD CONSTRAINT fk4822b25eff876347 FOREIGN KEY (criterion_type_id) REFERENCES criteriontype(id);
+
+
+--
+-- Name: fk5863798ca44abee3; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY resourcecalendar
+    ADD CONSTRAINT fk5863798ca44abee3 FOREIGN KEY (base_calendar_id) REFERENCES basecalendar(id);
+
+
+--
+-- Name: fk6017744297b1c209; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY orderline
+    ADD CONSTRAINT fk6017744297b1c209 FOREIGN KEY (orderelementid) REFERENCES orderelement(id);
+
+
+--
+-- Name: fk62b2994b4936bb8c; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY taskmilestone
+    ADD CONSTRAINT fk62b2994b4936bb8c FOREIGN KEY (task_element_id) REFERENCES taskelement(id);
+
+
+--
+-- Name: fk70d5d997a44abee3; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY taskelement
+    ADD CONSTRAINT fk70d5d997a44abee3 FOREIGN KEY (base_calendar_id) REFERENCES basecalendar(id);
+
+
+--
+-- Name: fk70d5d997a5f3c581; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY taskelement
+    ADD CONSTRAINT fk70d5d997a5f3c581 FOREIGN KEY (parent) REFERENCES taskgroup(task_element_id);
+
+
+--
+-- Name: fk70d5d997efda874f; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY taskelement
+    ADD CONSTRAINT fk70d5d997efda874f FOREIGN KEY (order_element_id) REFERENCES orderelement(id);
+
+
+--
+-- Name: fk7540af6b1545e7a; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY dependency
+    ADD CONSTRAINT fk7540af6b1545e7a FOREIGN KEY (origin) REFERENCES taskelement(id);
+
+
+--
+-- Name: fk7540af6be838f362; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY dependency
+    ADD CONSTRAINT fk7540af6be838f362 FOREIGN KEY (destination) REFERENCES taskelement(id);
+
+
+--
+-- Name: fk75a2f39df82680f8; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY order_table
+    ADD CONSTRAINT fk75a2f39df82680f8 FOREIGN KEY (orderelementid) REFERENCES orderlinegroup(orderelementid);
+
+
+--
+-- Name: fk7980035061f02c44; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY all_criterions
+    ADD CONSTRAINT fk7980035061f02c44 FOREIGN KEY (criterion_id) REFERENCES criterion(id);
+
+
+--
+-- Name: fk79800350b1524a73; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY all_criterions
+    ADD CONSTRAINT fk79800350b1524a73 FOREIGN KEY (generic_resource_allocation_id) REFERENCES generic_resource_allocation(resource_allocation_id);
+
+
+--
+-- Name: fk7d2eeb5d97b1c209; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY orderlinegroup
+    ADD CONSTRAINT fk7d2eeb5d97b1c209 FOREIGN KEY (orderelementid) REFERENCES orderelement(id);
+
+
+--
+-- Name: fk808010cfb216ed4c; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY advanceassignment
+    ADD CONSTRAINT fk808010cfb216ed4c FOREIGN KEY (advance_type_id) REFERENCES advancetype(id);
+
+
+--
+-- Name: fk80e79bda4936bb8c; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY taskgroup
+    ADD CONSTRAINT fk80e79bda4936bb8c FOREIGN KEY (task_element_id) REFERENCES taskelement(id);
+
+
+--
+-- Name: fk8e542e8114a5c61; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY criterion
+    ADD CONSTRAINT fk8e542e8114a5c61 FOREIGN KEY (id_criterion_type) REFERENCES criteriontype(id);
+
+
+--
+-- Name: fk8e542e813a156175; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY criterion
+    ADD CONSTRAINT fk8e542e813a156175 FOREIGN KEY (parent) REFERENCES criterion(id);
+
+
+--
+-- Name: fk9654b9ef5078e161; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY criterion_work_report_line
+    ADD CONSTRAINT fk9654b9ef5078e161 FOREIGN KEY (work_report_line_id) REFERENCES work_report_line(id);
+
+
+--
+-- Name: fk9654b9ef61f02c44; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY criterion_work_report_line
+    ADD CONSTRAINT fk9654b9ef61f02c44 FOREIGN KEY (criterion_id) REFERENCES criterion(id);
+
+
+--
+-- Name: fk9ac73f9e40901220; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY worker
+    ADD CONSTRAINT fk9ac73f9e40901220 FOREIGN KEY (worker_id) REFERENCES resource(id);
+
+
+--
+-- Name: fka3cfee1117b6c7cd; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY criterionhoursgroup
+    ADD CONSTRAINT fka3cfee1117b6c7cd FOREIGN KEY (hoursgroupid) REFERENCES hoursgroup(id);
+
+
+--
+-- Name: fka3cfee115c035047; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY criterionhoursgroup
+    ADD CONSTRAINT fka3cfee115c035047 FOREIGN KEY (criterionid) REFERENCES criterion(id);
+
+
+--
+-- Name: fkbb2f91fa2f2d3aec; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY advancemeasurement
+    ADD CONSTRAINT fkbb2f91fa2f2d3aec FOREIGN KEY (advance_assignment_id) REFERENCES advanceassignment(id);
+
+
+--
+-- Name: fkbb2f91faa9e53843; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY advancemeasurement
+    ADD CONSTRAINT fkbb2f91faa9e53843 FOREIGN KEY (advance_assignment_id) REFERENCES directadvanceassignment(advance_assignment_id);
+
+
+--
+-- Name: fkbb493f5048d21790; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY day_assignment
+    ADD CONSTRAINT fkbb493f5048d21790 FOREIGN KEY (resource_id) REFERENCES resource(id);
+
+
+--
+-- Name: fkbb493f506394139; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY day_assignment
+    ADD CONSTRAINT fkbb493f506394139 FOREIGN KEY (specific_resource_allocation_id) REFERENCES specific_resource_allocation(resource_allocation_id);
+
+
+--
+-- Name: fkbb493f50b1524a73; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY day_assignment
+    ADD CONSTRAINT fkbb493f50b1524a73 FOREIGN KEY (generic_resource_allocation_id) REFERENCES generic_resource_allocation(resource_allocation_id);
+
+
+--
+-- Name: fkc001d52efd5e49bc; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY hoursperday
+    ADD CONSTRAINT fkc001d52efd5e49bc FOREIGN KEY (base_calendar_id) REFERENCES calendardata(id);
+
+
+--
+-- Name: fkcf1f2cd01ed629ea; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY hoursgroup
+    ADD CONSTRAINT fkcf1f2cd01ed629ea FOREIGN KEY (parent_order_line) REFERENCES orderline(orderelementid);
+
+
+--
+-- Name: fkdbbb4fee1e635c19; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY orderelement
+    ADD CONSTRAINT fkdbbb4fee1e635c19 FOREIGN KEY (parent) REFERENCES orderlinegroup(orderelementid);
+
+
+--
+-- Name: fke203860c1c2746e; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY order_element_label
+    ADD CONSTRAINT fke203860c1c2746e FOREIGN KEY (label_id) REFERENCES label(id);
+
+
+--
+-- Name: fke203860efda874f; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY order_element_label
+    ADD CONSTRAINT fke203860efda874f FOREIGN KEY (order_element_id) REFERENCES orderelement(id);
+
+
+--
+-- Name: fkeb02c3f148d21790; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY work_report_line
+    ADD CONSTRAINT fkeb02c3f148d21790 FOREIGN KEY (resource_id) REFERENCES resource(id);
+
+
+--
+-- Name: fkeb02c3f1efda874f; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY work_report_line
+    ADD CONSTRAINT fkeb02c3f1efda874f FOREIGN KEY (order_element_id) REFERENCES orderelement(id);
+
+
+--
+-- Name: fkeb02c3f1f1a3177c; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY work_report_line
+    ADD CONSTRAINT fkeb02c3f1f1a3177c FOREIGN KEY (work_report_id) REFERENCES work_report(id);
+
+
+--
+-- Name: fkef86282ee893ce10; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY resource
+    ADD CONSTRAINT fkef86282ee893ce10 FOREIGN KEY (calendar) REFERENCES resourcecalendar(base_calendar_id);
+
+
+--
+-- Name: fkf0e8572475ed79ba; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY specific_resource_allocation
+    ADD CONSTRAINT fkf0e8572475ed79ba FOREIGN KEY (resource_allocation_id) REFERENCES resourceallocation(id);
+
+
+--
+-- Name: fkf0e85724eae850b2; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY specific_resource_allocation
+    ADD CONSTRAINT fkf0e85724eae850b2 FOREIGN KEY (resource) REFERENCES resource(id);
+
+
+--
+-- Name: fkf4bee4287fa34e3f; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY calendardata
+    ADD CONSTRAINT fkf4bee4287fa34e3f FOREIGN KEY (parent) REFERENCES basecalendar(id);
+
+
+--
+-- Name: fkf4bee428a44abee3; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY calendardata
+    ADD CONSTRAINT fkf4bee428a44abee3 FOREIGN KEY (base_calendar_id) REFERENCES basecalendar(id);
+
+
+--
+-- Name: fkf788b34975ed79ba; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY generic_resource_allocation
+    ADD CONSTRAINT fkf788b34975ed79ba FOREIGN KEY (resource_allocation_id) REFERENCES resourceallocation(id);
+
+
+--
+-- Name: fkf9ce78eda44abee3; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY exceptionday
+    ADD CONSTRAINT fkf9ce78eda44abee3 FOREIGN KEY (base_calendar_id) REFERENCES basecalendar(id);
+
+
+--
+-- Name: fkfc7b7be62f2d3aec; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY directadvanceassignment
+    ADD CONSTRAINT fkfc7b7be62f2d3aec FOREIGN KEY (advance_assignment_id) REFERENCES advanceassignment(id);
+
+
+--
+-- Name: fkfc7b7be6a1127ce5; Type: FK CONSTRAINT; Schema: public; Owner: naval
+--
+
+ALTER TABLE ONLY directadvanceassignment
+    ADD CONSTRAINT fkfc7b7be6a1127ce5 FOREIGN KEY (direct_order_element_id) REFERENCES orderelement(id);
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- PostgreSQL database dump complete
+--
+

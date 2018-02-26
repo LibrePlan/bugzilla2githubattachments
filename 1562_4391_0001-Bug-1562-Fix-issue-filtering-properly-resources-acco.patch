@@ -1,0 +1,188 @@
+From f2e802399d0d513cc6976ad1a6ebd9d745d261a2 Mon Sep 17 00:00:00 2001
+From: Manuel Rego Casasnovas <rego@igalia.com>
+Date: Fri, 23 Nov 2012 17:44:10 +0100
+Subject: [PATCH] Bug #1562: Fix issue filtering properly resources according
+ to their activation periods
+
+Now the dates filtering the resource load window are checked against the
+resources activation periods. Using the following algorithm:
+
+1) If the resource has not activation periods then it should always appear
+
+2) The filter can have null for start and end dates and the activation periods
+   can have null for start date. So we should define what to do in each case:
+
+  Let's define some acronyms:
+  * Filter Start Date: FSD
+  * Filter End Date: FED
+  * Activation Period Start Date: APSD (cannot be null)
+  * Activation Period End Date: APED
+
+  2.1) FSD is null and FED are null: The resource should appear regardless its
+       activation periods
+
+  2.2) FSD is null:
+    2.2.1) APED is null: Check if APSD is lower or equals than FED
+    2.2.2) APED is not null: Check if APSD is lower or equals than FED or APED
+           is lower or equals than FED
+
+  2.3) FED is null:
+    2.3.1) APED is null: The resource should appear
+    2.3.2) APED is not null: Check if APSD is later or equals than FSD or APED
+           is later or equals than FSD
+
+  2.4) FSD is not null and FED is not null:
+    2.4.1) APED is null: Check if APSD is between FSD and FED
+    2.4.2) APED is not null: Check if activation period overlaps filter period
+           at any point
+
+FEA: ItEr77S04BugFixing
+---
+ .../business/calendars/entities/BaseCalendar.java  |   12 +++++++
+ .../calendars/entities/CalendarAvailability.java   |   37 ++++++++++++++++++++
+ .../calendars/entities/ResourceCalendar.java       |    1 +
+ .../business/resources/entities/Resource.java      |    4 +++
+ .../web/resourceload/ResourceLoadModel.java        |   21 ++++++++++-
+ 5 files changed, 74 insertions(+), 1 deletion(-)
+
+diff --git a/libreplan-business/src/main/java/org/libreplan/business/calendars/entities/BaseCalendar.java b/libreplan-business/src/main/java/org/libreplan/business/calendars/entities/BaseCalendar.java
+index 85d2183..444c531 100644
+--- a/libreplan-business/src/main/java/org/libreplan/business/calendars/entities/BaseCalendar.java
++++ b/libreplan-business/src/main/java/org/libreplan/business/calendars/entities/BaseCalendar.java
+@@ -878,6 +878,18 @@ public class BaseCalendar extends IntegrationEntity implements ICalendar,
+         return false;
+     }
+ 
++    public boolean isActiveBetween(LocalDate startDate, LocalDate endDate) {
++        if (getCalendarAvailabilities().isEmpty()) {
++            return true;
++        }
++        for (CalendarAvailability calendarAvailability : getCalendarAvailabilities()) {
++            if (calendarAvailability.isActiveBetween(startDate, endDate)) {
++                return true;
++            }
++        }
++        return false;
++    }
++
+     public boolean canWorkOn(LocalDate date) {
+         Capacity capacity = findCapacityAt(date);
+         return capacity.allowsWorking();
+diff --git a/libreplan-business/src/main/java/org/libreplan/business/calendars/entities/CalendarAvailability.java b/libreplan-business/src/main/java/org/libreplan/business/calendars/entities/CalendarAvailability.java
+index dac6962..144cde8 100644
+--- a/libreplan-business/src/main/java/org/libreplan/business/calendars/entities/CalendarAvailability.java
++++ b/libreplan-business/src/main/java/org/libreplan/business/calendars/entities/CalendarAvailability.java
+@@ -25,6 +25,7 @@ import java.util.Comparator;
+ import java.util.Date;
+ 
+ import org.hibernate.validator.NotNull;
++import org.joda.time.Interval;
+ import org.joda.time.LocalDate;
+ import org.libreplan.business.calendars.daos.ICalendarAvailabilityDAO;
+ import org.libreplan.business.common.IntegrationEntity;
+@@ -126,4 +127,40 @@ public class CalendarAvailability extends IntegrationEntity {
+         return Registry.getCalendarAvailabilityDAO();
+     }
+ 
++    public boolean isActiveBetween(LocalDate filterStartDate,
++            LocalDate filterEndDate) {
++        if (filterStartDate == null && filterEndDate == null) {
++            return true;
++        }
++
++        if (filterStartDate == null) {
++            if (endDate == null) {
++                return startDate.compareTo(filterEndDate) <= 0;
++            }
++            return startDate.compareTo(filterEndDate) <= 0
++                    || endDate.compareTo(filterEndDate) <= 0;
++        }
++
++        if (filterEndDate == null) {
++            if (endDate == null) {
++                return true;
++            }
++            return startDate.compareTo(filterStartDate) >= 0
++                    || endDate.compareTo(filterStartDate) >= 0;
++        }
++
++        if (endDate == null) {
++            return startDate.compareTo(filterStartDate) >= 0
++                    && startDate.compareTo(filterEndDate) <= 0;
++        }
++
++        Interval filterPeriod = new Interval(
++                filterStartDate.toDateTimeAtStartOfDay(), filterEndDate
++                        .plusDays(1).toDateTimeAtStartOfDay());
++        Interval activationPeriod = new Interval(
++                startDate.toDateTimeAtStartOfDay(), endDate.plusDays(1)
++                        .toDateTimeAtStartOfDay());
++        return filterPeriod.overlaps(activationPeriod);
++    }
++
+ }
+diff --git a/libreplan-business/src/main/java/org/libreplan/business/calendars/entities/ResourceCalendar.java b/libreplan-business/src/main/java/org/libreplan/business/calendars/entities/ResourceCalendar.java
+index 4803be6..57b3ad2 100644
+--- a/libreplan-business/src/main/java/org/libreplan/business/calendars/entities/ResourceCalendar.java
++++ b/libreplan-business/src/main/java/org/libreplan/business/calendars/entities/ResourceCalendar.java
+@@ -88,4 +88,5 @@ public class ResourceCalendar extends BaseCalendar {
+     public Boolean isCodeAutogenerated() {
+         return true;
+     }
++
+ }
+diff --git a/libreplan-business/src/main/java/org/libreplan/business/resources/entities/Resource.java b/libreplan-business/src/main/java/org/libreplan/business/resources/entities/Resource.java
+index df0202f..f003817 100644
+--- a/libreplan-business/src/main/java/org/libreplan/business/resources/entities/Resource.java
++++ b/libreplan-business/src/main/java/org/libreplan/business/resources/entities/Resource.java
+@@ -1199,4 +1199,8 @@ public abstract class Resource extends IntegrationEntity implements
+         return true;
+     }
+ 
++    public boolean isActiveBetween(LocalDate startDate, LocalDate endDate) {
++        return calendar.isActiveBetween(startDate, endDate);
++    }
++
+ }
+diff --git a/libreplan-webapp/src/main/java/org/libreplan/web/resourceload/ResourceLoadModel.java b/libreplan-webapp/src/main/java/org/libreplan/web/resourceload/ResourceLoadModel.java
+index f33fdb2..0836720 100644
+--- a/libreplan-webapp/src/main/java/org/libreplan/web/resourceload/ResourceLoadModel.java
++++ b/libreplan-webapp/src/main/java/org/libreplan/web/resourceload/ResourceLoadModel.java
+@@ -309,7 +309,9 @@ public class ResourceLoadModel implements IResourceLoadModel {
+                             if (parameters.thereIsCurrentOrder()) {
+                                 return resourcesForActiveTasks();
+                             } else {
+-                                return allResources();
++                                return allResourcesActiveBetween(
++                                        parameters.getInitDateFilter(),
++                                        parameters.getEndDateFilter());
+                             }
+                         }
+ 
+@@ -319,6 +321,23 @@ public class ResourceLoadModel implements IResourceLoadModel {
+                                     .getResourcesRelatedWithAllocations());
+                         }
+ 
++                        private List<Resource> allResourcesActiveBetween(
++                                LocalDate startDate, LocalDate endDate) {
++                            List<Resource> allResources = allResources();
++                            if (startDate == null && endDate == null) {
++                                return allResources;
++                            }
++
++                            List<Resource> resources = new ArrayList<Resource>();
++                            for (Resource resource : allResources) {
++                                if (resource
++                                        .isActiveBetween(startDate, endDate)) {
++                                    resources.add(resource);
++                                }
++                            }
++                            return resources;
++                        }
++
+                         private List<Resource> allResources() {
+                             return Resource.sortByName(resourcesDAO
+                                     .list(Resource.class));
+-- 
+1.7.10.4
+

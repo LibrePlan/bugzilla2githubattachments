@@ -1,0 +1,50 @@
+From e3ea874004c24ca0e4dbebdfc5cfe4702ebe077d Mon Sep 17 00:00:00 2001
+From: Manuel Rego Casasnovas <rego@igalia.com>
+Date: Mon, 2 Jan 2012 18:22:02 +0100
+Subject: [PATCH] [Bug #1295] Remove TaskElements (except milestones) with
+ TaskSource null when saving
+
+Possible hack to prevent issue
+
+FEA: ItEr75S04BugFixing
+---
+ .../web/planner/order/SaveCommandBuilder.java      |   23 ++++++++++++++++++++
+ 1 files changed, 23 insertions(+), 0 deletions(-)
+
+diff --git a/libreplan-webapp/src/main/java/org/libreplan/web/planner/order/SaveCommandBuilder.java b/libreplan-webapp/src/main/java/org/libreplan/web/planner/order/SaveCommandBuilder.java
+index 9f3e208..3dc3fb6 100644
+--- a/libreplan-webapp/src/main/java/org/libreplan/web/planner/order/SaveCommandBuilder.java
++++ b/libreplan-webapp/src/main/java/org/libreplan/web/planner/order/SaveCommandBuilder.java
+@@ -358,6 +358,29 @@ public class SaveCommandBuilder {
+             subcontractedTaskDataDAO.removeOrphanedSubcontractedTaskData();
+ 
+             saveOrderAuthorizations();
++
++            removeTaskElementsWithTaskSourceNull();
++        }
++
++        private void removeTaskElementsWithTaskSourceNull() {
++            if (state.getRootTask() != null) {
++                removeTaskElementsWithTaskSourceNull(state.getRootTask());
++            }
++        }
++
++        private void removeTaskElementsWithTaskSourceNull(
++                TaskElement taskElement) {
++            for (TaskElement each : taskElement.getChildren()) {
++                removeTaskElementsWithTaskSourceNull(each);
++            }
++            if (!taskElement.isMilestone()
++                    && taskElement.getTaskSource() == null) {
++                try {
++                    taskElementDAO.remove(taskElement.getId());
++                } catch (InstanceNotFoundException e) {
++                    throw new RuntimeException(e);
++                }
++            }
+         }
+ 
+         private void saveOrderAuthorizations() {
+-- 
+1.7.7.3
+

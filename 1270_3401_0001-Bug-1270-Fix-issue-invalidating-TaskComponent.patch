@@ -1,0 +1,78 @@
+From 22d19a8c835478a376509a2095e488af16df7ffb Mon Sep 17 00:00:00 2001
+From: Manuel Rego Casasnovas <rego@igalia.com>
+Date: Fri, 18 Nov 2011 09:09:19 +0100
+Subject: [PATCH] [Bug #1270] Fix issue invalidating TaskComponent
+
+This is a quick fix for this issue but we should review it properly as
+smartUpdate should be the best way to do this change instead of using
+invalidate.
+
+Moreover the methods updateTooltipText are not really updating the
+tooltip so can cause some misunderstanding.
+
+FEA: ItEr75S04BugFixing
+---
+ .../src/main/java/org/zkoss/ganttz/Planner.java    |    2 ++
+ .../main/java/org/zkoss/ganttz/TaskComponent.java  |   16 +++++++++++++---
+ 2 files changed, 15 insertions(+), 3 deletions(-)
+
+diff --git a/ganttzk/src/main/java/org/zkoss/ganttz/Planner.java b/ganttzk/src/main/java/org/zkoss/ganttz/Planner.java
+index 75ca24c..a63a4c1 100644
+--- a/ganttzk/src/main/java/org/zkoss/ganttz/Planner.java
++++ b/ganttzk/src/main/java/org/zkoss/ganttz/Planner.java
+@@ -876,6 +876,8 @@ public class Planner extends HtmlMacroComponent  {
+         TaskList taskList = getTaskList();
+         if (taskList != null) {
+             taskList.updateCompletion(progressType);
++            // FIXME Bug #1270
++            taskList.invalidate();
+         }
+     }
+ 
+diff --git a/ganttzk/src/main/java/org/zkoss/ganttz/TaskComponent.java b/ganttzk/src/main/java/org/zkoss/ganttz/TaskComponent.java
+index 60ebf32..ce6fcc9 100644
+--- a/ganttzk/src/main/java/org/zkoss/ganttz/TaskComponent.java
++++ b/ganttzk/src/main/java/org/zkoss/ganttz/TaskComponent.java
+@@ -306,6 +306,9 @@ public class TaskComponent extends Div implements AfterCompose {
+     private transient PropertyChangeListener propertiesListener;
+     private IConstraintViolationListener<GanttDate> taskViolationListener;
+ 
++    // FIXME Bug #1270
++    private String progressType;
++
+     public TaskRow getRow() {
+         if (getParent() == null) {
+             throw new IllegalStateException(
+@@ -529,11 +532,13 @@ public class TaskComponent extends Div implements AfterCompose {
+     }
+ 
+     public void updateTooltipText() {
+-        smartUpdate("taskTooltipText", task.updateTooltipText());
++        // FIXME Bug #1270
++        this.progressType = null;
+     }
+ 
+     public void updateTooltipText(String progressType) {
+-        smartUpdate("taskTooltipText", task.updateTooltipText(progressType));
++        // FIXME Bug #1270
++        this.progressType = progressType;
+     }
+ 
+     private DependencyList getDependencyList() {
+@@ -567,7 +572,12 @@ public class TaskComponent extends Div implements AfterCompose {
+     }
+ 
+     public String getTooltipText() {
+-        return task.getTooltipText();
++        // FIXME Bug #1270
++        if (progressType == null) {
++            return task.getTooltipText();
++        } else {
++            return task.updateTooltipText(progressType);
++        }
+     }
+ 
+     public String getLabelsText() {
+-- 
+1.7.6.4
+

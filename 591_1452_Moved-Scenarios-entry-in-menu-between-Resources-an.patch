@@ -1,0 +1,37 @@
+From 32c159c843d6eb17dad9c8e45f586f6159331310 Mon Sep 17 00:00:00 2001
+From: Manuel Rego Casasnovas <mrego@igalia.com>
+Date: Wed, 18 Aug 2010 16:40:38 +0200
+Subject: [PATCH] [Bug #591] Moved "Scenarios" entry in menu between "Resources" and "Administration/Management".
+
+---
+ .../web/common/CustomMenuController.java           |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/navalplanner-webapp/src/main/java/org/navalplanner/web/common/CustomMenuController.java b/navalplanner-webapp/src/main/java/org/navalplanner/web/common/CustomMenuController.java
+index 1a545a0..88f69f0 100644
+--- a/navalplanner-webapp/src/main/java/org/navalplanner/web/common/CustomMenuController.java
++++ b/navalplanner-webapp/src/main/java/org/navalplanner/web/common/CustomMenuController.java
+@@ -220,10 +220,6 @@ public class CustomMenuController extends Div implements IMenuItemsRegister {
+     }
+ 
+     public void initializeMenu() {
+-        topItem(_("Scenarios"), "/scenarios/scenarios.zul", "",
+-            subItem(_("Scenarios Management"), "/scenarios/scenarios.zul",""),
+-            subItem(_("Transfer Projects Between Scenarios"), "/scenarios/transferOrders.zul", ""));
+-
+         topItem(_("Scheduling"), "/planner/index.zul", "",
+             subItem(_("Projects Planning"), "/planner/index.zul;company_scheduling","01-introducion.html"),
+             subItem(_("Resource Usage"),"/planner/index.zul;company_load","01-introducion.html#id1"),
+@@ -241,6 +237,10 @@ public class CustomMenuController extends Div implements IMenuItemsRegister {
+                 subItem(_("Subcontracted Tasks"), "/subcontract/subcontractedTasks.zul", ""),
+                 subItem(_("Advance Report"), "/subcontract/reportAdvances.zul", "")));
+ 
++        topItem(_("Scenarios"), "/scenarios/scenarios.zul", "",
++                subItem(_("Scenarios Management"), "/scenarios/scenarios.zul",""),
++                subItem(_("Transfer Projects Between Scenarios"), "/scenarios/transferOrders.zul", ""));
++
+         if (SecurityUtils.isUserInRole(UserRole.ROLE_ADMINISTRATION)) {
+             topItem(_("Administration / Management"), "/advance/advanceTypes.zul", "",
+                 subItem(_("NavalPlan Configuration"), "/common/configuration.zul","03-calendarios.html#calendario-por-defecto"),
+-- 
+1.7.0.4

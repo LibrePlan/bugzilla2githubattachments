@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- base_content.html -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+        <title>New user signup - Libreplan</title>
+        <meta name="description" content="Ask and answer questions.
+
+">
+        <meta name="keywords" content="Libreplan,CNPROG,forum,community">
+        
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        <link rel="shortcut icon" href="https://ask.libreplan.org/m/default/media/images/favicon.ico">
+        <link href="New%20user%20signup%20-%20Libreplan_files/style.css" rel="stylesheet" type="text/css">
+        
+        <link rel="stylesheet" type="text/css" href="New%20user%20signup%20-%20Libreplan_files/jquery-ui.css">
+        
+        <script src="New%20user%20signup%20-%20Libreplan_files/jsapi" type="text/javascript"></script>
+        <script type="text/javascript">
+            google.load("jquery", "1.4.2");
+            google.load("jqueryui", "1", {autoload:true});
+        </script><script src="New%20user%20signup%20-%20Libreplan_files/jquery.js" type="text/javascript"></script><script src="New%20user%20signup%20-%20Libreplan_files/jquery-ui.js" type="text/javascript"></script>
+        <script type="text/javascript">
+        /* <![CDATA[ */
+            var i18nLang = 'en';
+            var scriptUrl = '/'
+            var osqaSkin = 'default';
+
+            var messages = {
+                username: '',
+                confirm: "Are you sure?",
+                yes: "Yes",
+                no: "No",
+                message: "Message:",
+                cancel: "Cancel",
+                close: "Close",
+                ok: "Ok",
+                matching_tags_url: "/matching_tags/",
+                word: "word",
+                words: "words",
+                character: "character",
+                characters: "characters"
+            }
+        /* ]] */
+        </script>
+        <script type="text/javascript" src="New%20user%20signup%20-%20Libreplan_files/osqa.js"></script>
+        
+        
+        
+        <link rel="search" type="application/opensearchdescription+xml" href="https://ask.libreplan.org/opensearch.xml" title="Libreplan Search">
+        
+    </head>
+    <body>
+        <div class="notify" style="display:none">
+            
+                
+            
+            <a id="close-notify" onclick="notify.close(true)">×</a>
+        </div>
+        
+        <!-- template header.html -->
+
+
+	<div id="roof">
+	  
+		<div id="logo">
+			<a href="https://ask.libreplan.org/">
+				<img src="New%20user%20signup%20-%20Libreplan_files/logo_login.png" title="back to home page" alt="Libreplan: Q&amp;A Forum logo">
+			</a>
+		</div>
+	  
+		<div id="top">
+		     <a href="https://ask.libreplan.org/account/signin/">login</a>  <a href="https://ask.libreplan.org/about/">about</a>  <a href="https://ask.libreplan.org/faq/">faq</a> 
+		</div>
+
+    <div id="nav">
+        <a id="nav_questions" href="https://ask.libreplan.org/questions/">questions</a><a id="nav_tags" href="https://ask.libreplan.org/tags/">tags</a><a id="nav_users" href="https://ask.libreplan.org/users/">users</a><a id="nav_badges" href="https://ask.libreplan.org/badges/">badges</a><a id="nav_unanswered" href="https://ask.libreplan.org/questions/unanswered/">unanswered</a>
+        <a id="nav_ask" href="https://ask.libreplan.org/questions/ask/" class="special">ask a question</a>
+    </div>
+  </div>
+
+  <div class="clear"></div>
+  
+	<div id="searchBar">
+    <form action="/search/" method="get">
+        <div>
+            <input class="searchInput" name="q" id="keywords" type="text">
+            <input name="Submit" value="search" class="searchBtn" type="submit">
+        </div>
+        <div class="options">
+            <input id="type-question" value="question" name="t" checked="checked" type="radio"><label for="type-question">questions</label>
+            <input id="type-tag" value="tag" name="t" type="radio"><label for="type-tag">tags</label>
+            <input id="type-user" value="user" name="t" type="radio"><label for="type-user">users</label>
+        </div>
+    </form>	
+	</div>
+
+	
+
+<!-- end template header.html -->
+
+        
+        <div id="wrapper">
+            <div id="room">
+                <div id="CAFull">
+                    
+    <div id="main-bar" class="headNormal">
+		New user signup
+    </div>      
+	<div id="completetxt">
+        <div class="message">
+            
+            
+            <p>
+                Please choose your screen name and confirm your email 
+address. A valid email address is necessary to receive notifications 
+about activity in the areas of this community you're most interested in,
+ and will help you become an involved participant in this community.
+            </p>
+        </div>
+    	<p style="display:none">This account already exists, please use another.</p>
+	</div>
+
+	
+
+	<div class="login">
+        <form name="fregister" action="" method="POST">
+            <input name="next" value="/" id="id_next" type="hidden">
+            <div class="form-row-vertical margin-bottom">
+                <label for="id_username">Choose screen name</label>
+                
+                <input value="dabeegmon" id="id_username" class="required login" name="username" maxlength="30" type="text">
+            </div>
+            <div class="form-row-vertical margin-bottom">
+                <label for="id_email">Your email <i>(never shared)</i></label>
+                
+                <input value="o1bigtenor@gmail.com" id="id_email" class="required login" name="email" maxlength="200" type="text">
+            </div>
+            
+                <div class="form-row-vertical margin-bottom">
+                    <label for="password1_id">Password</label>
+                    
+                    <input id="id_password1" class="required login" name="password1" type="password">
+                </div>
+                <div class="form-row-vertical margin-bottom">
+                    <label for="password2_id">Password <i>(please retype)</i></label>
+                    
+                    <input id="id_password2" class="required login" name="password2" type="password">
+                </div>
+            
+            
+                <div class="form-row-vertical margin-bottom">
+                <label for="recaptcha_id">Recaptcha</label>
+                
+                <script type="text/javascript" src="New%20user%20signup%20-%20Libreplan_files/challenge"></script>
+
+<noscript>
+  <iframe src="http://api.recaptcha.net/noscript?k=6LdjEPsSAAAAAKzBSdgso48KVsjB5Jokorv2bF6F" height="300" width="500" frameborder="0"></iframe><br />
+  <textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
+  <input type='hidden' name='recaptcha_response_field' value='manual_challenge' />
+</noscript>
+
+                </div>
+            
+            <div class="submit-row"><input class="submit" name="bnewaccount" id="bnewaccount" value="Signup" type="submit"></div>
+		</form>
+	</div>
+    
+
+
+                </div>
+                <div id="tail" style="clear:both;">
+                    
+                    
+                </div>
+            </div>
+            <div class="spacer3"></div>
+        </div>
+        
+        
+            <div id="ground">
+                
+
+
+<div>
+    <div class="footerLinks">
+         <a href="https://ask.libreplan.org/about/">about</a> <span class="link-separator"> |</span> <a href="https://ask.libreplan.org/faq/">faq</a> <span class="link-separator"> |</span> <a href="https://ask.libreplan.org/privacy/">privacy</a> <span class="link-separator"> |</span> <a href="https://ask.libreplan.org/account/local/register/www.libreplan.com" target="_blank">support</a> <span class="link-separator"> |</span> <a href="https://ask.libreplan.org/account/local/register/www.libreplan.com">contact</a> 
+    </div>
+  <p>
+     <a href="http://osqa.net/" target="_blank" title="OSQA Development Build (SVN-unknown)">
+        powered by OSQA
+     </a>
+  </p>
+</div>
+ <div id="licenseLogo">
+  <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">
+            <img src="New%20user%20signup%20-%20Libreplan_files/by-sa-88x31.png" "="" title="Creative Commons: Attribution - Share Alike" alt="cc-by-sa" height="31" width="88">
+  </a>
+ </div>
+
+
+            </div>
+        
+        
+        
+        
+    
+
+
+</body></html>
+<!-- end template base_content.html -->

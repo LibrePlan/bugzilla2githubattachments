@@ -1,0 +1,37 @@
+From bef1e24fc09eaa2d9488331c9540cbd662cbd885 Mon Sep 17 00:00:00 2001
+From: Manuel Rego Casasnovas <rego@igalia.com>
+Date: Tue, 17 Jan 2012 11:33:51 +0100
+Subject: [PATCH] Bug #1346: Fix the cause of the bug removing TaskElement
+ from parent if it is removed
+
+In org.libreplan.web.planner.order.SaveCommandBuilder.SaveCommand.removeTaskElementsWithTaskSourceNull()
+when a TaskElement is removed, if it has parent, it's removed from the parent too.
+
+FEA: ItEr76S04BugFixing
+---
+ .../web/planner/order/SaveCommandBuilder.java      |    9 +++++++++
+ 1 files changed, 9 insertions(+), 0 deletions(-)
+
+diff --git a/libreplan-webapp/src/main/java/org/libreplan/web/planner/order/SaveCommandBuilder.java b/libreplan-webapp/src/main/java/org/libreplan/web/planner/order/SaveCommandBuilder.java
+index c783ce5..314dfe9 100644
+--- a/libreplan-webapp/src/main/java/org/libreplan/web/planner/order/SaveCommandBuilder.java
++++ b/libreplan-webapp/src/main/java/org/libreplan/web/planner/order/SaveCommandBuilder.java
+@@ -375,6 +375,15 @@ public class SaveCommandBuilder {
+             for (TaskElement taskElement : toRemove) {
+                 try {
+                     taskElementDAO.remove(taskElement.getId());
++
++                    TaskGroup parent = taskElement.getParent();
++                    if (parent != null) {
++                        parent.remove(taskElement);
++                        taskElementDAO.save(parent);
++                    }
++
++                    LOG.info("TaskElement removed because of TaskSource was null. "
++                            + taskElement);
+                 } catch (InstanceNotFoundException e) {
+                     // Do nothing
+                     // Maybe it was already removed before reaching this point
+-- 
+1.7.8.3
+

@@ -1,0 +1,26 @@
+From f6f8bf8a38263565d27c5400c2b60ae9faced691 Mon Sep 17 00:00:00 2001
+From: Manuel Rego Casasnovas <mrego@igalia.com>
+Date: Fri, 20 Aug 2010 18:08:22 +0200
+Subject: [PATCH] [Bug #599] Possible fix checking null value for status of EditTaskController.
+
+FEA: ItEr60S04ValidacionEProbasFuncionaisItEr59S04
+---
+ .../LimitingResourcesController.java               |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
+
+diff --git a/navalplanner-webapp/src/main/java/org/navalplanner/web/limitingresources/LimitingResourcesController.java b/navalplanner-webapp/src/main/java/org/navalplanner/web/limitingresources/LimitingResourcesController.java
+index 0b1431c..30acd6f 100644
+--- a/navalplanner-webapp/src/main/java/org/navalplanner/web/limitingresources/LimitingResourcesController.java
++++ b/navalplanner-webapp/src/main/java/org/navalplanner/web/limitingresources/LimitingResourcesController.java
+@@ -334,7 +334,8 @@ public class LimitingResourcesController extends GenericForwardComposer {
+             Set<LimitingResourceQueueDependency> incomingDependencies = oldElement.getDependenciesAsDestiny();
+ 
+             // New resource allocation or resource allocation modified ?
+-            if (editTaskController.getStatus() == Messagebox.OK) {
++            if ((editTaskController.getStatus() == null)
++                    || (editTaskController.getStatus() == Messagebox.OK)) {
+                 // Update resource allocation for element
+                 LimitingResourceQueueElement newElement = task.getResourceAllocation().getLimitingResourceQueueElement();
+ 
+-- 
+1.7.0.4

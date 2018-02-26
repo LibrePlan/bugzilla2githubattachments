@@ -1,0 +1,80 @@
+From bd2fb92b75a8fd1e5a149c461484a6982841e2f2 Mon Sep 17 00:00:00 2001
+From: Manuel Rego Casasnovas <rego@igalia.com>
+Date: Fri, 15 Jul 2011 14:05:28 +0200
+Subject: [PATCH] WIP
+
+---
+ .../business/orders/entities/Orders.hbm.xml        |    3 +-
+ .../web/orders/labels/AssignedLabelsModel.java     |   25 +++++++++++++++++--
+ 2 files changed, 23 insertions(+), 5 deletions(-)
+
+diff --git a/navalplanner-business/src/main/resources/org/navalplanner/business/orders/entities/Orders.hbm.xml b/navalplanner-business/src/main/resources/org/navalplanner/business/orders/entities/Orders.hbm.xml
+index f5a73b8..ae04255 100644
+--- a/navalplanner-business/src/main/resources/org/navalplanner/business/orders/entities/Orders.hbm.xml
++++ b/navalplanner-business/src/main/resources/org/navalplanner/business/orders/entities/Orders.hbm.xml
+@@ -26,8 +26,7 @@
+             <one-to-many class="org.navalplanner.business.advance.entities.DirectAdvanceAssignment" />
+         </set>
+ 
+-        <!-- Assess many-to-many bidireccional -->
+-        <set name="labels" table="order_element_label" cascade="save-update">
++        <set name="labels" table="order_element_label" cascade="none">
+             <key column="order_element_id" not-null="true"/>
+             <many-to-many column="label_id" class="org.navalplanner.business.labels.entities.Label"/>
+         </set>
+diff --git a/navalplanner-webapp/src/main/java/org/navalplanner/web/orders/labels/AssignedLabelsModel.java b/navalplanner-webapp/src/main/java/org/navalplanner/web/orders/labels/AssignedLabelsModel.java
+index 2392de4..f8812e0 100644
+--- a/navalplanner-webapp/src/main/java/org/navalplanner/web/orders/labels/AssignedLabelsModel.java
++++ b/navalplanner-webapp/src/main/java/org/navalplanner/web/orders/labels/AssignedLabelsModel.java
+@@ -24,7 +24,10 @@ import java.util.ArrayList;
+ import java.util.Collection;
+ import java.util.List;
+ 
++import org.navalplanner.business.common.IAdHocTransactionService;
++import org.navalplanner.business.common.IOnTransaction;
+ import org.navalplanner.business.labels.daos.ILabelDAO;
++import org.navalplanner.business.labels.daos.ILabelTypeDAO;
+ import org.navalplanner.business.labels.entities.Label;
+ import org.navalplanner.business.labels.entities.LabelType;
+ import org.springframework.beans.factory.annotation.Autowired;
+@@ -39,8 +42,14 @@ public abstract class AssignedLabelsModel<T> implements IAssignedLabelsModel<T>
+     @Autowired
+     private ILabelDAO labelDAO;
+ 
++    @Autowired
++    private ILabelTypeDAO labelTypeDAO;
++
+     private T element;
+ 
++    @Autowired
++    private IAdHocTransactionService adHocTransactionService;
++
+     @Transactional(readOnly = true)
+     public void init(T element) {
+         this.element = element;
+@@ -121,9 +130,19 @@ public abstract class AssignedLabelsModel<T> implements IAssignedLabelsModel<T>
+         return result;
+     }
+ 
+-    public Label createLabel(String labelName, LabelType labelType) {
+-        Label label = Label.create(labelName);
+-        label.setType(labelType);
++    public Label createLabel(final String labelName,
++            final LabelType labelType) {
++        Label label = adHocTransactionService
++                .runOnAnotherTransaction(new IOnTransaction<Label>() {
++                    @Override
++                    public Label execute() {
++                        Label label = Label.create(labelName);
++                        label.setType(labelType);
++                        labelDAO.save(label);
++                        return label;
++                    }
++        });
++        label.dontPoseAsTransientObjectAnymore();
+         addLabelToConversation(label);
+         return label;
+     }
+-- 
+1.7.6
+
